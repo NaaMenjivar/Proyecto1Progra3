@@ -78,6 +78,6 @@ public class Paciente {
 
     @Override
     public String toString() {
-        return nombre + " (" + id + ")" + getEdadTexto();
+        return nombre + " (" + id + ") " + getEdadTexto();
     }
 }

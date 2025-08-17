@@ -107,6 +107,21 @@ public class Receta {
         return diferenciaDias >= -3 && diferenciaDias <= 3;
     }
 
+    public boolean puedeAvanzarAEstado(EstadoReceta nuevoEstado) {
+        switch (estado) {
+            case CONFECCIONADA:
+                return nuevoEstado == EstadoReceta.PROCESO;
+            case PROCESO:
+                return nuevoEstado == EstadoReceta.LISTA;
+            case LISTA:
+                return nuevoEstado == EstadoReceta.ENTREGADA;
+            case ENTREGADA:
+                return false; // No puede cambiar una vez entregada
+            default:
+                return false;
+        }
+    }
+
     public String getResumenMedicamentos(){
         if(detalles.vacia()){
             return "Sin medicamentos";
