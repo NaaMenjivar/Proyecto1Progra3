@@ -44,6 +44,12 @@ public class Medicamento {
         return codigo + " - " + nombre;
     }
 
+    public boolean esValido(){
+        return codigo != null && !codigo.trim().isEmpty() &&
+                nombre != null && !nombre.trim().isEmpty() &&
+                presentacion != null && !presentacion.trim().isEmpty();
+    }
+
     // Métodos propios de Object
     @Override
     public boolean equals(Object o) {
