@@ -1,4 +1,7 @@
 package presentacion.vista.principales;
 
-public class VentanaCambiarClave {
+import javax.swing.*;
+
+abstract class VentanaCambiarClave extends JDialog {
+
 }

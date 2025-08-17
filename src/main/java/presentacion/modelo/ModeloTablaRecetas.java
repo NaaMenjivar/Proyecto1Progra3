@@ -1,4 +1,7 @@
 package presentacion.modelo;
 
-public class ModeloTablaRecetas {
+import javax.swing.table.AbstractTableModel;
+
+abstract class ModeloTablaRecetas extends AbstractTableModel {
+
 }

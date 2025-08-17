@@ -2,6 +2,6 @@ package presentacion.vista.principales;
 
 import javax.swing.*;
 
-abstract class VentanaLogin extends JDialog {
+abstract class VentanaAcercaDe extends JDialog {
 
 }

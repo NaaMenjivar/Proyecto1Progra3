@@ -156,6 +156,21 @@ public class TestearClasesModelo {
         System.out.println("  Med1 equals med2: " + med1.equals(med2));
 
         System.out.println("✓ Medicamentos funcionando correctamente");
+
+        System.out.printf("\tLISTA DE MEDICAMENTOS:\n");
+        ListaMedicamentos listaMedicamentos = new ListaMedicamentos();
+        listaMedicamentos.agregarInicio(med1);
+        listaMedicamentos.agregarInicio(med3);
+        listaMedicamentos.agregarFinal(med2);
+
+        System.out.printf(listaMedicamentos.toString() + "\n");
+        Medicamento medi4 = listaMedicamentos.obtener(0);
+        System.out.println(medi4.toString());
+
+        listaMedicamentos.modificar(0,med1Copia);
+        System.out.printf(listaMedicamentos.toString() + "\n");
+
+
     }
 
     // ================================

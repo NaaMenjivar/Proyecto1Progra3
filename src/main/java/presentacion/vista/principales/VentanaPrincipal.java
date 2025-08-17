@@ -1,4 +1,7 @@
 package presentacion.vista.principales;
 
-public class VentanaPrincipal {
+import javax.swing.*;
+
+abstract class VentanaPrincipal extends JFrame {
+
 }
