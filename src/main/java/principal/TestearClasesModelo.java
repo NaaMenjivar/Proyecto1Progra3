@@ -23,6 +23,7 @@ public class TestearClasesModelo {
         testDetalleReceta();
         testListaEnlazada();
         testRecetaCompleta();
+        testBuscarMedicamentoEnReceta();
         testCasosEspeciales();
 
         System.out.println("\n" + "=".repeat(60));
@@ -338,6 +339,116 @@ public class TestearClasesModelo {
         System.out.println("    Puede avanzar a ENTREGADA: " + receta.puedeAvanzarAEstado(EstadoReceta.ENTREGADA));
 
         System.out.println("✓ Receta completa funcionando correctamente");
+    }
+
+    // ================================
+// PRUEBA DE BÚSQUEDA DE MEDICAMENTO EN RECETA
+// ================================
+    public static void testBuscarMedicamentoEnReceta() {
+        System.out.println("\n>>> PROBANDO BÚSQUEDA DE MEDICAMENTO EN RECETA <<<");
+        System.out.println("-".repeat(40));
+
+        // Crear una receta con varios medicamentos
+        Receta receta = new Receta("REC001", "PAC001", "MED001", LocalDate.now().plusDays(1));
+
+        // Agregar varios detalles de medicamentos
+        receta.agregarDetalle(new DetalleReceta("MED001", 2, "1 tableta cada 8 horas con alimentos", 7));
+        receta.agregarDetalle(new DetalleReceta("MED002", 1, "1 cápsula cada 12 horas", 5));
+        receta.agregarDetalle(new DetalleReceta("MED003", 3, "1 cucharada cada 6 horas", 10));
+        receta.agregarDetalle(new DetalleReceta("MED004", 1, "Aplicar en la zona afectada 2 veces al día", 14));
+
+        System.out.println("Receta creada con " + receta.getTotalMedicamentos() + " medicamentos:");
+        System.out.println("  Número Receta: " + receta.getNumeroReceta());
+        System.out.println("  Total unidades: " + receta.getTotalUnidades());
+        System.out.println("  Resumen: " + receta.getResumenMedicamentos());
+
+        // Mostrar todos los medicamentos en la receta
+        System.out.println("\nMEDICAMENTOS EN LA RECETA:");
+        ListaDetalleReceta detalles = receta.getDetalles();
+        for (int i = 0; i < detalles.getTam(); i++) {
+            DetalleReceta detalle = detalles.obtener(i);
+            System.out.println("  " + (i+1) + ". Código: " + detalle.getCodigoMedicamento() +
+                    " | Cantidad: " + detalle.getCantidadTexto() +
+                    " | Duración: " + detalle.getDuracionTexto());
+        }
+
+        // Probar búsquedas por código
+        System.out.println("\nBÚSQUEDAS POR CÓDIGO DE MEDICAMENTO:");
+
+        // Buscar medicamentos que existen
+        String[] codigosBuscar = {"MED001", "MED002", "MED003", "MED004"};
+
+        for (String codigo : codigosBuscar) {
+            DetalleReceta medicamentoEncontrado = receta.getDetalles().buscarPorCodigo(codigo);
+
+            if (medicamentoEncontrado != null) {
+                System.out.println("  ✓ " + codigo + " ENCONTRADO:");
+                System.out.println("    - Cantidad: " + medicamentoEncontrado.getCantidadTexto());
+                System.out.println("    - Indicaciones: " + medicamentoEncontrado.getIndicaciones());
+                System.out.println("    - Duración: " + medicamentoEncontrado.getDuracionTexto());
+                System.out.println("    - Es válido: " + medicamentoEncontrado.esValidoPrescripcion());
+            } else {
+                System.out.println("  ✗ " + codigo + " NO ENCONTRADO");
+            }
+            System.out.println();
+        }
+
+        // Probar búsquedas de medicamentos que no existen
+        System.out.println("BÚSQUEDAS DE CÓDIGOS INEXISTENTES:");
+        String[] codigosInexistentes = {"MED999", "INVALID", "", null};
+
+        for (String codigo : codigosInexistentes) {
+            DetalleReceta resultado = receta.getDetalles().buscarPorCodigo(codigo);
+            System.out.println("  Buscar '" + codigo + "': " +
+                    (resultado == null ? "NO ENCONTRADO ✓" : "ENCONTRADO (ERROR)"));
+        }
+
+        // Probar búsqueda con criterios específicos
+        System.out.println("\nBÚSQUEDA CON ANÁLISIS DETALLADO:");
+        String codigoBuscar = "MED002";
+        DetalleReceta medicamento = receta.getDetalles().buscarPorCodigo(codigoBuscar);
+
+        if (medicamento != null) {
+            System.out.println("MEDICAMENTO " + codigoBuscar + " - INFORMACIÓN COMPLETA:");
+            System.out.println("  → Código: " + medicamento.getCodigoMedicamento());
+            System.out.println("  → Cantidad prescrita: " + medicamento.getCantidad() + " unidad(es)");
+            System.out.println("  → Indicaciones completas: " + medicamento.getIndicaciones());
+            System.out.println("  → Duración del tratamiento: " + medicamento.getDuracionDias() + " días");
+            System.out.println("  → Texto duración: " + medicamento.getDuracionTexto());
+            System.out.println("  → Prescripción válida: " + (medicamento.esValidoPrescripcion() ? "SÍ" : "NO"));
+
+            // Información adicional
+            if (medicamento.getDuracionDias() > 7) {
+                System.out.println("  → NOTA: Tratamiento prolongado (más de 1 semana)");
+            }
+            if (medicamento.getCantidad() > 2) {
+                System.out.println("  → NOTA: Cantidad alta por dosis");
+            }
+        }
+
+        // Ejemplo práctico: buscar todos los medicamentos de una receta para validar
+        System.out.println("\nVALIDACIÓN DE TODOS LOS MEDICAMENTOS EN LA RECETA:");
+        int medicamentosValidos = 0;
+        int medicamentosInvalidos = 0;
+
+        for (int i = 0; i < receta.getDetalles().getTam(); i++) {
+            DetalleReceta detalle = receta.getDetalles().obtener(i);
+            if (detalle.esValidoPrescripcion()) {
+                medicamentosValidos++;
+                System.out.println("  ✓ " + detalle.getCodigoMedicamento() + " - VÁLIDO");
+            } else {
+                medicamentosInvalidos++;
+                System.out.println("  ✗ " + detalle.getCodigoMedicamento() + " - INVÁLIDO");
+            }
+        }
+
+        System.out.println("\nRESUMEN DE VALIDACIÓN:");
+        System.out.println("  Medicamentos válidos: " + medicamentosValidos);
+        System.out.println("  Medicamentos inválidos: " + medicamentosInvalidos);
+        System.out.println("  Total medicamentos: " + receta.getTotalMedicamentos());
+        System.out.println("  Receta completa válida: " + (medicamentosInvalidos == 0 ? "SÍ" : "NO"));
+
+        System.out.println("✓ Búsqueda de medicamentos en receta funcionando correctamente");
     }
 
     // ================================

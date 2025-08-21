@@ -7,6 +7,7 @@ public abstract class Usuario {
     protected String nombre;
     protected String clave;
     protected TipoUsuario tipo;
+    private boolean sesionActiva = false;
 
     public Usuario(){
     }
@@ -41,6 +42,14 @@ public abstract class Usuario {
     }
     public void setTipo(TipoUsuario tipo) {
         this.tipo = tipo;
+    }
+
+    public boolean isSesionActiva() {
+        return sesionActiva;
+    }
+
+    public void setSesionActiva(boolean sesionActiva) {
+        this.sesionActiva = sesionActiva;
     }
 
     // Métodos para validar

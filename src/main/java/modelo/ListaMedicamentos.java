@@ -185,4 +185,20 @@ public class ListaMedicamentos {
         }
         return s.toString();
     }
+
+    public void mostrarBajoStock(int umbral) {
+        NodoMedicamento actual = primero;
+        boolean hayBajoStock = false;
+        while (actual != null) {
+            Medicamento med = actual.getDato();
+            if (med.getStock() <= umbral) {
+                System.out.println(med.getCodigoYNombre() + " - Stock: " + med.getStock());
+                hayBajoStock = true;
+            }
+            actual = actual.getSiguiente();
+        }
+        if (!hayBajoStock) {
+            System.out.println("No hay medicamentos con bajo stock.");
+        }
+    }
 }

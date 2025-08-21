@@ -6,14 +6,17 @@ public class Medicamento {
     private String codigo;
     private String nombre;
     private String presentacion;
+    private int stock;
 
     public Medicamento(){
+        stock = 0;
     }
 
     public Medicamento(String codigo, String nombre, String presentacion) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.presentacion = presentacion;
+        stock = 0;
     }
 
     public String getCodigo() {
@@ -33,6 +36,13 @@ public class Medicamento {
     }
     public void setPresentacion(String presentacion) {
         this.presentacion = presentacion;
+    }
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
     }
 
     // Métodos específicos
