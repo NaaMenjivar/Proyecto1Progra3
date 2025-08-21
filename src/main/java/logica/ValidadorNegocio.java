@@ -1,25 +1,24 @@
 package logica;
 
-import modelo.ListaPacientes;
-import modelo.ListaMedicamentos;
-import modelo.ListaUsuarios;
+import modelo.*;
+import modelo.lista.Lista;
 
 public class ValidadorNegocio {
-    private ListaPacientes pacientes;
-    private ListaMedicamentos medicamentos;
-    private ListaUsuarios usuarios;
+    private Lista<Paciente> pacientes;
+    private Lista<Medicamento> medicamentos;
+    private Lista<Usuario> usuarios;
 
-    public ValidadorNegocio(ListaPacientes pacientes, ListaMedicamentos medicamentos) {
+    public ValidadorNegocio(Lista<Paciente> pacientes, Lista<Medicamento> medicamentos) {
         this.pacientes = pacientes;
         this.medicamentos = medicamentos;
     }
 
     public boolean validarPaciente(String idPaciente) {
-        return pacientes.buscarPorID(idPaciente) != null;
+        return pacientes.buscarPorId(idPaciente) != null;
     }
 
     public boolean validarMedicamento(String codigo) {
-        return medicamentos.buscarPorCodigo(codigo) != null;
+        return medicamentos.buscarPorId(codigo) != null;
     }
 
     public boolean validarUsuario(String idUsuario) {

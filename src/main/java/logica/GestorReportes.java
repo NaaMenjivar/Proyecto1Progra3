@@ -1,36 +1,34 @@
 package logica;
 
-import modelo.ListaPacientes;
-import modelo.ListaMedicamentos;
+import modelo.Medicamento;
+import modelo.Paciente;
+import modelo.lista.Lista;
 
 public class GestorReportes {
-    private ListaPacientes pacientes;
-    private ListaMedicamentos medicamentos;
+    private Lista<Paciente> pacientes;
+    private Lista<Medicamento> medicamentos;
 
-    public GestorReportes(ListaPacientes pacientes, ListaMedicamentos medicamentos) {
+    public GestorReportes(Lista<Paciente> pacientes, Lista<Medicamento> medicamentos) {
         this.pacientes = pacientes;
         this.medicamentos = medicamentos;
     }
 
-    public void generarReporteGeneral() {
-        System.out.println("Pacientes registrados: " + pacientes.getTam());
-        System.out.println("Medicamentos registrados: " + medicamentos.getTam());
+    public String generarReporteGeneral() {
+        StringBuilder sd = new StringBuilder();
+        sd.append("Pacientes registrados: " + pacientes.getTam());
+        sd.append("Medicamentos registrados: " + medicamentos.getTam());
+
+        return sd.toString();
     }
 
     public void generarEstadisticas(int u) {
         System.out.println("Medicamentos con bajo stock:");
         medicamentos.mostrarBajoStock(u);
     }
-    public void generarReportePacientes() {
-        System.out.println("Lista de Pacientes:");
-        for (int i = 0; i < pacientes.getTam(); i++) {
-            System.out.println(pacientes.obtener(i));
-        }
+    public String generarReportePacientes() {
+        return pacientes.toString();
     }
-    public void generarReporteMedicamentos() {
-        System.out.println("Lista de Medicamentos:");
-        for (int i = 0; i < medicamentos.getTam(); i++) {
-            System.out.println(medicamentos.obtener(i));
-        }
+    public String generarReporteMedicamentos() {
+        return medicamentos.toString();
     }
 }

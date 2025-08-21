@@ -1,17 +1,17 @@
 package logica;
 
-import modelo.ListaUsuarios;
 import modelo.Usuario;
+import modelo.lista.Lista;
 
 public class GestorAutenticacion {
-    private ListaUsuarios usuarios;
+    private Lista<Usuario> usuarios;
 
     public GestorAutenticacion() {
-        usuarios = new ListaUsuarios();
+        usuarios = new Lista<Usuario>();
     }
 
     public boolean login(String id, String clave) {
-        Usuario usuario = usuarios.buscarPorId(id);
+        Usuario usuario = usuarios.buscarPorId(id); //Probar que funcione
         if (usuario != null && usuario.validarCredenciales(id, clave)) {
             usuario.setSesionActiva(true);
             return true;
@@ -20,7 +20,7 @@ public class GestorAutenticacion {
     }
 
     public void logout(String id) {
-        Usuario usuario = usuarios.buscarPorId(id);
+        Usuario usuario = usuarios.buscarPorId(id); //Probar que funcione
         if (usuario != null) {
             usuario.setSesionActiva(false);
         }
@@ -41,7 +41,7 @@ public class GestorAutenticacion {
         return true;
     }
 
-    public ListaUsuarios getUsuarios() {
+    public Lista<Usuario> getUsuarios() {
         return usuarios;
     }
 }

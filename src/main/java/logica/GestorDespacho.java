@@ -1,17 +1,17 @@
 package logica;
 
-import modelo.ListaMedicamentos;
 import modelo.Medicamento;
+import modelo.lista.Lista;
 
 public class GestorDespacho {
-    private ListaMedicamentos medicamentos;
+    private Lista<Medicamento> medicamentos;
 
-    public GestorDespacho(ListaMedicamentos medicamentos) {
+    public GestorDespacho(Lista<Medicamento> medicamentos) {
         this.medicamentos = medicamentos;
     }
 
     public boolean despacharMedicamento(String idPaciente, String codigo, int cantidad) {
-        Medicamento med = medicamentos.buscarPorCodigo(codigo);
+        Medicamento med = medicamentos.buscarPorId(codigo);
         if (med != null && med.getStock() >= cantidad) {
             med.setStock(med.getStock() - cantidad);
             return true;

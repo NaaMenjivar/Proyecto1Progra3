@@ -1,5 +1,7 @@
 package modelo;
 
+import modelo.lista.Lista;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -12,10 +14,10 @@ public class Receta {
     private LocalDate fechaConfeccion;
     private LocalDate fechaRetiro;
     private EstadoReceta estado;
-    private ListaDetalleReceta detalles;
+    private Lista<DetalleReceta> detalles;
 
     public Receta(){
-        this.detalles = new ListaDetalleReceta();
+        this.detalles = new Lista<DetalleReceta>();
         this.estado = EstadoReceta.CONFECCIONADA;
         this.fechaConfeccion = LocalDate.now();
     }
@@ -65,7 +67,7 @@ public class Receta {
     public void setEstado(EstadoReceta estado) {
         this.estado = estado;
     }
-    public ListaDetalleReceta getDetalles() {
+    public Lista<DetalleReceta> getDetalles() {
         return detalles;
     }
 
@@ -75,15 +77,15 @@ public class Receta {
     }
 
     public boolean eliminarDetalle(String codigoMedicamento){
-        return detalles.eliminar(codigoMedicamento);
+        return detalles.eliminarPorId(codigoMedicamento);
     }
 
     public void modificarDetalle(int i, DetalleReceta detalle){
-        detalles.modificar(i, detalle);
+        detalles.modificarPorPos(i, detalle);
     }
 
     public DetalleReceta obtenerDetalle(int i){
-        return detalles.obtener(i);
+        return detalles.obtenerPorPos(i);
     }
 
     public boolean tieneDetalles(){
@@ -95,7 +97,7 @@ public class Receta {
     }
 
     public int getTotalUnidades(){
-        return detalles.getTotalUnidades();
+        return detalles.getTam();
     }
 
     // Métodos de librerías

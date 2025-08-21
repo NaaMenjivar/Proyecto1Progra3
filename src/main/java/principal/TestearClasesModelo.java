@@ -6,6 +6,8 @@
 package principal;
 
 import modelo.*;
+import modelo.lista.Lista;
+
 import java.time.LocalDate;
 
 public class TestearClasesModelo {
@@ -159,16 +161,16 @@ public class TestearClasesModelo {
         System.out.println("✓ Medicamentos funcionando correctamente");
 
         System.out.printf("\tLISTA DE MEDICAMENTOS:\n");
-        ListaMedicamentos listaMedicamentos = new ListaMedicamentos();
+        Lista<Medicamento> listaMedicamentos = new Lista<Medicamento>();
         listaMedicamentos.agregarInicio(med1);
         listaMedicamentos.agregarInicio(med3);
         listaMedicamentos.agregarFinal(med2);
 
         System.out.printf(listaMedicamentos.toString() + "\n");
-        Medicamento medi4 = listaMedicamentos.obtener(0);
+        Medicamento medi4 = listaMedicamentos.obtenerPorPos(0);
         System.out.println(medi4.toString());
 
-        listaMedicamentos.modificar(0,med1Copia);
+        listaMedicamentos.modificarPorPos(0,med1Copia);
         System.out.printf(listaMedicamentos.toString() + "\n");
 
 
@@ -215,7 +217,7 @@ public class TestearClasesModelo {
         System.out.println("\n>>> PROBANDO LISTA ENLAZADA <<<");
         System.out.println("-".repeat(40));
 
-        ListaDetalleReceta lista = new ListaDetalleReceta();
+        Lista<DetalleReceta> lista = new Lista<DetalleReceta>();
 
         // Probar lista vacía
         System.out.println("Lista nueva (vacía): " + lista);
@@ -234,29 +236,29 @@ public class TestearClasesModelo {
         System.out.println("\nDespués de agregar 3 elementos:");
         System.out.println("  Lista: " + lista);
         System.out.println("  Tamaño: " + lista.getTam());
-        System.out.println("  Total unidades: " + lista.getTotalUnidades());
+        System.out.println("  Total unidades: " + lista.getTam());
 
         // Probar acceso por índice
         System.out.println("\nACCESO POR ÍNDICE:");
         for (int i = 0; i < lista.getTam(); i++) {
-            DetalleReceta detalle = lista.obtener(i);
+            DetalleReceta detalle = lista.obtenerPorPos(i);
             System.out.println("  [" + i + "]: " + detalle.getCodigoMedicamento() +
                     " - " + detalle.getCantidadTexto());
         }
 
         // Probar búsqueda
         System.out.println("\nBÚSQUEDA POR CÓDIGO:");
-        DetalleReceta encontrado = lista.buscarPorCodigo("MED002");
+        DetalleReceta encontrado = lista.buscarPorId("MED002");
         System.out.println("  Buscar MED002: " + (encontrado != null ? "Encontrado" : "No encontrado"));
 
         // Probar modificación
         DetalleReceta nuevoDetalle = new DetalleReceta("MED002", 5, "Cambié las indicaciones", 3);
-        lista.modificar(1, nuevoDetalle);
+        lista.modificarPorPos(1, nuevoDetalle);
         System.out.println("\nDespués de modificar elemento en índice 1:");
-        System.out.println("  Elemento modificado: " + lista.obtener(1).getIndicaciones());
+        System.out.println("  Elemento modificado: " + lista.obtenerPorPos(1).getIndicaciones());
 
         // Probar eliminación
-        lista.eliminar("MED001");
+        lista.eliminarPorId("MED001");
         System.out.println("\nDespués de eliminar MED001:");
         System.out.println("  Lista: " + lista);
         System.out.println("  Tamaño: " + lista.getTam());
@@ -266,12 +268,12 @@ public class TestearClasesModelo {
         lista.agregarInicio(d4);
         System.out.println("\nDespués de agregar al inicio:");
         System.out.println("  Lista: " + lista);
-        System.out.println("  Primer elemento: " + lista.getPrimero().getCodigoMedicamento());
-        System.out.println("  Último elemento: " + lista.getUltimo().getCodigoMedicamento());
+        System.out.println("  Primer elemento: " + lista.getCabeza());
+        System.out.println("  Último elemento: " + lista.getUltimo());
 
         // Probar conversión a array
         System.out.println("\nCONVERSIÓN A ARRAY:");
-        DetalleReceta[] array = lista.toArray();
+        DetalleReceta[] array = lista.toArrayDetalleReceta();
         System.out.print("  Array: [");
         for (int i = 0; i < array.length; i++) {
             System.out.print(array[i].getCodigoMedicamento());
@@ -309,9 +311,9 @@ public class TestearClasesModelo {
 
         // Mostrar todos los detalles
         System.out.println("\nDETALLES DE LA RECETA:");
-        ListaDetalleReceta detalles = receta.getDetalles();
+        Lista<DetalleReceta> detalles = receta.getDetalles();
         for (int i = 0; i < detalles.getTam(); i++) {
-            DetalleReceta detalle = detalles.obtener(i);
+            DetalleReceta detalle = detalles.obtenerPorPos(i);
             System.out.println("  " + (i+1) + ". " + detalle.getCodigoMedicamento() +
                     " - " + detalle.getCantidadTexto() +
                     " - " + detalle.getIndicaciones());
@@ -364,9 +366,9 @@ public class TestearClasesModelo {
 
         // Mostrar todos los medicamentos en la receta
         System.out.println("\nMEDICAMENTOS EN LA RECETA:");
-        ListaDetalleReceta detalles = receta.getDetalles();
+        Lista<DetalleReceta> detalles = receta.getDetalles();
         for (int i = 0; i < detalles.getTam(); i++) {
-            DetalleReceta detalle = detalles.obtener(i);
+            DetalleReceta detalle = detalles.obtenerPorPos(i);
             System.out.println("  " + (i+1) + ". Código: " + detalle.getCodigoMedicamento() +
                     " | Cantidad: " + detalle.getCantidadTexto() +
                     " | Duración: " + detalle.getDuracionTexto());
@@ -379,7 +381,7 @@ public class TestearClasesModelo {
         String[] codigosBuscar = {"MED001", "MED002", "MED003", "MED004"};
 
         for (String codigo : codigosBuscar) {
-            DetalleReceta medicamentoEncontrado = receta.getDetalles().buscarPorCodigo(codigo);
+            DetalleReceta medicamentoEncontrado = receta.getDetalles().buscarPorId(codigo);
 
             if (medicamentoEncontrado != null) {
                 System.out.println("  ✓ " + codigo + " ENCONTRADO:");
@@ -398,7 +400,7 @@ public class TestearClasesModelo {
         String[] codigosInexistentes = {"MED999", "INVALID", "", null};
 
         for (String codigo : codigosInexistentes) {
-            DetalleReceta resultado = receta.getDetalles().buscarPorCodigo(codigo);
+            DetalleReceta resultado = receta.getDetalles().buscarPorId(codigo);
             System.out.println("  Buscar '" + codigo + "': " +
                     (resultado == null ? "NO ENCONTRADO ✓" : "ENCONTRADO (ERROR)"));
         }
@@ -406,7 +408,7 @@ public class TestearClasesModelo {
         // Probar búsqueda con criterios específicos
         System.out.println("\nBÚSQUEDA CON ANÁLISIS DETALLADO:");
         String codigoBuscar = "MED002";
-        DetalleReceta medicamento = receta.getDetalles().buscarPorCodigo(codigoBuscar);
+        DetalleReceta medicamento = receta.getDetalles().buscarPorId(codigoBuscar);
 
         if (medicamento != null) {
             System.out.println("MEDICAMENTO " + codigoBuscar + " - INFORMACIÓN COMPLETA:");
@@ -432,7 +434,7 @@ public class TestearClasesModelo {
         int medicamentosInvalidos = 0;
 
         for (int i = 0; i < receta.getDetalles().getTam(); i++) {
-            DetalleReceta detalle = receta.getDetalles().obtener(i);
+            DetalleReceta detalle = receta.getDetalles().obtenerPorPos(i);
             if (detalle.esValidoPrescripcion()) {
                 medicamentosValidos++;
                 System.out.println("  ✓ " + detalle.getCodigoMedicamento() + " - VÁLIDO");
@@ -459,7 +461,7 @@ public class TestearClasesModelo {
         System.out.println("-".repeat(40));
 
         // Probar agregar elementos inválidos a la lista
-        ListaDetalleReceta lista = new ListaDetalleReceta();
+        Lista<DetalleReceta> lista = new Lista<DetalleReceta>();
         DetalleReceta detalleInvalido = new DetalleReceta("", 0, "", 0);
 
         lista.agregarFinal(detalleInvalido);
@@ -472,18 +474,18 @@ public class TestearClasesModelo {
 
         // Probar operaciones en lista vacía
         System.out.println("\nOperaciones en lista vacía:");
-        System.out.println("  Obtener elemento 0: " + lista.obtener(0));
-        System.out.println("  Buscar elemento: " + lista.buscarPorCodigo("MED001"));
-        System.out.println("  Eliminar elemento: " + lista.eliminar("MED001"));
-        System.out.println("  Primer elemento: " + lista.getPrimero());
+        System.out.println("  Obtener elemento 0: " + lista.obtenerPorPos(0));
+        System.out.println("  Buscar elemento: " + lista.buscarPorId("MED001"));
+        System.out.println("  Eliminar elemento: " + lista.eliminarPorId("MED001"));
+        System.out.println("  Primer elemento: " + lista.getCabeza());
         System.out.println("  Último elemento: " + lista.getUltimo());
 
         // Probar índices fuera de rango
         lista.agregarFinal(new DetalleReceta("MED001", 1, "Test", 1));
         System.out.println("\nÍndices fuera de rango (lista con 1 elemento):");
-        System.out.println("  Obtener elemento -1: " + lista.obtener(-1));
-        System.out.println("  Obtener elemento 5: " + lista.obtener(5));
-        System.out.println("  Modificar índice -1: " + lista.modificar(-1, new DetalleReceta("TEST", 1, "Test", 1)));
+        System.out.println("  Obtener elemento -1: " + lista.obtenerPorPos(-1));
+        System.out.println("  Obtener elemento 5: " + lista.obtenerPorPos(5));
+        System.out.println("  Modificar índice -1: " + lista.modificarPorPos(-1, new DetalleReceta("TEST", 1, "Test", 1)));
 
         // Probar receta sin detalles
         System.out.println("\nReceta sin detalles:");

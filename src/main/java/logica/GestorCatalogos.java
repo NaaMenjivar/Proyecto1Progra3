@@ -1,30 +1,29 @@
 package logica;
 
-import modelo.ListaMedicamentos;
-import modelo.ListaPacientes;
 import modelo.Paciente;
 import modelo.Medicamento;
+import modelo.lista.Lista;
 
 public class GestorCatalogos {
-    private ListaPacientes pacientes;
-    private ListaMedicamentos medicamentos;
+    private Lista<Paciente> pacientes;
+    private Lista<Medicamento> medicamentos;
 
     public GestorCatalogos() {
-        pacientes = new ListaPacientes();
-        medicamentos = new ListaMedicamentos();
+        pacientes = new Lista<Paciente>();
+        medicamentos = new Lista<Medicamento>();
     }
 
-    public ListaPacientes getPacientes() {
+    public Lista<Paciente> getPacientes() {
         return pacientes;
     }
 
-    public ListaMedicamentos getMedicamentos() {
+    public Lista<Medicamento> getMedicamentos() {
         return medicamentos;
     }
 
     // Agregar paciente solo si no existe
     public boolean agregarPaciente(Paciente paciente) {
-        if (paciente == null || pacientes.contiene(paciente.getId())) {
+        if (paciente == null) { //Buscar forma de comprobar si existe
             return false;
         }
         pacientes.agregarFinal(paciente);
@@ -32,31 +31,25 @@ public class GestorCatalogos {
     }
 
     public Paciente buscarPaciente(String id) {
-        return pacientes.buscarPorID(id);
+        return pacientes.buscarPorId(id);
     }
 
     // Eliminar paciente solo si existe
     public boolean eliminarPaciente(String id) {
-        if (!pacientes.contiene(id)) {
+        if (!pacientes.existe(id)) {
             return false;
         }
-        return pacientes.eliminar(id);
+        return pacientes.eliminarPorId(id);
     }
 
     // Actualizar paciente por id
     public boolean actualizarPaciente(String id, Paciente nuevoPaciente) {
-        for (int i = 0; i < pacientes.getTam(); i++) {
-            Paciente actual = pacientes.obtener(i);
-            if (actual != null && actual.getId().equals(id)) {
-                return pacientes.modificar(i, nuevoPaciente);
-            }
-        }
-        return false;
+        return pacientes.actualizarPorId(id, nuevoPaciente);
     }
 
     // Agregar medicamento solo si no existe
     public boolean agregarMedicamento(Medicamento medicamento) {
-        if (medicamento == null || medicamentos.contiene(medicamento.getCodigo())) {
+        if (medicamento == null || medicamentos.existe(medicamento.getCodigo())) {
             return false;
         }
         medicamentos.agregarFinal(medicamento);
@@ -64,25 +57,19 @@ public class GestorCatalogos {
     }
 
     public Medicamento buscarMedicamento(String codigo) {
-        return medicamentos.buscarPorCodigo(codigo);
+        return medicamentos.buscarPorId(codigo);
     }
 
     // Eliminar medicamento solo si existe
     public boolean eliminarMedicamento(String codigo) {
-        if (!medicamentos.contiene(codigo)) {
+        if (!medicamentos.existe(codigo)) {
             return false;
         }
-        return medicamentos.eliminar(codigo);
+        return medicamentos.eliminarPorId(codigo);
     }
 
     // Actualizar medicamento por código
     public boolean actualizarMedicamento(String codigo, Medicamento nuevoMedicamento) {
-        for (int i = 0; i < medicamentos.getTam(); i++) {
-            Medicamento actual = medicamentos.obtener(i);
-            if (actual != null && actual.getCodigo().equals(codigo)) {
-                return medicamentos.modificar(i, nuevoMedicamento);
-            }
-        }
-        return false;
+        return medicamentos.actualizarPorId(codigo, nuevoMedicamento);
     }
 }
