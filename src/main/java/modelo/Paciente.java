@@ -80,4 +80,11 @@ public class Paciente {
     public String toString() {
         return nombre + " (" + id + ") " + getEdadTexto();
     }
+
+    public boolean esValido() {
+        return id != null && !id.trim().isEmpty()
+            && nombre != null && !nombre.trim().isEmpty()
+            && fechaNacimiento != null
+            && telefono != null && !telefono.trim().isEmpty();
+    }
 }

@@ -82,7 +82,7 @@ public class Lista<T> {
             Usuario u = (Usuario) cabeza.getDato();
             if (u.getId().equals(id)) {
                 cabeza = cabeza.getSiguiente();
-                tam--; // recuerda actualizar el tamaño si usas la variable tam
+                tam--;
                 return true;
             }
         }
@@ -188,10 +188,7 @@ public class Lista<T> {
     }
 
     public boolean vacia(){
-        if(cabeza == null){
-            return false;
-        }
-        return true;
+        return cabeza == null;
     }
 
     public T obtenerPorPos(int i) {

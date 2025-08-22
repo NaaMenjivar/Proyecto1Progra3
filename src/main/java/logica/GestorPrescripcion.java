@@ -1,35 +1,140 @@
 package logica;
 
-import modelo.Receta;
+import datos.fabricas.DAOFactory;
+import datos.interfaces.*;
+import modelo.*;
+import logica.excepciones.PrescripcionException;
+import utilidades.GeneradorIds;
+
 import java.time.LocalDate;
+import java.util.List;
 
 public class GestorPrescripcion {
-    private Receta[] recetas;
-    private int cantidad;
+    private IRecetaDAO recetaDAO;
+    private IPacienteDAO pacienteDAO;
+    private IMedicamentoDAO medicamentoDAO;
+    private ValidadorNegocio validador;
 
     public GestorPrescripcion() {
-        recetas = new Receta[10];
-        cantidad = 0;
+        DAOFactory factory = DAOFactory.getInstance();
+        this.recetaDAO = factory.getRecetaDAO();
+        this.pacienteDAO = factory.getPacienteDAO();
+        this.medicamentoDAO = factory.getMedicamentoDAO();
+        // Se obtienen las listas desde los DAOs
+        this.validador = new ValidadorNegocio(
+            pacienteDAO.obtenerTodos() instanceof modelo.lista.Lista
+                ? (modelo.lista.Lista<Paciente>) pacienteDAO.obtenerTodos()
+                : new modelo.lista.Lista<Paciente>(),
+            medicamentoDAO.obtenerTodos() instanceof modelo.lista.Lista
+                ? (modelo.lista.Lista<Medicamento>) medicamentoDAO.obtenerTodos()
+                : new modelo.lista.Lista<Medicamento>()
+        );
     }
 
-    public boolean crearReceta(String numeroReceta, String idPaciente, String idMedico, LocalDate fechaRetiro) {
-        if (cantidad == recetas.length) {
-            Receta[] nuevo = new Receta[recetas.length + 10];
-            for (int i = 0; i < recetas.length; i++) {
-                nuevo[i] = recetas[i];
-            }
-            recetas = nuevo;
+    public Receta iniciarReceta(String idPaciente, String idMedico) throws PrescripcionException {
+        // Validar que el paciente existe
+        Paciente paciente = pacienteDAO.buscarPorId(idPaciente);
+        if (paciente == null) {
+            throw new PrescripcionException("Paciente no encontrado: " + idPaciente);
         }
-        recetas[cantidad] = new Receta(numeroReceta, idPaciente, idMedico, fechaRetiro);
-        cantidad++;
+
+        // Generar número de receta único
+        String numeroReceta = GeneradorIds.generarNumeroReceta();
+
+        // Crear receta con fecha de retiro por defecto (mañana)
+        LocalDate fechaRetiro = LocalDate.now().plusDays(1);
+
+        Receta receta = new Receta(numeroReceta, idPaciente, idMedico, fechaRetiro);
+        return receta;
+    }
+
+    public boolean agregarMedicamentoAReceta(Receta receta, String codigoMedicamento,
+                                             int cantidad, String indicaciones, int duracionDias)
+            throws PrescripcionException {
+
+        // Validar que el medicamento existe
+        Medicamento medicamento = medicamentoDAO.buscarPorCodigo(codigoMedicamento);
+        if (medicamento == null) {
+            throw new PrescripcionException("Medicamento no encontrado: " + codigoMedicamento);
+        }
+
+        // Crear detalle de receta
+        DetalleReceta detalle = new DetalleReceta(codigoMedicamento, cantidad, indicaciones, duracionDias);
+
+        // Validar detalle
+        if (!detalle.esValidoPrescripcion()) {
+            throw new PrescripcionException("Datos de medicamento inválidos");
+        }
+
+        // Verificar que no esté ya prescrito en esta receta
+        if (receta.getDetalles().buscarPorId(codigoMedicamento) != null) {
+            throw new PrescripcionException("Medicamento ya está prescrito en esta receta");
+        }
+
+        receta.agregarDetalle(detalle);
         return true;
     }
 
-    public Receta obtenerReceta(int index) {
-        if (index >= 0 && index < cantidad) {
-            return recetas[index];
+    public boolean modificarMedicamentoEnReceta(Receta receta, int indice,
+                                                int nuevaCantidad, String nuevasIndicaciones,
+                                                int nuevaDuracion) throws PrescripcionException {
+
+        if (indice < 0 || indice >= receta.getDetalles().getTam()) {
+            throw new PrescripcionException("Índice de medicamento inválido");
         }
-        return null;
+
+        DetalleReceta detalleExistente = receta.getDetalles().obtenerPorPos(indice);
+        if (detalleExistente == null) {
+            throw new PrescripcionException("Medicamento no encontrado en la receta");
+        }
+
+        // Crear nuevo detalle con los cambios
+        DetalleReceta nuevoDetalle = new DetalleReceta(
+                detalleExistente.getCodigoMedicamento(),
+                nuevaCantidad,
+                nuevasIndicaciones,
+                nuevaDuracion
+        );
+
+        if (!nuevoDetalle.esValidoPrescripcion()) {
+            throw new PrescripcionException("Datos modificados son inválidos");
+        }
+
+        receta.modificarDetalle(indice, nuevoDetalle);
+        return true;
     }
 
+    public boolean eliminarMedicamentoDeReceta(Receta receta, String codigoMedicamento) {
+        return receta.eliminarDetalle(codigoMedicamento);
+    }
+
+    public boolean finalizarReceta(Receta receta) throws PrescripcionException {
+        if (!receta.tieneDetalles()) {
+            throw new PrescripcionException("La receta debe tener al menos un medicamento");
+        }
+
+        // Validar todos los detalles
+        for (int i = 0; i < receta.getDetalles().getTam(); i++) {
+            DetalleReceta detalle = receta.getDetalles().obtenerPorPos(i);
+            if (!detalle.esValidoPrescripcion()) {
+                throw new PrescripcionException("Hay medicamentos con datos inválidos");
+            }
+        }
+
+        receta.setEstado(EstadoReceta.CONFECCIONADA);
+        return recetaDAO.guardar(receta);
+    }
+
+    // Métodos de consulta
+    public List<Receta> buscarRecetasPorMedico(String idMedico) {
+        return recetaDAO.buscarPorMedico(idMedico);
+    }
+
+    public List<Paciente> buscarPacientesPorNombre(String patron) {
+        return pacienteDAO.buscarPorNombreAproximado(patron);
+    }
+
+    public List<Medicamento> buscarMedicamentosPorDescripcion(String patron) {
+        return medicamentoDAO.buscarPorDescripcionAproximada(patron);
+    }
 }
