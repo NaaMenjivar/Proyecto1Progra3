@@ -6,7 +6,7 @@ public class Farmaceuta extends Usuario {
         this.tipo = TipoUsuario.FARMACEUTA;
     }
 
-    public Farmaceuta(String nombre, String id, String clave) {
+    public Farmaceuta(String id, String nombre, String clave) {
         super(id, nombre, clave, TipoUsuario.FARMACEUTA);
     }
 
