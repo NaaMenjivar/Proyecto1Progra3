@@ -400,4 +400,53 @@ public class VentanaLogin extends JDialog {
         limpiarCampos();
         dispose();
     }
+
+    /// Manejar los datos en el controlador en lugar de en esta misma clase para respetar el MVC
+
+    /*private void setupEventHandlers() {
+        botonIngresar.addActionListener(e -> {
+            if (controlador != null) {
+                controlador.procesarLogin(getId(), getClave(), getTipoUsuario());
+            }
+        });
+
+        botonCancelar.addActionListener(e -> {
+            if (controlador != null) {
+                controlador.cancelarLogin();
+            }
+        });
+
+        botonCambiarClave.addActionListener(e -> {
+            if (controlador != null) {
+                controlador.cambiarClave();
+            }
+        });
+
+        // Evento mostrar/ocultar clave (se queda igual)
+        botonMostrarClave.addActionListener(e ->
+                campoClave.setEchoChar(botonMostrarClave.isSelected() ? (char) 0 : '*')
+        );
+
+        // Enter para login
+        KeyAdapter enterKeyListener = new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && controlador != null) {
+                    controlador.procesarLogin(getId(), getClave(), getTipoUsuario());
+                }
+            }
+        };
+
+        campoId.addKeyListener(enterKeyListener);
+        campoClave.addKeyListener(enterKeyListener);
+        comboTipoUsuario.addKeyListener(enterKeyListener);
+
+        // Focus inicial
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                campoId.requestFocusInWindow();
+            }
+        });
+    }*/
 }
