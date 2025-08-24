@@ -101,8 +101,8 @@ public class VentanaLogin extends JDialog {
     private void configurarBotonMostrarClave() {
         try {
             // Intentar cargar iconos personalizados
-            ImageIcon ojoCerrado = new ImageIcon(getClass().getResource("/imagenes/iconos/ojo_cerrado.png"));
-            ImageIcon ojoAbierto = new ImageIcon(getClass().getResource("/imagenes/iconos/ojo_abierto.png"));
+            ImageIcon ojoCerrado = new ImageIcon(getClass().getResource("/Iconos/ojo_cerrado.png"));
+            ImageIcon ojoAbierto = new ImageIcon(getClass().getResource("/Iconos/ojo_abierto.png"));
 
             if (ojoCerrado.getIconWidth() > 0) {
                 Image ojoCerradoEscalado = ojoCerrado.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
