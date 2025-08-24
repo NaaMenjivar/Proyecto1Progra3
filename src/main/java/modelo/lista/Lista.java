@@ -3,6 +3,8 @@ package modelo.lista;
 import modelo.DetalleReceta;
 import modelo.Medicamento;
 import modelo.Usuario;
+import modelo.Receta;
+import modelo.Paciente;
 
 public class Lista<T> {
     private Nodo<T> cabeza;
@@ -122,12 +124,43 @@ public class Lista<T> {
     public T buscarPorId(String id) {
         Nodo<T> temp = cabeza;
         while (temp != null) {
-            if (temp.getDato() instanceof Usuario) {
-                Usuario u = (Usuario) temp.getDato();
+            T dato = temp.getDato();
+
+            if (dato instanceof Usuario) {
+                Usuario u = (Usuario) dato;
                 if (u.getId().equals(id)) {
-                    return temp.getDato();
+                    return dato;
                 }
             }
+
+            else if (dato instanceof Paciente) {
+                Paciente p = (Paciente) dato;
+                if (p.getId().equals(id)) {
+                    return dato;
+                }
+            }
+
+            else if (dato instanceof Medicamento) {
+                Medicamento m = (Medicamento) dato;
+                if (m.getCodigo().equals(id)) {
+                    return dato;
+                }
+            }
+
+            else if (dato instanceof DetalleReceta) {
+                DetalleReceta d = (DetalleReceta) dato;
+                if (d.getCodigoMedicamento().equals(id)) {
+                    return dato;
+                }
+            }
+
+            else if (dato instanceof Receta) {
+                Receta r = (Receta) dato;
+                if (r.getNumeroReceta().equals(id)) {
+                    return dato;
+                }
+            }
+
             temp = temp.getSiguiente();
         }
         return null;

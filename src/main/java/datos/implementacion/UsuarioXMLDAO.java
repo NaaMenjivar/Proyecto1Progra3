@@ -10,8 +10,7 @@ import org.jdom2.output.XMLOutputter;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.List;
-import java.util.ArrayList;
+
 
 public class UsuarioXMLDAO implements IUsuarioDAO {
     private static final String ARCHIVO_XML = "datos/usuarios.xml";
@@ -37,12 +36,8 @@ public class UsuarioXMLDAO implements IUsuarioDAO {
     }
 
     @Override
-    public List<Usuario> obtenerTodos() {
-        List<Usuario> lista = new ArrayList<>();
-        for (int i = 0; i < usuarios.getTam(); i++) {
-            lista.add(usuarios.obtenerPorPos(i));
-        }
-        return lista;
+    public Lista<Usuario> obtenerTodos() {
+        return usuarios; // Ya es Lista<Usuario>, no necesita conversión
     }
 
     @Override
@@ -76,12 +71,12 @@ public class UsuarioXMLDAO implements IUsuarioDAO {
     }
 
     @Override
-    public List<Usuario> buscarPorTipo(TipoUsuario tipo) {
-        List<Usuario> resultado = new ArrayList<>();
+    public Lista<Usuario> buscarPorTipo(TipoUsuario tipo) {
+        Lista<Usuario> resultado = new Lista<>();
         for (int i = 0; i < usuarios.getTam(); i++) {
             Usuario usuario = usuarios.obtenerPorPos(i);
             if (usuario.getTipo() == tipo) {
-                resultado.add(usuario);
+                resultado.agregarFinal(usuario);
             }
         }
         return resultado;

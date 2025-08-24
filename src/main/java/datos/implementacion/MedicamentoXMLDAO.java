@@ -10,8 +10,6 @@ import org.jdom2.output.XMLOutputter;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MedicamentoXMLDAO implements IMedicamentoDAO {
     private static final String ARCHIVO_XML = "datos/medicamentos.xml";
@@ -37,12 +35,8 @@ public class MedicamentoXMLDAO implements IMedicamentoDAO {
     }
 
     @Override
-    public List<Medicamento> obtenerTodos() {
-        List<Medicamento> lista = new ArrayList<>();
-        for (int i = 0; i < medicamentos.getTam(); i++) {
-            lista.add(medicamentos.obtenerPorPos(i));
-        }
-        return lista;
+    public Lista<Medicamento> obtenerTodos() {
+        return medicamentos; // Ya es Lista<Medicamento>, no necesita conversión
     }
 
     @Override
@@ -67,48 +61,48 @@ public class MedicamentoXMLDAO implements IMedicamentoDAO {
     }
 
     @Override
-    public List<Medicamento> buscarPorNombre(String nombre) {
-        List<Medicamento> resultado = new ArrayList<>();
+    public Lista<Medicamento> buscarPorNombre(String nombre) {
+        Lista<Medicamento> resultado = new Lista<>();
         for (int i = 0; i < medicamentos.getTam(); i++) {
             Medicamento m = medicamentos.obtenerPorPos(i);
             if (m.getNombre().equalsIgnoreCase(nombre)) {
-                resultado.add(m);
+                resultado.agregarFinal(m);
             }
         }
         return resultado;
     }
 
     @Override
-    public List<Medicamento> buscarPorDescripcion(String descripcion) {
-        List<Medicamento> resultado = new ArrayList<>();
+    public Lista<Medicamento> buscarPorDescripcion(String descripcion) {
+        Lista<Medicamento> resultado = new Lista<>();
         for (int i = 0; i < medicamentos.getTam(); i++) {
             Medicamento m = medicamentos.obtenerPorPos(i);
             if (m.getPresentacion().equalsIgnoreCase(descripcion)) {
-                resultado.add(m);
+                resultado.agregarFinal(m);
             }
         }
         return resultado;
     }
 
     @Override
-    public List<Medicamento> buscarPorDescripcionAproximada(String patron) {
-        List<Medicamento> resultado = new ArrayList<>();
+    public Lista<Medicamento> buscarPorDescripcionAproximada(String patron) {
+        Lista<Medicamento> resultado = new Lista<>();
         for (int i = 0; i < medicamentos.getTam(); i++) {
             Medicamento m = medicamentos.obtenerPorPos(i);
             if (m.getPresentacion().toLowerCase().contains(patron.toLowerCase())) {
-                resultado.add(m);
+                resultado.agregarFinal(m);
             }
         }
         return resultado;
     }
 
     @Override
-    public List<Medicamento> obtenerMedicamentosBajoStock(int umbral) {
-        List<Medicamento> resultado = new ArrayList<>();
+    public Lista<Medicamento> obtenerMedicamentosBajoStock(int umbral) {
+        Lista<Medicamento> resultado = new Lista<>();
         for (int i = 0; i < medicamentos.getTam(); i++) {
             Medicamento m = medicamentos.obtenerPorPos(i);
             if (m.getStock() <= umbral) {
-                resultado.add(m);
+                resultado.agregarFinal(m);
             }
         }
         return resultado;

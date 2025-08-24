@@ -2,30 +2,29 @@ package datos.interfaces;
 
 import modelo.Receta;
 import modelo.EstadoReceta;
+import modelo.lista.Lista;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 public interface IRecetaDAO {
     // CRUD básico
     boolean guardar(Receta receta);
     Receta buscarPorNumero(String numeroReceta);
-    List<Receta> obtenerTodas();
+    Lista<Receta> obtenerTodas();  // ✅ Cambio aquí
     boolean actualizar(Receta receta);
     boolean eliminar(String numeroReceta);
 
     // Métodos específicos del negocio
-    List<Receta> buscarPorPaciente(String idPaciente);
-    List<Receta> buscarPorMedico(String idMedico);
-    List<Receta> buscarPorEstado(EstadoReceta estado);
-    List<Receta> buscarPorFechaRetiro(LocalDate fecha);
-    List<Receta> buscarPorRangoFechas(LocalDate fechaInicio, LocalDate fechaFin);
-    List<Receta> obtenerRecetasDespachables(LocalDate fecha);
+    Lista<Receta> buscarPorPaciente(String idPaciente);  // ✅ Cambio aquí
+    Lista<Receta> buscarPorMedico(String idMedico);  // ✅ Cambio aquí
+    Lista<Receta> buscarPorEstado(EstadoReceta estado);  // ✅ Cambio aquí
+    Lista<Receta> buscarPorFechaRetiro(LocalDate fecha);  // ✅ Cambio aquí
+    Lista<Receta> buscarPorRangoFechas(LocalDate fechaInicio, LocalDate fechaFin);  // ✅ Cambio aquí
+    Lista<Receta> obtenerRecetasDespachables(LocalDate fecha);  // ✅ Cambio aquí
 
     // Métodos para reportes y estadísticas
     int contarPorEstado(EstadoReceta estado);
     int contarMedicamentosEnMes(String codigoMedicamento, int año, int mes);
-    List<Receta> obtenerRecetasDelMes(int año, int mes);
+    Lista<Receta> obtenerRecetasDelMes(int año, int mes);  // ✅ Cambio aquí
 
     // Métodos de utilidad
     String generarNumeroReceta();

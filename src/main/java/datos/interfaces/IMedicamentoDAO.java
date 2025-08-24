@@ -1,21 +1,21 @@
 package datos.interfaces;
 
 import modelo.Medicamento;
-import java.util.List;
+import modelo.lista.Lista;
 
 public interface IMedicamentoDAO {
     // CRUD básico
     boolean guardar(Medicamento medicamento);
     Medicamento buscarPorCodigo(String codigo);
-    List<Medicamento> obtenerTodos();
+    Lista<Medicamento> obtenerTodos();  // ✅ Cambio aquí
     boolean actualizar(Medicamento medicamento);
     boolean eliminar(String codigo);
 
     // Métodos específicos del negocio
-    List<Medicamento> buscarPorNombre(String nombre);
-    List<Medicamento> buscarPorDescripcion(String descripcion);
-    List<Medicamento> buscarPorDescripcionAproximada(String patron);
-    List<Medicamento> obtenerMedicamentosBajoStock(int umbral);
+    Lista<Medicamento> buscarPorNombre(String nombre);  // ✅ Cambio aquí
+    Lista<Medicamento> buscarPorDescripcion(String descripcion);  // ✅ Cambio aquí
+    Lista<Medicamento> buscarPorDescripcionAproximada(String patron);  // ✅ Cambio aquí
+    Lista<Medicamento> obtenerMedicamentosBajoStock(int umbral);  // ✅ Cambio aquí
     boolean existeMedicamento(String codigo);
 
     // Métodos de utilidad

@@ -11,8 +11,6 @@ import org.jdom2.output.XMLOutputter;
 import java.io.File;
 import java.io.FileWriter;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PacienteXMLDAO implements IPacienteDAO {
     private static final String ARCHIVO_XML = "datos/pacientes.xml";
@@ -38,12 +36,8 @@ public class PacienteXMLDAO implements IPacienteDAO {
     }
 
     @Override
-    public List<Paciente> obtenerTodos() {
-        List<Paciente> lista = new ArrayList<>();
-        for (int i = 0; i < pacientes.getTam(); i++) {
-            lista.add(pacientes.obtenerPorPos(i));
-        }
-        return lista;
+    public Lista<Paciente> obtenerTodos() {
+        return pacientes; // Ya es Lista<Paciente>, no necesita conversión
     }
 
     @Override
@@ -68,24 +62,24 @@ public class PacienteXMLDAO implements IPacienteDAO {
     }
 
     @Override
-    public List<Paciente> buscarPorNombre(String nombre) {
-        List<Paciente> resultado = new ArrayList<>();
+    public Lista<Paciente> buscarPorNombre(String nombre) {
+        Lista<Paciente> resultado = new Lista<>();
         for (int i = 0; i < pacientes.getTam(); i++) {
             Paciente p = pacientes.obtenerPorPos(i);
             if (p.getNombre().equalsIgnoreCase(nombre)) {
-                resultado.add(p);
+                resultado.agregarFinal(p);
             }
         }
         return resultado;
     }
 
     @Override
-    public List<Paciente> buscarPorNombreAproximado(String patron) {
-        List<Paciente> resultado = new ArrayList<>();
+    public Lista<Paciente> buscarPorNombreAproximado(String patron) {
+        Lista<Paciente> resultado = new Lista<>();
         for (int i = 0; i < pacientes.getTam(); i++) {
             Paciente p = pacientes.obtenerPorPos(i);
             if (p.getNombre().toLowerCase().contains(patron.toLowerCase())) {
-                resultado.add(p);
+                resultado.agregarFinal(p);
             }
         }
         return resultado;

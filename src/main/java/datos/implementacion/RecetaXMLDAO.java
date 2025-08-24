@@ -38,12 +38,8 @@ public class RecetaXMLDAO implements IRecetaDAO {
     }
 
     @Override
-    public List<Receta> obtenerTodas() {
-        List<Receta> lista = new ArrayList<>();
-        for (int i = 0; i < recetas.getTam(); i++) {
-            lista.add(recetas.obtenerPorPos(i));
-        }
-        return lista;
+    public Lista<Receta> obtenerTodas() {
+        return recetas; // Ya es Lista<Receta>, no necesita conversión
     }
 
     @Override
@@ -68,74 +64,74 @@ public class RecetaXMLDAO implements IRecetaDAO {
     }
 
     @Override
-    public List<Receta> buscarPorPaciente(String idPaciente) {
-        List<Receta> resultado = new ArrayList<>();
+    public Lista<Receta> buscarPorPaciente(String idPaciente) {
+        Lista<Receta> resultado = new Lista<>();
         for (int i = 0; i < recetas.getTam(); i++) {
             Receta r = recetas.obtenerPorPos(i);
             if (r.getIdPaciente().equalsIgnoreCase(idPaciente)) {
-                resultado.add(r);
+                resultado.agregarFinal(r);
             }
         }
         return resultado;
     }
 
     @Override
-    public List<Receta> buscarPorMedico(String idMedico) {
-        List<Receta> resultado = new ArrayList<>();
+    public Lista<Receta> buscarPorMedico(String idMedico) {
+        Lista<Receta> resultado = new Lista<>();
         for (int i = 0; i < recetas.getTam(); i++) {
             Receta r = recetas.obtenerPorPos(i);
             if (r.getIdMedico().equalsIgnoreCase(idMedico)) {
-                resultado.add(r);
+                resultado.agregarFinal(r);
             }
         }
         return resultado;
     }
 
     @Override
-    public List<Receta> buscarPorEstado(EstadoReceta estado) {
-        List<Receta> resultado = new ArrayList<>();
+    public Lista<Receta> buscarPorEstado(EstadoReceta estado) {
+        Lista<Receta> resultado = new Lista<>();
         for (int i = 0; i < recetas.getTam(); i++) {
             Receta r = recetas.obtenerPorPos(i);
             if (r.getEstado() == estado) {
-                resultado.add(r);
+                resultado.agregarFinal(r);
             }
         }
         return resultado;
     }
 
     @Override
-    public List<Receta> buscarPorFechaRetiro(LocalDate fecha) {
-        List<Receta> resultado = new ArrayList<>();
+    public Lista<Receta> buscarPorFechaRetiro(LocalDate fecha) {
+        Lista<Receta> resultado = new Lista<>();
         for (int i = 0; i < recetas.getTam(); i++) {
             Receta r = recetas.obtenerPorPos(i);
             if (r.getFechaRetiro() != null && r.getFechaRetiro().equals(fecha)) {
-                resultado.add(r);
+                resultado.agregarFinal(r);
             }
         }
         return resultado;
     }
 
     @Override
-    public List<Receta> buscarPorRangoFechas(LocalDate fechaInicio, LocalDate fechaFin) {
-        List<Receta> resultado = new ArrayList<>();
+    public Lista<Receta> buscarPorRangoFechas(LocalDate fechaInicio, LocalDate fechaFin) {
+        Lista<Receta> resultado = new Lista<>();
         for (int i = 0; i < recetas.getTam(); i++) {
             Receta r = recetas.obtenerPorPos(i);
             if (r.getFechaRetiro() != null &&
                 !r.getFechaRetiro().isBefore(fechaInicio) &&
                 !r.getFechaRetiro().isAfter(fechaFin)) {
-                resultado.add(r);
+                resultado.agregarFinal(r);
             }
         }
         return resultado;
     }
 
     @Override
-    public List<Receta> obtenerRecetasDespachables(LocalDate fecha) {
-        List<Receta> resultado = new ArrayList<>();
+    public Lista<Receta> obtenerRecetasDespachables(LocalDate fecha) {
+        Lista<Receta> resultado = new Lista<>();
         for (int i = 0; i < recetas.getTam(); i++) {
             Receta r = recetas.obtenerPorPos(i);
             if (r.puedeSerDespachada(fecha)) {
-                resultado.add(r);
+                resultado.agregarFinal(r);
             }
         }
         return resultado;
@@ -172,14 +168,14 @@ public class RecetaXMLDAO implements IRecetaDAO {
     }
 
     @Override
-    public List<Receta> obtenerRecetasDelMes(int año, int mes) {
-        List<Receta> resultado = new ArrayList<>();
+    public Lista<Receta> obtenerRecetasDelMes(int año, int mes) {
+        Lista<Receta> resultado = new Lista<>();
         for (int i = 0; i < recetas.getTam(); i++) {
             Receta r = recetas.obtenerPorPos(i);
             if (r.getFechaRetiro() != null &&
                 r.getFechaRetiro().getYear() == año &&
                 r.getFechaRetiro().getMonthValue() == mes) {
-                resultado.add(r);
+                resultado.agregarFinal(r);
             }
         }
         return resultado;
