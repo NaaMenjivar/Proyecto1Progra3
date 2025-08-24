@@ -4,10 +4,9 @@ import datos.fabricas.DAOFactory;
 import datos.interfaces.*;
 import modelo.*;
 import logica.excepciones.PrescripcionException;
+import modelo.lista.Lista;
 import utilidades.GeneradorIds;
-
 import java.time.LocalDate;
-import java.util.List;
 
 public class GestorPrescripcion {
     private IRecetaDAO recetaDAO;
@@ -126,15 +125,15 @@ public class GestorPrescripcion {
     }
 
     // Métodos de consulta
-    public List<Receta> buscarRecetasPorMedico(String idMedico) {
+    public Lista<Receta> buscarRecetasPorMedico(String idMedico) {
         return recetaDAO.buscarPorMedico(idMedico);
     }
 
-    public List<Paciente> buscarPacientesPorNombre(String patron) {
+    public Lista<Paciente> buscarPacientesPorNombre(String patron) {
         return pacienteDAO.buscarPorNombreAproximado(patron);
     }
 
-    public List<Medicamento> buscarMedicamentosPorDescripcion(String patron) {
+    public Lista<Medicamento> buscarMedicamentosPorDescripcion(String patron) {
         return medicamentoDAO.buscarPorDescripcionAproximada(patron);
     }
 }

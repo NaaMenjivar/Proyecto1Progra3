@@ -4,7 +4,7 @@ import datos.fabricas.DAOFactory;
 import datos.interfaces.*;
 import modelo.*;
 import logica.excepciones.CatalogoException;
-import java.util.List;
+import modelo.lista.Lista;
 
 public class GestorCatalogos {
     private IUsuarioDAO usuarioDAO;
@@ -80,11 +80,11 @@ public class GestorCatalogos {
         return usuarioDAO.eliminar(id);
     }
 
-    public List<Usuario> buscarMedicos() {
+    public Lista<Usuario> buscarMedicos() {
         return usuarioDAO.buscarPorTipo(TipoUsuario.MEDICO);
     }
 
-    public List<Usuario> buscarFarmaceutas() {
+    public Lista<Usuario> buscarFarmaceutas() {
         return usuarioDAO.buscarPorTipo(TipoUsuario.FARMACEUTA);
     }
 
@@ -112,7 +112,7 @@ public class GestorCatalogos {
         return pacienteDAO.buscarPorId(id);
     }
 
-    public List<Paciente> buscarPacientesPorNombre(String nombre) {
+    public Lista<Paciente> buscarPacientesPorNombre(String nombre) {
         return pacienteDAO.buscarPorNombreAproximado(nombre);
     }
 
@@ -136,7 +136,7 @@ public class GestorCatalogos {
         return pacienteDAO.eliminar(id);
     }
 
-    public List<Paciente> obtenerTodosPacientes() {
+    public Lista<Paciente> obtenerTodosPacientes() {
         return pacienteDAO.obtenerTodos();
     }
 
@@ -164,7 +164,7 @@ public class GestorCatalogos {
         return medicamentoDAO.buscarPorCodigo(codigo);
     }
 
-    public List<Medicamento> buscarMedicamentosPorDescripcion(String descripcion) {
+    public Lista<Medicamento> buscarMedicamentosPorDescripcion(String descripcion) {
         return medicamentoDAO.buscarPorDescripcionAproximada(descripcion);
     }
 
@@ -188,11 +188,11 @@ public class GestorCatalogos {
         return medicamentoDAO.eliminar(codigo);
     }
 
-    public List<Medicamento> obtenerTodosMedicamentos() {
+    public Lista<Medicamento> obtenerTodosMedicamentos() {
         return medicamentoDAO.obtenerTodos();
     }
 
-    public List<Medicamento> obtenerMedicamentosBajoStock(int umbral) {
+    public Lista<Medicamento> obtenerMedicamentosBajoStock(int umbral) {
         return medicamentoDAO.obtenerMedicamentosBajoStock(umbral);
     }
 
@@ -209,10 +209,10 @@ public class GestorCatalogos {
     }
 
     public int contarMedicos() {
-        return buscarMedicos().size();
+        return buscarMedicos().getTam();
     }
 
     public int contarFarmaceutas() {
-        return buscarFarmaceutas().size();
+        return buscarFarmaceutas().getTam();
     }
 }

@@ -129,8 +129,8 @@ public class VentanaLogin extends JDialog {
     private void configurarIconos() {
         try {
             // Configurar iconos de botones
-            ImageIcon iconoIngresar = new ImageIcon(getClass().getResource("/imagenes/iconos/login.png"));
-            ImageIcon iconoCancelar = new ImageIcon(getClass().getResource("/imagenes/iconos/salir.png"));
+            ImageIcon iconoIngresar = new ImageIcon(getClass().getResource("/Iconos/login.jpg"));
+            ImageIcon iconoCancelar = new ImageIcon(getClass().getResource("/Iconos/exit.jpg"));
 
             if (iconoIngresar.getIconWidth() > 0) {
                 Image imgIngresar = iconoIngresar.getImage().getScaledInstance(16, 16, Image.SCALE_SMOOTH);
@@ -227,8 +227,6 @@ public class VentanaLogin extends JDialog {
     }
 
     private void setupEventHandlers() {
-        // Controlador (se asignará después)
-        // controlador = new ControladorLogin(this);
 
         // Eventos de botones
         botonIngresar.addActionListener(new ActionListener() {
@@ -312,12 +310,10 @@ public class VentanaLogin extends JDialog {
             return;
         }
 
-        // Aquí se llamaría al controlador
         if (controlador != null) {
-            // controlador.procesarLogin(id, clave, tipo);
+            controlador.procesarLogin(id, clave, tipo);
         } else {
-            // Simulación temporal para pruebas
-            simularLogin(id, clave, tipo);
+            mostrarError("Controlador Invalido o NULL");
         }
     }
 
@@ -342,11 +338,7 @@ public class VentanaLogin extends JDialog {
     }
 
     private void mostrarVentanaCambiarClave() {
-        // Aquí se abriría la ventana de cambiar clave
-        JOptionPane.showMessageDialog(this,
-                "Funcionalidad de cambiar clave\n(Por implementar con VentanaCambiarClave)",
-                "Cambiar Clave",
-                JOptionPane.INFORMATION_MESSAGE);
+        this.controlador.cambiarClave();
     }
 
     private void limpiarCampos() {
@@ -401,52 +393,5 @@ public class VentanaLogin extends JDialog {
         dispose();
     }
 
-    /// Manejar los datos en el controlador en lugar de en esta misma clase para respetar el MVC
 
-    /*private void setupEventHandlers() {
-        botonIngresar.addActionListener(e -> {
-            if (controlador != null) {
-                controlador.procesarLogin(getId(), getClave(), getTipoUsuario());
-            }
-        });
-
-        botonCancelar.addActionListener(e -> {
-            if (controlador != null) {
-                controlador.cancelarLogin();
-            }
-        });
-
-        botonCambiarClave.addActionListener(e -> {
-            if (controlador != null) {
-                controlador.cambiarClave();
-            }
-        });
-
-        // Evento mostrar/ocultar clave (se queda igual)
-        botonMostrarClave.addActionListener(e ->
-                campoClave.setEchoChar(botonMostrarClave.isSelected() ? (char) 0 : '*')
-        );
-
-        // Enter para login
-        KeyAdapter enterKeyListener = new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER && controlador != null) {
-                    controlador.procesarLogin(getId(), getClave(), getTipoUsuario());
-                }
-            }
-        };
-
-        campoId.addKeyListener(enterKeyListener);
-        campoClave.addKeyListener(enterKeyListener);
-        comboTipoUsuario.addKeyListener(enterKeyListener);
-
-        // Focus inicial
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowOpened(java.awt.event.WindowEvent e) {
-                campoId.requestFocusInWindow();
-            }
-        });
-    }*/
 }

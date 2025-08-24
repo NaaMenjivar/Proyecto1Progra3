@@ -1,6 +1,7 @@
 package presentacion.controlador;
 
 import modelo.TipoUsuario;
+import presentacion.vista.principales.VentanaCambiarClave;
 import presentacion.vista.principales.VentanaLogin;
 
 import java.awt.*;
@@ -27,13 +28,12 @@ public class ControladorLogin {
         }
     }
     public void cancelarLogin() {
-        ventanaLogin.dispose(); // simplemente cerramos
+        ventanaLogin.dispose();
     }
 
     public void cambiarClave() {
-        // Abrir ventana de cambio de clave
-        // (pendiente de implementar)
-        System.out.println("Aquí iría la lógica para cambiar clave.");
+        VentanaCambiarClave ventanaCambiarClave = new VentanaCambiarClave(null);
+        ventanaCambiarClave.setVisible(true);
     }
 
 }
