@@ -9,7 +9,8 @@ public class Main {
         System.out.println(num);
 
         ControladorPrincipal controladorPrincipal = new ControladorPrincipal();
-        controladorPrincipal.iniciarApp();
+        controladorPrincipal.iniciarVentanaPrincipal();
+
 
 
     }

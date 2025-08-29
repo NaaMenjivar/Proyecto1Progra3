@@ -1,5 +1,8 @@
 package presentacion.vista.principales;
 
+import presentacion.controlador.ControladorPrincipal;
+import presentacion.modelo.ModeloPrincipal;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
@@ -22,8 +25,9 @@ public class VentanaPrincipal extends JFrame {
     private JTable tableMedicos;
     private DefaultTableModel tableModel;
 
-    // TODO: Agregar referencia al controlador siguiendo patrón MVC
-    // private MedicosController controller;
+    private ControladorPrincipal controllerPrincipal;
+    private ModeloPrincipal modeloPrincipal;
+
 
     public VentanaPrincipal() {
         initializeComponents();
@@ -89,7 +93,6 @@ public class VentanaPrincipal extends JFrame {
         medicoSection.add(new JLabel("Id"), gbcMedico);
 
         gbcMedico.gridx = 1;
-        txtId.setBackground(Color.LIGHT_GRAY);
         txtId.setEditable(true);
         medicoSection.add(txtId, gbcMedico);
 
@@ -168,6 +171,7 @@ public class VentanaPrincipal extends JFrame {
         tableMedicos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // Agregar datos de ejemplo
+
         tableModel.addRow(new Object[]{"MED-111", "David", "Pediatría"});
         tableModel.addRow(new Object[]{"MED-222", "Miguel", "Neurocirugía"});
 

@@ -1,15 +1,19 @@
 package presentacion.controlador;
 
+import presentacion.modelo.ModeloPrincipal;
+import presentacion.vista.principales.VentanaPrincipal;
+
 public class ControladorPrincipal {
 
-    private ControladorLogin login;
+    private ModeloPrincipal modeloPrincipal;
+    private VentanaPrincipal ventanaPrincipal;
 
-    public ControladorPrincipal () {
-        System.out.printf("\tSe Creo un Menu Principal:");
-        login = new ControladorLogin();
+    public ControladorPrincipal() {
+        ventanaPrincipal = new VentanaPrincipal();
+        modeloPrincipal = new ModeloPrincipal();
     }
 
-    public void iniciarApp() {
-        login.mostrarLogin();
+    public void iniciarVentanaPrincipal() {
+        ventanaPrincipal.setVisible(true);
     }
 }
