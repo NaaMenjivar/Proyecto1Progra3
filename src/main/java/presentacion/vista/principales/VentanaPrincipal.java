@@ -87,7 +87,8 @@ public class VentanaPrincipal extends JFrame {
         GridBagConstraints gbcMedico = new GridBagConstraints();
 
         // ID
-        gbcMedico.gridx = 0; gbcMedico.gridy = 0;
+        gbcMedico.gridx = 0;
+        gbcMedico.gridy = 0;
         gbcMedico.anchor = GridBagConstraints.WEST;
         gbcMedico.insets = new Insets(5, 5, 5, 5);
         medicoSection.add(new JLabel("Id"), gbcMedico);
@@ -104,14 +105,16 @@ public class VentanaPrincipal extends JFrame {
         medicoSection.add(txtNombre, gbcMedico);
 
         // Botones de acción
-        gbcMedico.gridx = 4; gbcMedico.gridy = 0;
+        gbcMedico.gridx = 4;
+        gbcMedico.gridy = 0;
         medicoSection.add(btnGuardar, gbcMedico);
 
         gbcMedico.gridx = 5;
         medicoSection.add(btnLimpiar, gbcMedico);
 
         // Especialidad
-        gbcMedico.gridx = 0; gbcMedico.gridy = 1;
+        gbcMedico.gridx = 0;
+        gbcMedico.gridy = 1;
         medicoSection.add(new JLabel("Especialidad"), gbcMedico);
 
         gbcMedico.gridx = 1;
@@ -129,7 +132,8 @@ public class VentanaPrincipal extends JFrame {
         busquedaSection.add(btnReporte);
 
         // Agregar secciones al panel de formulario
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
         formPanel.add(medicoSection, gbc);
@@ -377,10 +381,14 @@ public class VentanaPrincipal extends JFrame {
             }
 
             @Override
-            public int getIconWidth() { return 16; }
+            public int getIconWidth() {
+                return 16;
+            }
 
             @Override
-            public int getIconHeight() { return 16; }
+            public int getIconHeight() {
+                return 16;
+            }
         };
     }
 
@@ -393,10 +401,14 @@ public class VentanaPrincipal extends JFrame {
             }
 
             @Override
-            public int getIconWidth() { return 16; }
+            public int getIconWidth() {
+                return 16;
+            }
 
             @Override
-            public int getIconHeight() { return 16; }
+            public int getIconHeight() {
+                return 16;
+            }
         };
     }
 
@@ -444,6 +456,7 @@ public class VentanaPrincipal extends JFrame {
 
     /**
      * Muestra un mensaje de error al usuario
+     *
      * @param mensaje Mensaje de error
      */
     public void mostrarMensajeError(String mensaje) {
@@ -452,6 +465,7 @@ public class VentanaPrincipal extends JFrame {
 
     /**
      * Muestra un mensaje de información al usuario
+     *
      * @param mensaje Mensaje de información
      */
     public void mostrarMensajeInformacion(String mensaje) {
@@ -460,23 +474,11 @@ public class VentanaPrincipal extends JFrame {
 
     /**
      * Obtiene el índice de la fila seleccionada en la tabla
+     *
      * @return Índice de la fila seleccionada
      */
     public int obtenerFilaSeleccionada() {
         return tableMedicos.getSelectedRow();
-    }
-
-    // Método main para pruebas
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            new VentanaPrincipal().setVisible(true);
-        });
     }
 }
 
