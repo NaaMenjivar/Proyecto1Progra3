@@ -2,6 +2,10 @@ package presentacion.vista.principales;
 
 import presentacion.controlador.ControladorPrincipal;
 import presentacion.modelo.ModeloPrincipal;
+import presentacion.vista.administrador.PanelGestionFarmaceutas;
+import presentacion.vista.administrador.PanelGestionMedicos;
+import presentacion.vista.administrador.PanelGestionMedicamentos;
+import presentacion.vista.administrador.PanelGestionPacientes;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -75,88 +79,30 @@ public class VentanaPrincipal extends JFrame {
         setLayout(new BorderLayout());
 
         // Panel principal para la pestaña Médicos
-        JPanel medicosPanel = new JPanel(new BorderLayout());
+        JPanel medicosPanel = new PanelGestionMedicos();
 
-        // Panel superior con formulario
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        // Panel Farmaceutas
+        JPanel farmaceutasPanel = new PanelGestionFarmaceutas();
 
-        // Sección Médico
-        JPanel medicoSection = new JPanel(new GridBagLayout());
-        medicoSection.setBorder(BorderFactory.createTitledBorder("Médico"));
-        GridBagConstraints gbcMedico = new GridBagConstraints();
+        // Panel Pacientes
+        JPanel pacientesPanel = new PanelGestionPacientes();
 
-        // ID
-        gbcMedico.gridx = 0;
-        gbcMedico.gridy = 0;
-        gbcMedico.anchor = GridBagConstraints.WEST;
-        gbcMedico.insets = new Insets(5, 5, 5, 5);
-        medicoSection.add(new JLabel("Id"), gbcMedico);
+        // Panel Medicamentos
+        JPanel medicamentosPanel = new PanelGestionMedicamentos();
 
-        gbcMedico.gridx = 1;
-        txtId.setEditable(true);
-        medicoSection.add(txtId, gbcMedico);
+        // Panel Dashboard y otros siguen igual
+        JPanel dashboardPanel = new JPanel();
+        JPanel historicoPanel = new JPanel();
+        JPanel acercaPanel = new JPanel();
 
-        // Nombre
-        gbcMedico.gridx = 2;
-        medicoSection.add(new JLabel("Nombre"), gbcMedico);
-
-        gbcMedico.gridx = 3;
-        medicoSection.add(txtNombre, gbcMedico);
-
-        // Botones de acción
-        gbcMedico.gridx = 4;
-        gbcMedico.gridy = 0;
-        medicoSection.add(btnGuardar, gbcMedico);
-
-        gbcMedico.gridx = 5;
-        medicoSection.add(btnLimpiar, gbcMedico);
-
-        // Especialidad
-        gbcMedico.gridx = 0;
-        gbcMedico.gridy = 1;
-        medicoSection.add(new JLabel("Especialidad"), gbcMedico);
-
-        gbcMedico.gridx = 1;
-        medicoSection.add(txtEspecialidad, gbcMedico);
-
-        gbcMedico.gridx = 4;
-        medicoSection.add(btnBorrar, gbcMedico);
-
-        // Sección Búsqueda
-        JPanel busquedaSection = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        busquedaSection.setBorder(BorderFactory.createTitledBorder("Búsqueda"));
-        busquedaSection.add(new JLabel("Nombre"));
-        busquedaSection.add(txtBusquedaNombre);
-        busquedaSection.add(btnBuscar);
-        busquedaSection.add(btnReporte);
-
-        // Agregar secciones al panel de formulario
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        formPanel.add(medicoSection, gbc);
-
-        gbc.gridy = 1;
-        formPanel.add(busquedaSection, gbc);
-
-        // Panel de la tabla
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBorder(BorderFactory.createTitledBorder("Listado"));
-
-        // Agregar componentes al panel principal
-        medicosPanel.add(formPanel, BorderLayout.NORTH);
-        medicosPanel.add(tablePanel, BorderLayout.CENTER);
-
-        // Agregar pestañas
+        // Agregar pestañas con los paneles de gestión
         tabbedPane.addTab("Médicos", createTabIcon(Color.RED), medicosPanel);
-        tabbedPane.addTab("Farmaceutas", createTabIcon(Color.ORANGE), new JPanel());
-        tabbedPane.addTab("Pacientes", createTabIcon(Color.BLUE), new JPanel());
-        tabbedPane.addTab("Medicamentos", createTabIcon(Color.GREEN), new JPanel());
-        tabbedPane.addTab("Dashboard", createTabIcon(Color.MAGENTA), new JPanel());
-        tabbedPane.addTab("Histórico", createTabIcon(Color.CYAN), new JPanel());
-        tabbedPane.addTab("Acerca de...", createTabIcon(Color.GRAY), new JPanel());
+        tabbedPane.addTab("Farmaceutas", createTabIcon(Color.ORANGE), farmaceutasPanel);
+        tabbedPane.addTab("Pacientes", createTabIcon(Color.BLUE), pacientesPanel);
+        tabbedPane.addTab("Medicamentos", createTabIcon(Color.GREEN), medicamentosPanel);
+        tabbedPane.addTab("Dashboard", createTabIcon(Color.MAGENTA), dashboardPanel);
+        tabbedPane.addTab("Histórico", createTabIcon(Color.CYAN), historicoPanel);
+        tabbedPane.addTab("Acerca de...", createTabIcon(Color.GRAY), acercaPanel);
 
         add(tabbedPane, BorderLayout.CENTER);
     }

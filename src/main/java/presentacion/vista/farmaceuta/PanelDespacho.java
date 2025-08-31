@@ -1,4 +1,4 @@
 package presentacion.vista.farmaceuta;
 
-public class VentanaBuscarRecetas {
+public class PanelDespacho {
 }

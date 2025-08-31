@@ -5,7 +5,6 @@ import javax.swing.*;
 import presentacion.controlador.ControladorLogin;
 import modelo.TipoUsuario;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,7 +36,7 @@ public class VentanaLogin extends JDialog {
         super(parent, "Ingreso al Sistema Hospital", true);
         initComponents();
         setupLayout();
-        setupEventHandlers();
+        initEvents();
         setupWindow();
     }
 
@@ -226,7 +225,7 @@ public class VentanaLogin extends JDialog {
         add(panelPrincipal, BorderLayout.CENTER);
     }
 
-    private void setupEventHandlers() {
+    private void initEvents() {
 
         // Eventos de botones
         botonIngresar.addActionListener(new ActionListener() {

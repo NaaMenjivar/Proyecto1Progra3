@@ -21,12 +21,8 @@ public class GestorPrescripcion {
         this.medicamentoDAO = factory.getMedicamentoDAO();
         // Se obtienen las listas desde los DAOs
         this.validador = new ValidadorNegocio(
-            pacienteDAO.obtenerTodos() instanceof modelo.lista.Lista
-                ? (modelo.lista.Lista<Paciente>) pacienteDAO.obtenerTodos()
-                : new modelo.lista.Lista<Paciente>(),
-            medicamentoDAO.obtenerTodos() instanceof modelo.lista.Lista
-                ? (modelo.lista.Lista<Medicamento>) medicamentoDAO.obtenerTodos()
-                : new modelo.lista.Lista<Medicamento>()
+                pacienteDAO.obtenerTodos(),
+                medicamentoDAO.obtenerTodos()
         );
     }
 

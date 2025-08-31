@@ -1,4 +1,4 @@
 package presentacion.vista.medico;
 
-public class VentanaPrescripcion {
+public class PanelHistorialMedico {
 }

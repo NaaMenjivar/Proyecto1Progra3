@@ -1,4 +1,4 @@
 package presentacion.vista.compartidas;
 
-public class VentanaDashboard {
+public class PanelDetalleReceta {
 }
