@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<medicamentos>
+  <medicamento>
+    <codigo>MED001</codigo>
+    <nombre>Paracetamol</nombre>
+    <presentacion>Analgésico</presentacion>
+    <stock>100</stock>
+  </medicamento>
+  <medicamento>
+    <codigo>MED002</codigo>
+    <nombre>Ibuprofeno</nombre>
+    <presentacion>Antiinflamatorio</presentacion>
+    <stock>50</stock>
+  </medicamento>
+</medicamentos>
