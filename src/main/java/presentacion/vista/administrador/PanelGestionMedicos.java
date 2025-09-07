@@ -3,189 +3,259 @@ package presentacion.vista.administrador;
 import presentacion.controlador.ControladorCatalogos;
 import presentacion.modelo.ModeloTablaUsuarios;
 import modelo.*;
+import modelo.lista.Lista;
 import utilidades.GeneradorIds;
 import logica.excepciones.CatalogoException;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 /**
- * VIEW - Panel de gestión de médicos siguiendo patrón MVC tradicional
- * ✅ USA LOS COMPONENTES EXACTOS DEL ARCHIVO .form
- * ✅ Implementa PropertyChangeListener para recibir notificaciones del modelo
+ * VISTA - MVC Simple con .form de IntelliJ
+ * SOLUCION: Fuerza la inicialización correcta del .form
  */
-public class PanelGestionMedicos extends JPanel implements PropertyChangeListener {
+public class PanelGestionMedicos extends JPanel {
 
     // ============================================
-    // ✅ COMPONENTES EXACTOS DEL ARCHIVO .form
+    // COMPONENTES EXACTOS DEL ARCHIVO .form
+    // DEBEN coincidir EXACTAMENTE con el .form
     // ============================================
+
+    // Paneles principales
     private JPanel Medico;
     private JPanel Busqueda;
     private JPanel Listado;
+
+    // Campos de texto
     private JTextField idFld;
     private JTextField nombreFld;
     private JTextField especialidadFld;
-    private JPanel panelBotones1;
+    private JTextField nombreBusquedaFld;
+
+    // Botones
     private JButton botonGuardarMedico;
     private JButton botonLimpiarCamposMedico;
     private JButton botonBorrarMedico;
-    private JLabel idLabel;
-    private JLabel tituloMedico;
-    private JLabel especialidadLabel;
-    private JLabel nombreLabel;
-    private JLabel nombreBusquedaLabel;
-    private JTextField nombreBusquedaFld;
-    private JPanel panelBotones2;
     private JButton botonBuscar;
     private JButton botonGenerarReporte;
+
+    // Labels
+    private JLabel idLabel;
+    private JLabel nombreLabel;
+    private JLabel especialidadLabel;
+    private JLabel tituloMedico;
+    private JLabel nombreBusquedaLabel;
+
+    // Paneles de botones
+    private JPanel panelBotones1;
+    private JPanel panelBotones2;
+
+    // Tabla y scroll - ESTOS SON CRÍTICOS
     private JTable tablaListaMedicos;
+    private JScrollPane scrollTablaMedicos;  // Nombre exacto del .form
 
     // ============================================
     // COMPONENTES MVC
     // ============================================
-    private ControladorCatalogos controlador;     // CONTROLLER
-    private ModeloTablaUsuarios modelo;           // MODEL
+    private ControladorCatalogos controlador;
+    private ModeloTablaUsuarios modelo;
+    private boolean modoEdicion = false;
 
     // ============================================
-    // CONSTRUCTOR
+    // CONSTRUCTOR CON FORZADO DE INICIALIZACION
     // ============================================
     public PanelGestionMedicos() {
+        System.out.println("🚀 INICIANDO PanelGestionMedicos...");
+
+        // CRÍTICO: Forzar la inicialización del .form PRIMERO
+        try {
+            // Llamar al método generado por IntelliJ (si existe)
+            $$$setupUI$$$();
+        } catch (Exception e) {
+            System.out.println("⚠️ Método $$$setupUI$$$() no encontrado, IntelliJ lo generará automáticamente");
+        }
+
+        // Pequeña pausa para asegurar inicialización
+        SwingUtilities.invokeLater(() -> {
+            try {
+                Thread.sleep(50); // 50ms para asegurar que el .form esté listo
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+
+            inicializarComponentes();
+        });
+    }
+
+    /**
+     * MÉTODO CRÍTICO: Aquí se inicializa todo después del .form
+     */
+    private void inicializarComponentes() {
+        System.out.println("🔧 Inicializando componentes...");
+
+        // Verificar componentes críticos
+        verificarComponentesDelForm();
+
+        // Inicializar MVC
         initMVC();
+
+        // Configurar todo
         configurarTabla();
         configurarEventos();
-        configurarValidaciones();
+        configurarEstilos();
+
+        // Cargar datos
+        cargarDatos();
+
+        System.out.println("✅ PanelGestionMedicos completamente inicializado!");
     }
 
-    // ============================================
-    // INICIALIZACIÓN MVC
-    // ============================================
+    /**
+     * Verifica que los componentes del .form existan
+     */
+    private void verificarComponentesDelForm() {
+        System.out.println("🔍 Verificando componentes del .form...");
+
+        // Verificaciones críticas
+        if (tablaListaMedicos == null) {
+            System.err.println("❌ CRÍTICO: tablaListaMedicos es NULL");
+            System.err.println("   Verifique el field name en el .form");
+        } else {
+            System.out.println("✅ tablaListaMedicos inicializada");
+        }
+
+        if (botonGuardarMedico == null) {
+            System.err.println("❌ CRÍTICO: botonGuardarMedico es NULL");
+        } else {
+            System.out.println("✅ botonGuardarMedico inicializado");
+        }
+
+        if (nombreFld == null) {
+            System.err.println("❌ CRÍTICO: nombreFld es NULL");
+        } else {
+            System.out.println("✅ nombreFld inicializado");
+        }
+
+        if (especialidadFld == null) {
+            System.err.println("❌ CRÍTICO: especialidadFld es NULL");
+        } else {
+            System.out.println("✅ especialidadFld inicializado");
+        }
+
+        if (scrollTablaMedicos == null) {
+            System.err.println("❌ ADVERTENCIA: scrollTablaMedicos (JScrollPane) es NULL");
+        } else {
+            System.out.println("✅ scrollTablaMedicos (JScrollPane) inicializado");
+        }
+
+        // Contar componentes inicializados
+        int componentesOK = 0;
+        int componentesTotal = 5; // Los críticos
+
+        if (tablaListaMedicos != null) componentesOK++;
+        if (botonGuardarMedico != null) componentesOK++;
+        if (nombreFld != null) componentesOK++;
+        if (especialidadFld != null) componentesOK++;
+        if (scrollTablaMedicos != null) componentesOK++;
+
+        System.out.println("📊 Componentes inicializados: " + componentesOK + "/" + componentesTotal);
+
+        if (componentesOK < componentesTotal) {
+            System.err.println("⚠️ ADVERTENCIA: Algunos componentes no se inicializaron");
+            System.err.println("   Revise los field names en el archivo .form");
+        }
+    }
+
     private void initMVC() {
-        // Crear e inicializar componentes MVC
-        this.controlador = new ControladorCatalogos();
-        this.modelo = new ModeloTablaUsuarios();
-
-        // Establecer relaciones MVC
-        this.controlador.setModelo(this.modelo);
-        this.modelo.addPropertyChangeListener(this);
-
-        System.out.println("✅ PanelGestionMedicos: MVC inicializado correctamente");
+        try {
+            this.controlador = new ControladorCatalogos();
+            this.modelo = new ModeloTablaUsuarios();
+            System.out.println("✅ MVC inicializado");
+        } catch (Exception e) {
+            System.err.println("❌ Error al inicializar MVC: " + e.getMessage());
+        }
     }
 
-    // ============================================
-    // CONFIGURACIÓN DE TABLA (USA COMPONENTES DEL .form)
-    // ============================================
     private void configurarTabla() {
-        // ✅ VERIFICAR que los componentes del .form existen
-        if (tablaListaMedicos != null && modelo != null) {
-            // Conectar el modelo con la tabla del .form
-            tablaListaMedicos.setModel(modelo);
+        if (tablaListaMedicos == null || modelo == null) {
+            System.err.println("❌ No se puede configurar tabla: componentes null");
+            return;
+        }
 
-            // Configuraciones visuales
+        try {
+            tablaListaMedicos.setModel(modelo);
             tablaListaMedicos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             tablaListaMedicos.setRowHeight(25);
             tablaListaMedicos.getTableHeader().setReorderingAllowed(false);
             tablaListaMedicos.setFillsViewportHeight(true);
 
             // Configurar anchos de columnas
-            javax.swing.table.TableColumnModel columnModel = tablaListaMedicos.getColumnModel();
-            if (columnModel.getColumnCount() >= 4) {
-                columnModel.getColumn(0).setPreferredWidth(100); // ID
-                columnModel.getColumn(1).setPreferredWidth(200); // Nombre
-                columnModel.getColumn(2).setPreferredWidth(150); // Especialidad
-                columnModel.getColumn(3).setPreferredWidth(80);  // Estado
+            if (tablaListaMedicos.getColumnModel().getColumnCount() >= 4) {
+                tablaListaMedicos.getColumnModel().getColumn(0).setPreferredWidth(100); // ID
+                tablaListaMedicos.getColumnModel().getColumn(1).setPreferredWidth(200); // Nombre
+                tablaListaMedicos.getColumnModel().getColumn(2).setPreferredWidth(150); // Especialidad
+                tablaListaMedicos.getColumnModel().getColumn(3).setPreferredWidth(80);  // Estado
             }
 
-            System.out.println("✅ Tabla configurada con modelo MVC");
-        } else {
-            System.err.println("❌ ERROR: tablaListaMedicos o modelo es null");
+            System.out.println("✅ Tabla configurada correctamente");
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al configurar tabla: " + e.getMessage());
         }
     }
 
-    // ============================================
-    // CONFIGURACIÓN DE EVENTOS (USA COMPONENTES DEL .form)
-    // ============================================
     private void configurarEventos() {
+        System.out.println("🔧 Configurando eventos...");
 
-        // ============= EVENTOS DE BOTONES DEL .form =============
+        // Botón Guardar
         if (botonGuardarMedico != null) {
-            botonGuardarMedico.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (validar()) { // ✅ CORREGIDO: Usar nuevo nombre del método
-                        Medico medico = take();
-                        try {
-                            if (modelo.isModoEdicion()) {
-                                controlador.update(medico);
-                                mostrarMensajeExito("MÉDICO ACTUALIZADO");
-                            } else {
-                                controlador.create(medico);
-                                mostrarMensajeExito("MÉDICO REGISTRADO");
-                            }
-                        } catch (Exception ex) {
-                            mostrarMensajeError(ex.getMessage());
-                        }
-                    }
-                }
+            botonGuardarMedico.addActionListener(e -> {
+                System.out.println("👆 Click en Guardar");
+                guardarMedico();
             });
         }
 
+        // Botón Limpiar
         if (botonLimpiarCamposMedico != null) {
-            botonLimpiarCamposMedico.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    controlador.clear();
-                }
+            botonLimpiarCamposMedico.addActionListener(e -> {
+                System.out.println("👆 Click en Limpiar");
+                limpiarFormulario();
             });
         }
 
+        // Botón Borrar
         if (botonBorrarMedico != null) {
-            botonBorrarMedico.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    borrarMedicoSeleccionado();
-                }
+            botonBorrarMedico.addActionListener(e -> {
+                System.out.println("👆 Click en Borrar");
+                borrarMedico();
             });
         }
 
+        // Botón Buscar
         if (botonBuscar != null) {
-            botonBuscar.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    aplicarFiltro();
-                }
+            botonBuscar.addActionListener(e -> {
+                System.out.println("👆 Click en Buscar");
+                buscarMedicos();
             });
         }
 
+        // Botón Generar Reporte
         if (botonGenerarReporte != null) {
-            botonGenerarReporte.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    generarReporte();
-                }
+            botonGenerarReporte.addActionListener(e -> {
+                System.out.println("👆 Click en Generar Reporte");
+                generarReporte();
             });
         }
 
-        // ============= EVENTOS DE TABLA DEL .form =============
+        // Eventos de tabla
         if (tablaListaMedicos != null) {
-            tablaListaMedicos.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    if (!e.getValueIsAdjusting()) {
-                        int filaSeleccionada = tablaListaMedicos.getSelectedRow();
-                        if (filaSeleccionada >= 0) {
-                            controlador.seleccionarMedico(filaSeleccionada);
-                        }
-                    }
+            tablaListaMedicos.getSelectionModel().addListSelectionListener(e -> {
+                if (!e.getValueIsAdjusting()) {
+                    seleccionarMedicoEnTabla();
                 }
             });
 
@@ -194,347 +264,328 @@ public class PanelGestionMedicos extends JPanel implements PropertyChangeListene
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getClickCount() == 2) {
-                        int filaSeleccionada = tablaListaMedicos.getSelectedRow();
-                        if (filaSeleccionada >= 0) {
-                            controlador.seleccionarMedico(filaSeleccionada);
-                            modelo.setModoEdicion(true);
-                        }
+                        System.out.println("👆 Doble click en tabla");
+                        activarModoEdicion();
                     }
                 }
             });
         }
 
-        // ============= BÚSQUEDA EN TIEMPO REAL =============
+        // Búsqueda en tiempo real
         if (nombreBusquedaFld != null) {
             nombreBusquedaFld.addKeyListener(new KeyAdapter() {
                 @Override
                 public void keyReleased(KeyEvent e) {
-                    String filtro = nombreBusquedaFld.getText().trim();
-                    controlador.filtrar(filtro);
+                    buscarMedicos();
                 }
             });
         }
 
-        // ============= ENTER PARA GUARDAR =============
-        KeyAdapter enterKeyListener = new KeyAdapter() {
+        // Enter para guardar
+        KeyAdapter enterListener = new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    if (botonGuardarMedico != null) {
-                        botonGuardarMedico.doClick();
-                    }
+                    guardarMedico();
                 }
             }
         };
 
-        if (nombreFld != null) {
-            nombreFld.addKeyListener(enterKeyListener);
-        }
-        if (especialidadFld != null) {
-            especialidadFld.addKeyListener(enterKeyListener);
-        }
+        if (idFld != null) idFld.addKeyListener(enterListener);
+        if (nombreFld != null) nombreFld.addKeyListener(enterListener);
+        if (especialidadFld != null) especialidadFld.addKeyListener(enterListener);
+
+        System.out.println("✅ Eventos configurados");
     }
 
-    // ============================================
-    // CONFIGURACIONES ADICIONALES
-    // ============================================
-    private void configurarValidaciones() {
-        // Estado inicial de botones
-        if (botonBorrarMedico != null) {
-            botonBorrarMedico.setEnabled(false);
+    private void configurarEstilos() {
+        try {
+            // Configurar colores de botones
+            if (botonGuardarMedico != null) {
+                botonGuardarMedico.setBackground(new Color(0, 153, 76));
+                botonGuardarMedico.setForeground(Color.WHITE);
+                botonGuardarMedico.setOpaque(true);
+            }
+
+            if (botonBorrarMedico != null) {
+                botonBorrarMedico.setBackground(new Color(204, 51, 51));
+                botonBorrarMedico.setForeground(Color.WHITE);
+                botonBorrarMedico.setOpaque(true);
+                botonBorrarMedico.setEnabled(false);
+            }
+
+            System.out.println("✅ Estilos configurados");
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al configurar estilos: " + e.getMessage());
         }
-
-        // Colores de botones (si se desea)
-        if (botonGuardarMedico != null) {
-            botonGuardarMedico.setBackground(new Color(0, 153, 76));
-            botonGuardarMedico.setForeground(Color.WHITE);
-        }
-
-        if (botonBorrarMedico != null) {
-            botonBorrarMedico.setBackground(new Color(204, 51, 51));
-            botonBorrarMedico.setForeground(Color.WHITE);
-        }
-    }
-
-    // ============================================
-    // IMPLEMENTACIÓN DE PropertyChangeListener
-    // ============================================
-    @Override
-    public void propertyChange(PropertyChangeEvent evt) {
-        switch (evt.getPropertyName()) {
-            case ModeloTablaUsuarios.LIST:
-                // La tabla se actualiza automáticamente por AbstractTableModel
-                System.out.println("✅ Lista actualizada: " + modelo.getRowCount() + " médicos");
-                break;
-
-            case ModeloTablaUsuarios.CURRENT:
-                // Actualizar formulario con médico actual
-                Medico medico = modelo.getMedicoActual();
-                if (medico != null) {
-                    // ✅ USAR COMPONENTES DEL .form
-                    if (idFld != null) {
-                        idFld.setText(medico.getId() != null ? medico.getId() : "");
-                    }
-                    if (nombreFld != null) {
-                        nombreFld.setText(medico.getNombre() != null ? medico.getNombre() : "");
-                    }
-                    if (especialidadFld != null) {
-                        especialidadFld.setText(medico.getEspecialidad() != null ? medico.getEspecialidad() : "");
-                    }
-
-                    // Configurar modo edición
-                    if (modelo.isModoEdicion()) {
-                        if (idFld != null) idFld.setEditable(false);
-                        if (botonGuardarMedico != null) botonGuardarMedico.setText("Actualizar");
-                    } else {
-                        if (idFld != null) idFld.setEditable(true);
-                        if (botonGuardarMedico != null) botonGuardarMedico.setText("Guardar");
-                    }
-
-                    // Limpiar validaciones visuales
-                    limpiarValidacionesVisuales();
-                }
-
-                // Actualizar estado de botones
-                actualizarEstadoBotones();
-                break;
-
-            case ModeloTablaUsuarios.FILTER:
-                String filtro = modelo.getFiltroActual();
-                if (nombreBusquedaFld != null && !nombreBusquedaFld.getText().equals(filtro)) {
-                    nombreBusquedaFld.setText(filtro);
-                }
-                System.out.println("✅ Filtro aplicado: '" + filtro + "' - " + modelo.getRowCount() + " resultados");
-                break;
-        }
-
-        // Revalidar panel
-        this.revalidate();
-        this.repaint();
     }
 
     // ============================================
     // MÉTODOS DE ACCIÓN
     // ============================================
 
-    /**
-     * Toma los datos del formulario y crea un objeto Medico
-     */
-    private Medico take() {
-        Medico medico = new Medico();
+    private void cargarDatos() {
+        System.out.println("📊 Cargando datos...");
 
-        // ✅ USAR COMPONENTES DEL .form
-        String id = idFld != null ? idFld.getText().trim() : "";
-        if (id.isEmpty()) {
-            id = GeneradorIds.generarIdMedico();
-        }
+        try {
+            Lista<Usuario> medicos = controlador.buscarMedicos();
+            modelo.setUsuarios(medicos);
+            actualizarEstadoBotones();
+            System.out.println("✅ Datos cargados: " + medicos.getTam() + " médicos");
 
-        medico.setId(id);
-        medico.setNombre(nombreFld != null ? nombreFld.getText().trim() : "");
-        medico.setEspecialidad(especialidadFld != null ? especialidadFld.getText().trim() : "");
-        medico.setClave(id); // Clave igual al ID por defecto
-
-        return medico;
-    }
-
-    /**
-     * Valida los datos del formulario
-     */
-    private boolean validar() {
-        boolean valid = true;
-
-        // Limpiar validaciones anteriores
-        limpiarValidacionesVisuales();
-
-        // ✅ VALIDAR USANDO COMPONENTES DEL .form
-        if (nombreFld != null && nombreFld.getText().trim().isEmpty()) {
-            valid = false;
-            nombreFld.setBackground(Color.PINK);
-            nombreFld.setToolTipText("Nombre requerido");
-        }
-
-        if (especialidadFld != null && especialidadFld.getText().trim().isEmpty()) {
-            valid = false;
-            especialidadFld.setBackground(Color.PINK);
-            especialidadFld.setToolTipText("Especialidad requerida");
-        }
-
-        return valid;
-    }
-
-    /**
-     * Limpia las validaciones visuales
-     */
-    private void limpiarValidacionesVisuales() {
-        if (idFld != null) {
-            idFld.setBackground(null);
-            idFld.setToolTipText(null);
-        }
-        if (nombreFld != null) {
-            nombreFld.setBackground(null);
-            nombreFld.setToolTipText(null);
-        }
-        if (especialidadFld != null) {
-            especialidadFld.setBackground(null);
-            especialidadFld.setToolTipText(null);
-        }
-    }
-
-    /**
-     * Actualiza el estado de los botones según el contexto
-     */
-    private void actualizarEstadoBotones() {
-        Medico medicoActual = modelo.getMedicoActual();
-        boolean hayMedicoSeleccionado = medicoActual != null &&
-                medicoActual.getId() != null &&
-                !medicoActual.getId().isEmpty();
-
-        if (botonBorrarMedico != null) {
-            botonBorrarMedico.setEnabled(hayMedicoSeleccionado);
-        }
-
-        if (botonGuardarMedico != null) {
-            if (modelo.isModoEdicion()) {
-                botonGuardarMedico.setText("Actualizar");
-            } else {
-                botonGuardarMedico.setText("Guardar");
+            // Verificar que la tabla se actualizó
+            if (tablaListaMedicos != null) {
+                System.out.println("📋 Filas en tabla: " + tablaListaMedicos.getRowCount());
             }
+
+        } catch (Exception e) {
+            System.err.println("❌ Error al cargar datos: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    /**
-     * Borra el médico seleccionado
-     */
-    private void borrarMedicoSeleccionado() {
-        Medico medicoActual = modelo.getMedicoActual();
-        if (medicoActual == null || medicoActual.getId() == null || medicoActual.getId().isEmpty()) {
-            mostrarMensajeError("Seleccione un médico para borrar");
+    private void guardarMedico() {
+        System.out.println("💾 Guardando médico...");
+
+        if (!validarFormulario()) {
             return;
         }
 
+        try {
+            Medico medico = extraerDatosFormulario();
+            boolean exito;
+
+            if (modoEdicion) {
+                exito = controlador.actualizarUsuario(medico);
+                if (exito) {
+                    mostrarMensaje("Médico actualizado exitosamente");
+                }
+            } else {
+                exito = controlador.agregarMedico(medico);
+                if (exito) {
+                    mostrarMensaje("Médico agregado exitosamente");
+                }
+            }
+
+            if (exito) {
+                limpiarFormulario();
+                cargarDatos();
+            }
+
+        } catch (CatalogoException e) {
+            mostrarError(e.getMessage());
+        }
+    }
+
+    private void borrarMedico() {
+        if (tablaListaMedicos == null) {
+            mostrarError("Tabla no disponible");
+            return;
+        }
+
+        int fila = tablaListaMedicos.getSelectedRow();
+        if (fila < 0) {
+            mostrarError("Seleccione un médico para eliminar");
+            return;
+        }
+
+        Usuario usuario = modelo.getUsuarioEnFila(fila);
         int confirmacion = JOptionPane.showConfirmDialog(
                 this,
-                "¿Está seguro de eliminar al médico " + medicoActual.getNombre() + "?",
+                "¿Está seguro de eliminar al médico " + usuario.getNombre() + "?",
                 "Confirmar eliminación",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE
+                JOptionPane.YES_NO_OPTION
         );
 
         if (confirmacion == JOptionPane.YES_OPTION) {
             try {
-                controlador.delete(medicoActual.getId());
-                mostrarMensajeExito("MÉDICO ELIMINADO");
-            } catch (Exception ex) {
-                mostrarMensajeError(ex.getMessage());
+                boolean exito = controlador.eliminarUsuario(usuario.getId());
+                if (exito) {
+                    mostrarMensaje("Médico eliminado exitosamente");
+                    limpiarFormulario();
+                    cargarDatos();
+                }
+            } catch (CatalogoException e) {
+                mostrarError(e.getMessage());
             }
         }
     }
 
-    /**
-     * Aplica filtro de búsqueda
-     */
-    private void aplicarFiltro() {
+    private void buscarMedicos() {
+        String filtro = "";
         if (nombreBusquedaFld != null) {
-            String filtro = nombreBusquedaFld.getText().trim();
-            controlador.filtrar(filtro);
+            filtro = nombreBusquedaFld.getText().trim();
+        }
+
+        Lista<Usuario> medicosFiltrados = controlador.filtrarMedicos(filtro);
+        modelo.setUsuarios(medicosFiltrados);
+
+        System.out.println("🔍 Búsqueda: '" + filtro + "' -> " + medicosFiltrados.getTam() + " resultados");
+    }
+
+    private void seleccionarMedicoEnTabla() {
+        if (tablaListaMedicos == null) return;
+
+        int fila = tablaListaMedicos.getSelectedRow();
+        if (fila >= 0) {
+            Usuario usuario = modelo.getUsuarioEnFila(fila);
+            if (usuario instanceof Medico) {
+                cargarMedicoEnFormulario((Medico) usuario);
+                actualizarEstadoBotones();
+            }
         }
     }
 
-    /**
-     * Genera reporte de estadísticas
-     */
+    private void activarModoEdicion() {
+        modoEdicion = true;
+        if (idFld != null) {
+            idFld.setEnabled(false);
+        }
+        if (botonGuardarMedico != null) {
+            botonGuardarMedico.setText("Actualizar");
+        }
+        mostrarMensaje("Modo edición activado");
+    }
+
     private void generarReporte() {
-        try {
-            String resumen = controlador.obtenerResumenEstadisticas();
+        String reporte = controlador.obtenerResumenEstadisticas();
 
-            JTextArea areaTexto = new JTextArea(15, 50);
-            areaTexto.setText(resumen);
-            areaTexto.setEditable(false);
-            areaTexto.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JTextArea textArea = new JTextArea(reporte);
+        textArea.setEditable(false);
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
-            JScrollPane scroll = new JScrollPane(areaTexto);
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(500, 300));
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    scroll,
-                    "Reporte del Sistema Hospital",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-        } catch (Exception e) {
-            mostrarMensajeError("Error al generar reporte: " + e.getMessage());
-        }
+        JOptionPane.showMessageDialog(this, scrollPane, "Reporte del Sistema", JOptionPane.INFORMATION_MESSAGE);
     }
 
     // ============================================
-    // MÉTODOS DE UTILIDAD
+    // MÉTODOS DE FORMULARIO
     // ============================================
 
-    private void mostrarMensajeError(String mensaje) {
+    private boolean validarFormulario() {
+        if (nombreFld == null || especialidadFld == null) {
+            mostrarError("Formulario no está disponible");
+            return false;
+        }
+
+        limpiarValidacionesVisuales();
+        boolean valido = true;
+
+        if (nombreFld.getText().trim().isEmpty()) {
+            nombreFld.setBackground(Color.PINK);
+            valido = false;
+        }
+
+        if (especialidadFld.getText().trim().isEmpty()) {
+            especialidadFld.setBackground(Color.PINK);
+            valido = false;
+        }
+
+        if (!modoEdicion && idFld != null) {
+            String id = idFld.getText().trim();
+            if (!id.isEmpty() && controlador.existeUsuario(id)) {
+                idFld.setBackground(Color.PINK);
+                valido = false;
+            }
+        }
+
+        return valido;
+    }
+
+    private void limpiarValidacionesVisuales() {
+        if (idFld != null) idFld.setBackground(null);
+        if (nombreFld != null) nombreFld.setBackground(null);
+        if (especialidadFld != null) especialidadFld.setBackground(null);
+    }
+
+    private Medico extraerDatosFormulario() {
+        String id = idFld != null ? idFld.getText().trim() : "";
+        String nombre = nombreFld != null ? nombreFld.getText().trim() : "";
+        String especialidad = especialidadFld != null ? especialidadFld.getText().trim() : "";
+
+        if (id.isEmpty()) {
+            id = GeneradorIds.generarIdMedico();
+        }
+
+        return new Medico(id, nombre, id, especialidad);
+    }
+
+    private void cargarMedicoEnFormulario(Medico medico) {
+        if (idFld != null) idFld.setText(medico.getId());
+        if (nombreFld != null) nombreFld.setText(medico.getNombre());
+        if (especialidadFld != null) especialidadFld.setText(medico.getEspecialidad());
+        limpiarValidacionesVisuales();
+    }
+
+    private void limpiarFormulario() {
+        if (idFld != null) {
+            idFld.setText("");
+            idFld.setEnabled(true);
+        }
+        if (nombreFld != null) nombreFld.setText("");
+        if (especialidadFld != null) especialidadFld.setText("");
+
+        modoEdicion = false;
+
+        if (botonGuardarMedico != null) {
+            botonGuardarMedico.setText("Guardar");
+        }
+        if (tablaListaMedicos != null) {
+            tablaListaMedicos.clearSelection();
+        }
+
+        limpiarValidacionesVisuales();
+        actualizarEstadoBotones();
+    }
+
+    private void actualizarEstadoBotones() {
+        boolean haySeleccion = tablaListaMedicos != null && tablaListaMedicos.getSelectedRow() >= 0;
+        if (botonBorrarMedico != null) {
+            botonBorrarMedico.setEnabled(haySeleccion);
+        }
+    }
+
+    private void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    private void mostrarMensajeExito(String mensaje) {
-        JOptionPane.showMessageDialog(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
-    }
-
     // ============================================
-    // MÉTODOS PÚBLICOS PARA INTEGRACIÓN
+    // MÉTODOS PÚBLICOS
     // ============================================
 
-    /**
-     * Establece el controlador (para integración externa)
-     */
-    public void setControlador(ControladorCatalogos controlador) {
-        this.controlador = controlador;
-        if (this.modelo != null) {
-            this.controlador.setModelo(this.modelo);
-        }
-    }
-
-    /**
-     * Establece el modelo (para integración externa)
-     */
-    public void setModelo(ModeloTablaUsuarios modelo) {
-        if (this.modelo != null) {
-            this.modelo.removePropertyChangeListener(this);
-        }
-
-        this.modelo = modelo;
-        this.modelo.addPropertyChangeListener(this);
-
-        if (this.controlador != null) {
-            this.controlador.setModelo(this.modelo);
-        }
-
-        // ✅ SOLO configurar la tabla - el JScrollPane lo maneja el .form automáticamente
-        if (tablaListaMedicos != null) {
-            tablaListaMedicos.setModel(this.modelo);
-        }
-    }
-
-    /**
-     * Refresca los datos desde el exterior
-     */
     public void refrescarDatos() {
-        if (controlador != null) {
-            controlador.cargarTodosMedicos();
-        }
+        System.out.println("🔄 Refrescando datos del panel...");
+        cargarDatos();
     }
 
-    /**
-     * Obtiene el número de médicos mostrados
-     */
     public int getNumeroMedicos() {
         return modelo != null ? modelo.getRowCount() : 0;
     }
 
-    /**
-     * Verifica si hay cambios sin guardar
-     */
     public boolean hayCambiosSinGuardar() {
         boolean hayTextoNombre = nombreFld != null && !nombreFld.getText().trim().isEmpty();
         boolean hayTextoEspecialidad = especialidadFld != null && !especialidadFld.getText().trim().isEmpty();
         return hayTextoNombre || hayTextoEspecialidad;
+    }
+
+    // ============================================
+    // MÉTODO PLACEHOLDER PARA INTELLIJ
+    // IntelliJ puede generar este método automáticamente
+    // ============================================
+
+    /**
+     * Método generado por IntelliJ para inicializar componentes del .form
+     * Si no existe, IntelliJ lo creará automáticamente al compilar
+     */
+    private void $$$setupUI$$$() {
+        // Este método será generado automáticamente por IntelliJ
+        // si no existe. No modificar manualmente.
     }
 }

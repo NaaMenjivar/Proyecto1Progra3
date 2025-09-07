@@ -10,30 +10,18 @@ import presentacion.vista.administrador.PanelGestionMedicos;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Ventana Principal del Sistema Hospital
- * ✅ ACTUALIZADA para usar PanelGestionMedicos con patrón MVC
- */
 public class VentanaPrincipal extends JFrame {
     private JTabbedPane tabbedPane;
 
-    // ============================================
-    // PANELES DE GESTIÓN CON MVC
-    // ============================================
-    private PanelGestionMedicos panelMedicos;              // ✅ Usa MVC completo
-    private PanelGestionFarmaceutas panelFarmaceutas;      // ✅ Mantiene patrón existente
-    private PanelGestionPacientes panelPacientes;          // ✅ Mantiene patrón existente
-    private PanelGestionMedicamentos panelMedicamentos;    // ✅ Mantiene patrón existente
+    // Paneles de gestión
+    private PanelGestionMedicos panelMedicos;
+    private PanelGestionFarmaceutas panelFarmaceutas;
+    private PanelGestionPacientes panelPacientes;
+    private PanelGestionMedicamentos panelMedicamentos;
 
-    // ============================================
-    // CONTROLADORES Y MODELOS MVC
-    // ============================================
     private ControladorPrincipal controllerPrincipal;
     private ModeloPrincipal modeloPrincipal;
 
-    // ============================================
-    // CONSTRUCTOR
-    // ============================================
     public VentanaPrincipal() {
         initializeComponents();
         setupLayout();
@@ -41,9 +29,6 @@ public class VentanaPrincipal extends JFrame {
         setupWindow();
     }
 
-    // ============================================
-    // INICIALIZACIÓN DE COMPONENTES
-    // ============================================
     private void initializeComponents() {
         setTitle("Sistema Hospital - Ventana Principal");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,19 +36,18 @@ public class VentanaPrincipal extends JFrame {
         // Crear JTabbedPane principal
         tabbedPane = new JTabbedPane();
 
-        // ✅ INICIALIZAR PANELES - el MVC se configura automáticamente
-        panelMedicos = new PanelGestionMedicos();              // ✅ MVC ya configurado en constructor
-        panelFarmaceutas = new PanelGestionFarmaceutas();      // ✅ Patrón existente
-        panelPacientes = new PanelGestionPacientes();          // ✅ Patrón existente
-        panelMedicamentos = new PanelGestionMedicamentos();    // ✅ Patrón existente
+        // Inicializar paneles de gestión - USAR LOS PANELES REALES
+        panelMedicos = new PanelGestionMedicos();
+        panelFarmaceutas = new PanelGestionFarmaceutas();
+        panelPacientes = new PanelGestionPacientes();
+        panelMedicamentos = new PanelGestionMedicamentos();
+
+        // Cargar datos iniciales en los paneles
+        cargarDatosIniciales();
     }
 
     private void setupLayout() {
         setLayout(new BorderLayout());
-
-        // ============================================
-        // PANELES PLACEHOLDER PARA FUNCIONALIDADES FALTANTES
-        // ============================================
 
         // Panel Dashboard (placeholder)
         JPanel dashboardPanel = crearPanelPlaceholder("Dashboard",
@@ -73,44 +57,17 @@ public class VentanaPrincipal extends JFrame {
         JPanel historicoPanel = crearPanelPlaceholder("Histórico de Recetas",
                 "Aquí se mostrará el histórico de todas las recetas del sistema");
 
-        // Panel Prescripción (placeholder para médicos)
-        JPanel prescripcionPanel = crearPanelPlaceholder("Prescripción de Recetas",
-                "Aquí los médicos podrán confeccionar recetas para pacientes");
-
-        // Panel Despacho (placeholder para farmaceutas)
-        JPanel despachoPanel = crearPanelPlaceholder("Despacho de Medicamentos",
-                "Aquí los farmaceutas podrán despachar medicamentos");
-
-        // Panel Acerca de
+        // Panel Acerca de (placeholder)
         JPanel acercaPanel = crearPanelAcercaDe();
 
-        // ============================================
-        // AGREGAR PESTAÑAS CON ICONOS
-        // ============================================
-
-        // Pestañas de gestión (Administrador)
-        tabbedPane.addTab("Médicos", createTabIcon(Color.RED), panelMedicos,
-                "Gestión de médicos del hospital - ✅ MVC Completo");
-        tabbedPane.addTab("Farmaceutas", createTabIcon(Color.ORANGE), panelFarmaceutas,
-                "Gestión de farmaceutas del hospital");
-        tabbedPane.addTab("Pacientes", createTabIcon(Color.BLUE), panelPacientes,
-                "Gestión de pacientes del hospital");
-        tabbedPane.addTab("Medicamentos", createTabIcon(Color.GREEN), panelMedicamentos,
-                "Gestión del catálogo de medicamentos");
-
-        // Pestañas funcionales (en desarrollo)
-        tabbedPane.addTab("Prescripción", createTabIcon(Color.MAGENTA), prescripcionPanel,
-                "Prescripción de recetas - En desarrollo");
-        tabbedPane.addTab("Despacho", createTabIcon(Color.CYAN), despachoPanel,
-                "Despacho de medicamentos - En desarrollo");
-
-        // Pestañas de información
-        tabbedPane.addTab("Dashboard", createTabIcon(Color.PINK), dashboardPanel,
-                "Estadísticas y reportes del sistema - En desarrollo");
-        tabbedPane.addTab("Histórico", createTabIcon(Color.LIGHT_GRAY), historicoPanel,
-                "Histórico de recetas del sistema - En desarrollo");
-        tabbedPane.addTab("Acerca de...", createTabIcon(Color.GRAY), acercaPanel,
-                "Información sobre el sistema");
+        // Agregar pestañas con iconos - USAR LOS PANELES REALES
+        tabbedPane.addTab("Médicos", createTabIcon(Color.RED), panelMedicos, "Gestión de médicos del hospital");
+        tabbedPane.addTab("Farmaceutas", createTabIcon(Color.ORANGE), panelFarmaceutas, "Gestión de farmaceutas del hospital");
+        tabbedPane.addTab("Pacientes", createTabIcon(Color.BLUE), panelPacientes, "Gestión de pacientes del hospital");
+        tabbedPane.addTab("Medicamentos", createTabIcon(Color.GREEN), panelMedicamentos, "Gestión del catálogo de medicamentos");
+        tabbedPane.addTab("Dashboard", createTabIcon(Color.MAGENTA), dashboardPanel, "Estadísticas y reportes del sistema");
+        tabbedPane.addTab("Histórico", createTabIcon(Color.CYAN), historicoPanel, "Histórico de recetas del sistema");
+        tabbedPane.addTab("Acerca de...", createTabIcon(Color.GRAY), acercaPanel, "Información sobre el sistema");
 
         add(tabbedPane, BorderLayout.CENTER);
 
@@ -119,42 +76,33 @@ public class VentanaPrincipal extends JFrame {
         add(barraEstado, BorderLayout.SOUTH);
     }
 
-    // ============================================
-    // CONFIGURACIÓN DE EVENTOS
-    // ============================================
     private void setupEventListeners() {
         // Listener para cambio de pestañas
         tabbedPane.addChangeListener(e -> {
             int selectedIndex = tabbedPane.getSelectedIndex();
             String tabTitle = tabbedPane.getTitleAt(selectedIndex);
 
-            // ✅ REFRESCAR DATOS cuando se selecciona una pestaña de gestión
+            // Refrescar datos cuando se selecciona una pestaña de gestión
             switch (selectedIndex) {
-                case 0: // Médicos - ✅ MVC automático, no necesita refresh manual
-                    // El MVC se encarga automáticamente de mantener datos actualizados
-                    System.out.println("✅ Pestaña Médicos seleccionada - MVC activo");
+                case 0: // Médicos
+                    if (panelMedicos != null) {
+                        panelMedicos.refrescarDatos();
+                    }
                     break;
-
                 case 1: // Farmaceutas
                     if (panelFarmaceutas != null) {
                         panelFarmaceutas.refrescarDatos();
                     }
                     break;
-
                 case 2: // Pacientes
                     if (panelPacientes != null) {
                         panelPacientes.refrescarDatos();
                     }
                     break;
-
                 case 3: // Medicamentos
                     if (panelMedicamentos != null) {
                         panelMedicamentos.refrescarDatos();
                     }
-                    break;
-
-                default:
-                    // Otras pestañas no necesitan refresh
                     break;
             }
 
@@ -163,12 +111,9 @@ public class VentanaPrincipal extends JFrame {
         });
     }
 
-    // ============================================
-    // CONFIGURACIÓN DE VENTANA
-    // ============================================
     private void setupWindow() {
         // Configurar ventana
-        setSize(1200, 800);
+        setSize(1000, 700);
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximizar por defecto
 
@@ -181,9 +126,37 @@ public class VentanaPrincipal extends JFrame {
         }
     }
 
-    // ============================================
-    // MÉTODOS AUXILIARES PARA CREAR PANELES
-    // ============================================
+    // ================================
+    // MÉTODOS AUXILIARES
+    // ================================
+
+    /**
+     * Carga los datos iniciales en todos los paneles de gestión
+     */
+    private void cargarDatosIniciales() {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                // Cargar datos en cada panel
+                if (panelMedicos != null) {
+                    panelMedicos.refrescarDatos();
+                }
+                if (panelFarmaceutas != null) {
+                    panelFarmaceutas.refrescarDatos();
+                }
+                if (panelPacientes != null) {
+                    panelPacientes.refrescarDatos();
+                }
+                if (panelMedicamentos != null) {
+                    panelMedicamentos.refrescarDatos();
+                }
+
+                System.out.println("✅ Datos iniciales cargados en todos los paneles");
+            } catch (Exception e) {
+                System.err.println("❌ Error al cargar datos iniciales: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+    }
 
     private JPanel crearPanelPlaceholder(String titulo, String descripcion) {
         JPanel panel = new JPanel(new BorderLayout());
@@ -231,27 +204,19 @@ public class VentanaPrincipal extends JFrame {
                         "Funcionalidades principales:\n" +
                         "• Gestión de usuarios (médicos, farmaceutas, administradores)\n" +
                         "• Catálogo de pacientes y medicamentos\n" +
-                        "• Prescripción digital de recetas (en desarrollo)\n" +
-                        "• Despacho controlado en farmacia (en desarrollo)\n" +
+                        "• Prescripción digital de recetas\n" +
+                        "• Despacho controlado en farmacia\n" +
                         "• Reportes y estadísticas\n\n" +
                         "Arquitectura: Capas + MVC\n" +
                         "Persistencia: XML con JDOM2\n" +
                         "Interfaz: Java Swing\n\n" +
-                        "Estado actual:\n" +
-                        "✅ Gestión de Médicos - MVC Completo\n" +
-                        "✅ Gestión de Farmaceutas - Funcional\n" +
-                        "✅ Gestión de Pacientes - Funcional\n" +
-                        "✅ Gestión de Medicamentos - Funcional\n" +
-                        "⚠️ Prescripción - En desarrollo\n" +
-                        "⚠️ Despacho - En desarrollo\n" +
-                        "⚠️ Dashboard - En desarrollo\n\n" +
                         "© 2024 - Sistema Hospital\n" +
                         "Versión 1.0.0"
         );
 
         JScrollPane scrollInfo = new JScrollPane(areaInfo);
         scrollInfo.setBorder(BorderFactory.createTitledBorder("Información del Sistema"));
-        scrollInfo.setPreferredSize(new Dimension(500, 400));
+        scrollInfo.setPreferredSize(new Dimension(500, 300));
 
         panel.add(panelSuperior, BorderLayout.NORTH);
         panel.add(scrollInfo, BorderLayout.CENTER);
@@ -264,7 +229,7 @@ public class VentanaPrincipal extends JFrame {
         barraEstado.setBorder(BorderFactory.createLoweredBevelBorder());
         barraEstado.setPreferredSize(new Dimension(0, 25));
 
-        JLabel labelEstado = new JLabel(" Sistema Hospital - Listo | Médicos: MVC Activo");
+        JLabel labelEstado = new JLabel(" Sistema Hospital - Listo");
         labelEstado.setFont(new Font("Arial", Font.PLAIN, 11));
 
         JLabel labelFecha = new JLabel(java.time.LocalDateTime.now().format(
@@ -278,9 +243,10 @@ public class VentanaPrincipal extends JFrame {
         return barraEstado;
     }
 
-    // ============================================
+    // ================================
     // MÉTODOS PARA CREAR ICONOS
-    // ============================================
+    // ================================
+
     private Icon createTabIcon(Color color) {
         return new Icon() {
             @Override
@@ -305,9 +271,9 @@ public class VentanaPrincipal extends JFrame {
         };
     }
 
-    // ============================================
+    // ================================
     // MÉTODOS PÚBLICOS PARA CONTROLADOR
-    // ============================================
+    // ================================
 
     /**
      * Muestra un mensaje de error al usuario
@@ -333,7 +299,7 @@ public class VentanaPrincipal extends JFrame {
     }
 
     /**
-     * ✅ Obtiene el panel de médicos para acceso directo (MVC)
+     * Obtiene el panel de médicos para acceso directo
      */
     public PanelGestionMedicos getPanelMedicos() {
         return panelMedicos;
@@ -361,23 +327,96 @@ public class VentanaPrincipal extends JFrame {
     }
 
     /**
-     * ✅ Actualiza todos los paneles de gestión
+     * Actualiza todos los paneles de gestión
      */
     public void refrescarTodosLosPaneles() {
-        // ✅ Panel de médicos - MVC se actualiza automáticamente
-        if (panelMedicos != null) {
-            panelMedicos.refrescarDatos();
+        System.out.println("🔄 Refrescando todos los paneles...");
+
+        try {
+            if (panelMedicos != null) {
+                try {
+                    panelMedicos.refrescarDatos();
+                    System.out.println("✅ Panel Médicos actualizado");
+                } catch (Exception e) {
+                    System.err.println("❌ Error al actualizar Panel Médicos: " + e.getMessage());
+                }
+            }
+
+            if (panelFarmaceutas != null) {
+                try {
+                    panelFarmaceutas.refrescarDatos();
+                    System.out.println("✅ Panel Farmaceutas actualizado");
+                } catch (Exception e) {
+                    System.err.println("❌ Error al actualizar Panel Farmaceutas: " + e.getMessage());
+                }
+            }
+
+            if (panelPacientes != null) {
+                try {
+                    panelPacientes.refrescarDatos();
+                    System.out.println("✅ Panel Pacientes actualizado");
+                } catch (Exception e) {
+                    System.err.println("❌ Error al actualizar Panel Pacientes: " + e.getMessage());
+                }
+            }
+
+            if (panelMedicamentos != null) {
+                try {
+                    panelMedicamentos.refrescarDatos();
+                    System.out.println("✅ Panel Medicamentos actualizado");
+                } catch (Exception e) {
+                    System.err.println("❌ Error al actualizar Panel Medicamentos: " + e.getMessage());
+                }
+            }
+
+            System.out.println("✅ Actualización de paneles completada");
+
+        } catch (Exception e) {
+            System.err.println("❌ Error general al actualizar paneles: " + e.getMessage());
+            mostrarMensajeError("Error al actualizar datos: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Obtiene estadísticas generales del sistema
+     */
+    public String obtenerEstadisticasGenerales() {
+        StringBuilder stats = new StringBuilder();
+        stats.append("=== ESTADÍSTICAS GENERALES ===\n");
+
+        try {
+            if (panelMedicos != null) {
+                stats.append("Médicos: ").append(panelMedicos.getNumeroMedicos()).append("\n");
+            }
+            if (panelFarmaceutas != null) {
+                stats.append("Farmaceutas: ").append(panelFarmaceutas.getNumeroFarmaceutas()).append("\n");
+            }
+            if (panelPacientes != null) {
+                stats.append("Pacientes: ").append(panelPacientes.getNumeroPacientes()).append("\n");
+            }
+            if (panelMedicamentos != null) {
+                stats.append("Medicamentos: ").append(panelMedicamentos.getNumeroMedicamentos()).append("\n");
+            }
+        } catch (Exception e) {
+            stats.append("Error al obtener estadísticas: ").append(e.getMessage());
         }
 
-        // Otros paneles - refresh manual
-        if (panelFarmaceutas != null) {
-            panelFarmaceutas.refrescarDatos();
-        }
-        if (panelPacientes != null) {
-            panelPacientes.refrescarDatos();
-        }
-        if (panelMedicamentos != null) {
-            panelMedicamentos.refrescarDatos();
+        return stats.toString();
+    }
+
+    /**
+     * Verifica si hay cambios sin guardar en algún panel
+     */
+    public boolean hayCambiosSinGuardar() {
+        try {
+            if (panelMedicos != null && panelMedicos.hayCambiosSinGuardar()) {
+                return true;
+            }
+            // Agregar verificaciones para otros paneles cuando tengan el método
+            return false;
+        } catch (Exception e) {
+            System.err.println("❌ Error al verificar cambios: " + e.getMessage());
+            return false;
         }
     }
 
@@ -393,34 +432,5 @@ public class VentanaPrincipal extends JFrame {
      */
     public void setModelo(ModeloPrincipal modelo) {
         this.modeloPrincipal = modelo;
-    }
-
-    /**
-     * ✅ Obtiene estadísticas de todos los paneles
-     */
-    public String obtenerResumenSistema() {
-        StringBuilder resumen = new StringBuilder();
-        resumen.append("=== RESUMEN DEL SISTEMA ===\n");
-
-        // Estadísticas del panel de médicos (MVC)
-        if (panelMedicos != null) {
-            resumen.append("Médicos registrados: ").append(panelMedicos.getNumeroMedicos()).append("\n");
-        }
-
-        // Estadísticas de otros paneles
-        if (panelFarmaceutas != null) {
-            resumen.append("Farmaceutas registrados: ").append(panelFarmaceutas.getNumeroFarmaceutas()).append("\n");
-        }
-        if (panelPacientes != null) {
-            resumen.append("Pacientes registrados: ").append(panelPacientes.getNumeroPacientes()).append("\n");
-        }
-        if (panelMedicamentos != null) {
-            resumen.append("Medicamentos en catálogo: ").append(panelMedicamentos.getNumeroMedicamentos()).append("\n");
-        }
-
-        resumen.append("\n✅ Panel de Médicos: MVC Completo");
-        resumen.append("\n✅ Otros paneles: Funcionales");
-
-        return resumen.toString();
     }
 }
