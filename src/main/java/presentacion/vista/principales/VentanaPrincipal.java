@@ -3,347 +3,220 @@ package presentacion.vista.principales;
 import presentacion.controlador.ControladorPrincipal;
 import presentacion.modelo.ModeloPrincipal;
 import presentacion.vista.administrador.PanelGestionFarmaceutas;
-import presentacion.vista.administrador.PanelGestionMedicos;
 import presentacion.vista.administrador.PanelGestionMedicamentos;
 import presentacion.vista.administrador.PanelGestionPacientes;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.UIManager;
 
 public class VentanaPrincipal extends JFrame {
     private JTabbedPane tabbedPane;
-    private JTextField txtId;
-    private JTextField txtNombre;
-    private JTextField txtEspecialidad;
-    private JTextField txtBusquedaNombre;
-    private JButton btnGuardar;
-    private JButton btnLimpiar;
-    private JButton btnBorrar;
-    private JButton btnBuscar;
-    private JButton btnReporte;
-    private JTable tableMedicos;
-    private DefaultTableModel tableModel;
+
+    // Paneles de gestión
+    private PanelGestionMedicos panelMedicos;
+    private PanelGestionFarmaceutas panelFarmaceutas;
+    private PanelGestionPacientes panelPacientes;
+    private PanelGestionMedicamentos panelMedicamentos;
 
     private ControladorPrincipal controllerPrincipal;
     private ModeloPrincipal modeloPrincipal;
 
-
     public VentanaPrincipal() {
         initializeComponents();
         setupLayout();
-        setupTable();
         setupEventListeners();
-
-        // TODO: Inicializar controlador
-        // this.controller = new MedicosController(this, new MedicosModel());
+        setupWindow();
     }
 
     private void initializeComponents() {
-        setTitle("Ventana Principal");
+        setTitle("Sistema Hospital - Ventana Principal");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
-        setLocationRelativeTo(null);
 
         // Crear JTabbedPane principal
         tabbedPane = new JTabbedPane();
 
-        // Componentes del formulario
-        txtId = new JTextField("MED-111", 15);
-        txtNombre = new JTextField("David", 15);
-        txtEspecialidad = new JTextField("Pediatria", 15);
-        txtBusquedaNombre = new JTextField(15);
-
-        // Botones
-        btnGuardar = new JButton("Guardar");
-        btnGuardar.setIcon(createColoredIcon(Color.BLUE));
-
-        btnLimpiar = new JButton("Limpiar");
-        btnLimpiar.setIcon(createColoredIcon(Color.RED));
-
-        btnBorrar = new JButton("Borrar");
-        btnBorrar.setIcon(createColoredIcon(Color.RED));
-
-        btnBuscar = new JButton("Buscar");
-        btnBuscar.setIcon(createColoredIcon(Color.ORANGE));
-
-        btnReporte = new JButton("Reporte");
-        btnReporte.setIcon(createColoredIcon(Color.RED));
+        // Inicializar paneles de gestión
+        panelMedicos = new PanelGestionMedicos();
+        panelFarmaceutas = new PanelGestionFarmaceutas();
+        panelPacientes = new PanelGestionPacientes();
+        panelMedicamentos = new PanelGestionMedicamentos();
     }
 
     private void setupLayout() {
         setLayout(new BorderLayout());
 
-        // Panel principal para la pestaña Médicos
-        JPanel medicosPanel = new PanelGestionMedicos();
+        // Panel Dashboard (placeholder)
+        JPanel dashboardPanel = crearPanelPlaceholder("Dashboard",
+                "Aquí se mostrarán estadísticas y gráficos del sistema");
 
-        // Panel Farmaceutas
-        JPanel farmaceutasPanel = new PanelGestionFarmaceutas();
+        // Panel Histórico (placeholder)
+        JPanel historicoPanel = crearPanelPlaceholder("Histórico de Recetas",
+                "Aquí se mostrará el histórico de todas las recetas del sistema");
 
-        // Panel Pacientes
-        JPanel pacientesPanel = new PanelGestionPacientes();
+        // Panel Acerca de (placeholder)
+        JPanel acercaPanel = crearPanelAcercaDe();
 
-        // Panel Medicamentos
-        JPanel medicamentosPanel = new PanelGestionMedicamentos();
-
-        // Panel Dashboard y otros siguen igual
-        JPanel dashboardPanel = new JPanel();
-        JPanel historicoPanel = new JPanel();
-        JPanel acercaPanel = new JPanel();
-
-        // Agregar pestañas con los paneles de gestión
-        tabbedPane.addTab("Médicos", createTabIcon(Color.RED), medicosPanel);
-        tabbedPane.addTab("Farmaceutas", createTabIcon(Color.ORANGE), farmaceutasPanel);
-        tabbedPane.addTab("Pacientes", createTabIcon(Color.BLUE), pacientesPanel);
-        tabbedPane.addTab("Medicamentos", createTabIcon(Color.GREEN), medicamentosPanel);
-        tabbedPane.addTab("Dashboard", createTabIcon(Color.MAGENTA), dashboardPanel);
-        tabbedPane.addTab("Histórico", createTabIcon(Color.CYAN), historicoPanel);
-        tabbedPane.addTab("Acerca de...", createTabIcon(Color.GRAY), acercaPanel);
+        // Agregar pestañas con iconos
+        tabbedPane.addTab("Médicos", createTabIcon(Color.RED), panelMedicos, "Gestión de médicos del hospital");
+        tabbedPane.addTab("Farmaceutas", createTabIcon(Color.ORANGE), panelFarmaceutas, "Gestión de farmaceutas del hospital");
+        tabbedPane.addTab("Pacientes", createTabIcon(Color.BLUE), panelPacientes, "Gestión de pacientes del hospital");
+        tabbedPane.addTab("Medicamentos", createTabIcon(Color.GREEN), panelMedicamentos, "Gestión del catálogo de medicamentos");
+        tabbedPane.addTab("Dashboard", createTabIcon(Color.MAGENTA), dashboardPanel, "Estadísticas y reportes del sistema");
+        tabbedPane.addTab("Histórico", createTabIcon(Color.CYAN), historicoPanel, "Histórico de recetas del sistema");
+        tabbedPane.addTab("Acerca de...", createTabIcon(Color.GRAY), acercaPanel, "Información sobre el sistema");
 
         add(tabbedPane, BorderLayout.CENTER);
-    }
 
-    private void setupTable() {
-        // Configurar modelo de tabla
-        String[] columnNames = {"Id", "Nombre", "Especialidad"};
-        tableModel = new DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // Hacer tabla de solo lectura
-            }
-        };
-
-        tableMedicos = new JTable(tableModel);
-        tableMedicos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        // Agregar datos de ejemplo
-
-        tableModel.addRow(new Object[]{"MED-111", "David", "Pediatría"});
-        tableModel.addRow(new Object[]{"MED-222", "Miguel", "Neurocirugía"});
-
-        // Seleccionar primera fila por defecto
-        if (tableModel.getRowCount() > 0) {
-            tableMedicos.setRowSelectionInterval(0, 0);
-        }
-
-        JScrollPane scrollPane = new JScrollPane(tableMedicos);
-        scrollPane.setPreferredSize(new Dimension(0, 200));
-
-        // Agregar la tabla al panel correspondiente
-        Component medicosPanel = tabbedPane.getComponentAt(0);
-        if (medicosPanel instanceof JPanel) {
-            JPanel panel = (JPanel) medicosPanel;
-            Component[] components = panel.getComponents();
-            for (Component comp : components) {
-                if (comp instanceof JPanel) {
-                    JPanel subPanel = (JPanel) comp;
-                    if (subPanel.getBorder() instanceof TitledBorder) {
-                        TitledBorder border = (TitledBorder) subPanel.getBorder();
-                        if ("Listado".equals(border.getTitle())) {
-                            subPanel.add(scrollPane, BorderLayout.CENTER);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        // Agregar barra de estado
+        JPanel barraEstado = crearBarraEstado();
+        add(barraEstado, BorderLayout.SOUTH);
     }
 
     private void setupEventListeners() {
-        // TODO: Implementar listeners que deleguen al controlador
-        // Ejemplo de cómo debería ser la implementación siguiendo MVC:
+        // Listener para cambio de pestañas
+        tabbedPane.addChangeListener(e -> {
+            int selectedIndex = tabbedPane.getSelectedIndex();
+            String tabTitle = tabbedPane.getTitleAt(selectedIndex);
 
-        btnGuardar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO: Delegar al controlador
-                // controller.guardarMedico();
-                guardarMedico(); // Implementación temporal
+            // Refrescar datos cuando se selecciona una pestaña de gestión
+            switch (selectedIndex) {
+                case 0: // Médicos
+                    panelMedicos.refrescarDatos();
+                    break;
+                case 1: // Farmaceutas
+                    panelFarmaceutas.refrescarDatos();
+                    break;
+                case 2: // Pacientes
+                    panelPacientes.refrescarDatos();
+                    break;
+                case 3: // Medicamentos
+                    panelMedicamentos.refrescarDatos();
+                    break;
             }
-        });
 
-        btnLimpiar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO: Delegar al controlador
-                // controller.limpiarFormulario();
-                limpiarFormulario(); // Implementación temporal
-            }
-        });
-
-        btnBorrar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO: Delegar al controlador
-                // controller.borrarMedico();
-                borrarMedico(); // Implementación temporal
-            }
-        });
-
-        btnBuscar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO: Delegar al controlador
-                // controller.buscarMedico(txtBusquedaNombre.getText());
-                buscarMedico(); // Implementación temporal
-            }
-        });
-
-        btnReporte.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // TODO: Delegar al controlador
-                // controller.generarReporte();
-                generarReporte(); // Implementación temporal
-            }
-        });
-
-        // Listener para selección en tabla
-        tableMedicos.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                // TODO: Delegar al controlador
-                // controller.seleccionarMedico(tableMedicos.getSelectedRow());
-                cargarDatosSeleccionados(); // Implementación temporal
-            }
+            // Actualizar título de la ventana
+            setTitle("Sistema Hospital - " + tabTitle);
         });
     }
 
-    // TODO: Los siguientes métodos son implementaciones temporales
-    // En el patrón MVC, la vista solo debería tener métodos para:
-    // - Obtener datos de los componentes (getters)
-    // - Establecer datos en los componentes (setters)
-    // - Mostrar mensajes al usuario
-    // La lógica de negocio debería estar en el controlador
+    private void setupWindow() {
+        // Configurar ventana
+        setSize(1000, 700);
+        setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Maximizar por defecto
 
-    private void guardarMedico() {
-        // TODO: Este método debería ser reemplazado por controller.guardarMedico()
-        String id = txtId.getText();
-        String nombre = txtNombre.getText();
-        String especialidad = txtEspecialidad.getText();
-
-        if (nombre.trim().isEmpty() || especialidad.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Verificar si es edición o nuevo registro
-        int selectedRow = tableMedicos.getSelectedRow();
-        if (selectedRow >= 0) {
-            // Editar registro existente
-            tableModel.setValueAt(id, selectedRow, 0);
-            tableModel.setValueAt(nombre, selectedRow, 1);
-            tableModel.setValueAt(especialidad, selectedRow, 2);
-        } else {
-            // Agregar nuevo registro
-            tableModel.addRow(new Object[]{id, nombre, especialidad});
-        }
-
-        JOptionPane.showMessageDialog(this, "Médico guardado exitosamente",
-                "Información", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void limpiarFormulario() {
-        // TODO: Este método debería ser reemplazado por controller.limpiarFormulario()
-        txtId.setText("");
-        txtNombre.setText("");
-        txtEspecialidad.setText("");
-        tableMedicos.clearSelection();
-    }
-
-    private void borrarMedico() {
-        // TODO: Este método debería ser reemplazado por controller.borrarMedico()
-        int selectedRow = tableMedicos.getSelectedRow();
-        if (selectedRow >= 0) {
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    "¿Está seguro de eliminar el médico seleccionado?",
-                    "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-
-            if (confirm == JOptionPane.YES_OPTION) {
-                tableModel.removeRow(selectedRow);
-                limpiarFormulario();
-                JOptionPane.showMessageDialog(this, "Médico eliminado exitosamente",
-                        "Información", JOptionPane.INFORMATION_MESSAGE);
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Seleccione un médico para eliminar",
-                    "Advertencia", JOptionPane.WARNING_MESSAGE);
+        // Configurar Look and Feel
+        try {
+            UIManager.setLookAndFeel(UIManager.getLookAndFeel());
+            SwingUtilities.updateComponentTreeUI(this);
+        } catch (Exception e) {
+            System.err.println("No se pudo configurar Look and Feel: " + e.getMessage());
         }
     }
 
-    private void buscarMedico() {
-        // TODO: Este método debería ser reemplazado por controller.buscarMedico()
-        String busqueda = txtBusquedaNombre.getText().toLowerCase();
-        if (busqueda.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingrese un criterio de búsqueda",
-                    "Advertencia", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
+    // ================================
+    // MÉTODOS AUXILIARES
+    // ================================
 
-        // Búsqueda simple en la tabla
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            String nombre = tableModel.getValueAt(i, 1).toString().toLowerCase();
-            String id = tableModel.getValueAt(i, 0).toString().toLowerCase();
+    private JPanel crearPanelPlaceholder(String titulo, String descripcion) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-            if (nombre.contains(busqueda) || id.contains(busqueda)) {
-                tableMedicos.setRowSelectionInterval(i, i);
-                tableMedicos.scrollRectToVisible(tableMedicos.getCellRect(i, 0, true));
-                cargarDatosSeleccionados();
-                return;
-            }
-        }
+        JLabel labelTitulo = new JLabel(titulo, SwingConstants.CENTER);
+        labelTitulo.setFont(new Font("Arial", Font.BOLD, 18));
+        labelTitulo.setForeground(new Color(0, 102, 153));
 
-        JOptionPane.showMessageDialog(this, "No se encontraron médicos con ese criterio",
-                "Información", JOptionPane.INFORMATION_MESSAGE);
+        JLabel labelDescripcion = new JLabel("<html><center>" + descripcion + "</center></html>", SwingConstants.CENTER);
+        labelDescripcion.setFont(new Font("Arial", Font.PLAIN, 14));
+        labelDescripcion.setForeground(Color.GRAY);
+
+        JLabel labelEstado = new JLabel("⚠️ Funcionalidad en desarrollo", SwingConstants.CENTER);
+        labelEstado.setFont(new Font("Arial", Font.ITALIC, 12));
+        labelEstado.setForeground(new Color(255, 140, 0));
+
+        panel.add(labelTitulo, BorderLayout.NORTH);
+        panel.add(labelDescripcion, BorderLayout.CENTER);
+        panel.add(labelEstado, BorderLayout.SOUTH);
+
+        return panel;
     }
 
-    private void generarReporte() {
-        // TODO: Este método debería ser reemplazado por controller.generarReporte()
-        JOptionPane.showMessageDialog(this, "Funcionalidad de reporte en desarrollo",
-                "Información", JOptionPane.INFORMATION_MESSAGE);
+    private JPanel crearPanelAcercaDe() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+        // Panel superior con logo/título
+        JPanel panelSuperior = new JPanel(new FlowLayout());
+        JLabel labelTitulo = new JLabel("Sistema Hospital v1.0");
+        labelTitulo.setFont(new Font("Arial", Font.BOLD, 24));
+        labelTitulo.setForeground(new Color(0, 102, 153));
+        panelSuperior.add(labelTitulo);
+
+        // Panel central con información
+        JTextArea areaInfo = new JTextArea();
+        areaInfo.setEditable(false);
+        areaInfo.setOpaque(false);
+        areaInfo.setFont(new Font("Arial", Font.PLAIN, 14));
+        areaInfo.setText(
+                "Sistema de Prescripción y Despacho de Recetas\n\n" +
+                        "Desarrollado para hospitales estatales que requieren un sistema\n" +
+                        "digital para la gestión de recetas médicas.\n\n" +
+                        "Funcionalidades principales:\n" +
+                        "• Gestión de usuarios (médicos, farmaceutas, administradores)\n" +
+                        "• Catálogo de pacientes y medicamentos\n" +
+                        "• Prescripción digital de recetas\n" +
+                        "• Despacho controlado en farmacia\n" +
+                        "• Reportes y estadísticas\n\n" +
+                        "Arquitectura: Capas + MVC\n" +
+                        "Persistencia: XML con JDOM2\n" +
+                        "Interfaz: Java Swing\n\n" +
+                        "© 2024 - Sistema Hospital\n" +
+                        "Versión 1.0.0"
+        );
+
+        JScrollPane scrollInfo = new JScrollPane(areaInfo);
+        scrollInfo.setBorder(BorderFactory.createTitledBorder("Información del Sistema"));
+        scrollInfo.setPreferredSize(new Dimension(500, 300));
+
+        panel.add(panelSuperior, BorderLayout.NORTH);
+        panel.add(scrollInfo, BorderLayout.CENTER);
+
+        return panel;
     }
 
-    private void cargarDatosSeleccionados() {
-        // TODO: Este método debería ser reemplazado por controller.cargarDatosSeleccionados()
-        int selectedRow = tableMedicos.getSelectedRow();
-        if (selectedRow >= 0) {
-            txtId.setText(tableModel.getValueAt(selectedRow, 0).toString());
-            txtNombre.setText(tableModel.getValueAt(selectedRow, 1).toString());
-            txtEspecialidad.setText(tableModel.getValueAt(selectedRow, 2).toString());
-        }
+    private JPanel crearBarraEstado() {
+        JPanel barraEstado = new JPanel(new BorderLayout());
+        barraEstado.setBorder(BorderFactory.createLoweredBevelBorder());
+        barraEstado.setPreferredSize(new Dimension(0, 25));
+
+        JLabel labelEstado = new JLabel(" Sistema Hospital - Listo");
+        labelEstado.setFont(new Font("Arial", Font.PLAIN, 11));
+
+        JLabel labelFecha = new JLabel(java.time.LocalDateTime.now().format(
+                java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + " ");
+        labelFecha.setFont(new Font("Arial", Font.PLAIN, 11));
+        labelFecha.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        barraEstado.add(labelEstado, BorderLayout.WEST);
+        barraEstado.add(labelFecha, BorderLayout.EAST);
+
+        return barraEstado;
     }
 
-    // Métodos auxiliares para crear iconos
-    private Icon createColoredIcon(Color color) {
-        return new Icon() {
-            @Override
-            public void paintIcon(Component c, Graphics g, int x, int y) {
-                g.setColor(color);
-                g.fillRect(x, y, getIconWidth(), getIconHeight());
-            }
-
-            @Override
-            public int getIconWidth() {
-                return 16;
-            }
-
-            @Override
-            public int getIconHeight() {
-                return 16;
-            }
-        };
-    }
+    // ================================
+    // MÉTODOS PARA CREAR ICONOS
+    // ================================
 
     private Icon createTabIcon(Color color) {
         return new Icon() {
             @Override
             public void paintIcon(Component c, Graphics g, int x, int y) {
-                g.setColor(color);
-                g.fillOval(x + 2, y + 2, getIconWidth() - 4, getIconHeight() - 4);
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(color);
+                g2.fillOval(x + 2, y + 2, getIconWidth() - 4, getIconHeight() - 4);
+                g2.setColor(color.darker());
+                g2.drawOval(x + 2, y + 2, getIconWidth() - 4, getIconHeight() - 4);
             }
 
             @Override
@@ -358,52 +231,12 @@ public class VentanaPrincipal extends JFrame {
         };
     }
 
-    // TODO: Métodos que debería tener la Vista en el patrón MVC
-    // Estos métodos permiten al controlador interactuar con la vista
-
-    /**
-     * Obtiene los datos del médico desde el formulario
-     * @return Objeto con los datos del médico (debería ser MedicoDTO)
-     */
-    /*
-    public MedicoDTO obtenerDatosMedico() {
-        return new MedicoDTO(txtId.getText(), txtNombre.getText(), txtEspecialidad.getText());
-    }
-    */
-
-    /**
-     * Establece los datos del médico en el formulario
-     * @param medico Objeto con los datos del médico
-     */
-    /*
-    public void establecerDatosMedico(MedicoDTO medico) {
-        txtId.setText(medico.getId());
-        txtNombre.setText(medico.getNombre());
-        txtEspecialidad.setText(medico.getEspecialidad());
-    }
-    */
-
-    /**
-     * Actualiza la tabla con la lista de médicos
-     * @param medicos Lista de médicos
-     */
-    /*
-    public void actualizarTablaMedicos(List<MedicoDTO> medicos) {
-        tableModel.setRowCount(0);
-        for (MedicoDTO medico : medicos) {
-            tableModel.addRow(new Object[]{
-                medico.getId(),
-                medico.getNombre(),
-                medico.getEspecialidad()
-            });
-        }
-    }
-    */
+    // ================================
+    // MÉTODOS PÚBLICOS PARA CONTROLADOR
+    // ================================
 
     /**
      * Muestra un mensaje de error al usuario
-     *
-     * @param mensaje Mensaje de error
      */
     public void mostrarMensajeError(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
@@ -411,152 +244,69 @@ public class VentanaPrincipal extends JFrame {
 
     /**
      * Muestra un mensaje de información al usuario
-     *
-     * @param mensaje Mensaje de información
      */
     public void mostrarMensajeInformacion(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
-     * Obtiene el índice de la fila seleccionada en la tabla
-     *
-     * @return Índice de la fila seleccionada
+     * Cambia a una pestaña específica
      */
-    public int obtenerFilaSeleccionada() {
-        return tableMedicos.getSelectedRow();
-    }
-}
-
-/*
-TODO: IMPLEMENTACIÓN COMPLETA DEL PATRÓN MVC
-
-1. MODELO (MedicosModel.java):
-=================================
-public class MedicosModel {
-    private List<MedicoDTO> medicos;
-    private MedicoDAO medicoDAO;
-
-    public MedicosModel() {
-        this.medicoDAO = new MedicoDAO();
-        this.medicos = new ArrayList<>();
-    }
-
-    public void guardarMedico(MedicoDTO medico) {
-        // Validaciones de negocio
-        // Guardar en XML usando DAO
-        medicoDAO.guardar(medico);
-    }
-
-    public List<MedicoDTO> obtenerTodosMedicos() {
-        return medicoDAO.obtenerTodos();
-    }
-
-    public void eliminarMedico(String id) {
-        medicoDAO.eliminar(id);
-    }
-
-    public List<MedicoDTO> buscarMedicos(String criterio) {
-        return medicoDAO.buscar(criterio);
-    }
-}
-
-2. CONTROLADOR (MedicosController.java):
-========================================
-public class MedicosController {
-    private MedicosView vista;
-    private MedicosModel modelo;
-
-    public MedicosController(MedicosView vista, MedicosModel modelo) {
-        this.vista = vista;
-        this.modelo = modelo;
-        inicializarVista();
-    }
-
-    private void inicializarVista() {
-        cargarTodosMedicos();
-    }
-
-    public void guardarMedico() {
-        try {
-            MedicoDTO medico = vista.obtenerDatosMedico();
-            modelo.guardarMedico(medico);
-            vista.mostrarMensajeInformacion("Médico guardado exitosamente");
-            cargarTodosMedicos();
-        } catch (Exception e) {
-            vista.mostrarMensajeError("Error al guardar: " + e.getMessage());
+    public void cambiarAPestana(int indice) {
+        if (indice >= 0 && indice < tabbedPane.getTabCount()) {
+            tabbedPane.setSelectedIndex(indice);
         }
     }
 
-    public void eliminarMedico() {
-        int fila = vista.obtenerFilaSeleccionada();
-        if (fila >= 0) {
-            // Obtener ID del médico seleccionado
-            // Confirmar eliminación
-            // modelo.eliminarMedico(id);
-            // vista.mostrarMensajeInformacion("Médico eliminado");
-            // cargarTodosMedicos();
-        }
+    /**
+     * Obtiene el panel de médicos para acceso directo
+     */
+    public PanelGestionMedicos getPanelMedicos() {
+        return panelMedicos;
     }
 
-    public void buscarMedico(String criterio) {
-        try {
-            List<MedicoDTO> resultados = modelo.buscarMedicos(criterio);
-            vista.actualizarTablaMedicos(resultados);
-        } catch (Exception e) {
-            vista.mostrarMensajeError("Error en búsqueda: " + e.getMessage());
-        }
+    /**
+     * Obtiene el panel de farmaceutas para acceso directo
+     */
+    public PanelGestionFarmaceutas getPanelFarmaceutas() {
+        return panelFarmaceutas;
     }
 
-    private void cargarTodosMedicos() {
-        try {
-            List<MedicoDTO> medicos = modelo.obtenerTodosMedicos();
-            vista.actualizarTablaMedicos(medicos);
-        } catch (Exception e) {
-            vista.mostrarMensajeError("Error al cargar médicos: " + e.getMessage());
-        }
-    }
-}
-
-3. DTO (MedicoDTO.java):
-========================
-public class MedicoDTO {
-    private String id;
-    private String nombre;
-    private String especialidad;
-    private String clave;
-
-    // Constructores, getters y setters
-}
-
-4. DAO (MedicoDAO.java):
-========================
-public class MedicoDAO {
-    private static final String XML_FILE = "medicos.xml";
-
-    public void guardar(MedicoDTO medico) {
-        // Implementar guardado en XML usando DOM o JAXB
+    /**
+     * Obtiene el panel de pacientes para acceso directo
+     */
+    public PanelGestionPacientes getPanelPacientes() {
+        return panelPacientes;
     }
 
-    public List<MedicoDTO> obtenerTodos() {
-        // Implementar lectura desde XML
-        return new ArrayList<>();
+    /**
+     * Obtiene el panel de medicamentos para acceso directo
+     */
+    public PanelGestionMedicamentos getPanelMedicamentos() {
+        return panelMedicamentos;
     }
 
-    public void eliminar(String id) {
-        // Implementar eliminación en XML
+    /**
+     * Actualiza todos los paneles de gestión
+     */
+    public void refrescarTodosLosPaneles() {
+        panelMedicos.refrescarDatos();
+        panelFarmaceutas.refrescarDatos();
+        panelPacientes.refrescarDatos();
+        panelMedicamentos.refrescarDatos();
     }
 
-    public List<MedicoDTO> buscar(String criterio) {
-        // Implementar búsqueda en XML
-        return new ArrayList<>();
+    /**
+     * Establece el controlador principal
+     */
+    public void setControlador(ControladorPrincipal controlador) {
+        this.controllerPrincipal = controlador;
+    }
+
+    /**
+     * Establece el modelo principal
+     */
+    public void setModelo(ModeloPrincipal modelo) {
+        this.modeloPrincipal = modelo;
     }
 }
-
-5. INTEGRACIÓN:
-===============
-En el constructor de MedicosView:
-    this.controller = new MedicosController(this, new MedicosModel());
-
-Y reemplazar todas las implementaciones temporales con llamadas al controlador.
-*/

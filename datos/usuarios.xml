@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <usuarios>
   <usuario>
-    <id>MED-333</id>
-    <nombre>Arturo</nombre>
-    <clave>MED-333</clave>
+    <id>MED2509017078</id>
+    <nombre>Carlos Álvarez</nombre>
+    <clave>MED2509017078</clave>
     <tipo>Médico</tipo>
     <especialidad>Oncología</especialidad>
   </usuario>
