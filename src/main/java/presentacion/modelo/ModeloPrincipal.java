@@ -1,7 +1,7 @@
 package presentacion.modelo;
 
-import modelo.Medico;
-import modelo.lista.Lista;
+import logica.entidades.Medico;
+import logica.entidades.lista.Lista;
 
 public class ModeloPrincipal {
     private Lista<Medico> listaMedicos;
