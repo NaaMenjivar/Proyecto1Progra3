@@ -10,9 +10,9 @@ public class PanelGestionPacientes {
     private JButton guardar;
     private JButton limpiar;
     private JButton borrar;
-    private JTextField fechaNacimientoFld;
     private JTextField nombreBusquedaFld;
     private JButton buscar;
     private JButton reporte;
     private JTable list;
+    private JSpinner fechaNacimientoFld;
 }

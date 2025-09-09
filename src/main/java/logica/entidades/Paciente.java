@@ -1,23 +1,27 @@
 package logica.entidades;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Paciente {
     private String id;
     private String nombre;
-    private String fechaNacimiento;  // Cambiado a String
+    private LocalDate fechaNacimiento;  // Cambiado a LocalDate
     private String telefono;
 
     public Paciente(){
     }
 
-    public Paciente(String id, String nombre, String fechaNacimiento, String telefono){
+    public Paciente(String id, String nombre, LocalDate fechaNacimiento, String telefono){
         this.id = id;
         this.nombre = nombre;
         this.fechaNacimiento = fechaNacimiento;
         this.telefono = telefono;
     }
 
+    // Getters y Setters
     public String getId() {
         return id;
     }
@@ -30,10 +34,10 @@ public class Paciente {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
-    public String getFechaNacimiento() {  // Cambiado a String
+    public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
     }
-    public void setFechaNacimiento(String fechaNacimiento) {  // Cambiado a String
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
     public String getTelefono() {
@@ -43,63 +47,43 @@ public class Paciente {
         this.telefono = telefono;
     }
 
-    // Métodos específicos simplificados
-    public String getEdad(){
-        // Simplificado - retorna la fecha como string o mensaje
-        if(fechaNacimiento == null || fechaNacimiento.trim().isEmpty()){
+    // Métodos de conveniencia
+    public String getFechaNacimientoTexto() {
+        if(fechaNacimiento == null) {
             return "No especificada";
         }
-        return fechaNacimiento; // Retorna la fecha directamente
+        return fechaNacimiento.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    public int getEdad(){
+        if(fechaNacimiento == null) {
+            return 0;
+        }
+        return Period.between(fechaNacimiento, LocalDate.now()).getYears();
+    }
+
+    public String getEdadTexto(){
+        if(fechaNacimiento == null) {
+            return "No especificada";
+        }
+        int edad = getEdad();
+        return edad + (edad == 1 ? " año" : " años");
     }
 
     public boolean esMayorDeEdad(){
-        if(fechaNacimiento == null || fechaNacimiento.trim().isEmpty()){
+        if(fechaNacimiento == null) {
             return false;
         }
-
-        // Intentar calcular edad desde formato "dd/MM/yyyy" o "yyyy" o similar
-        try {
-            String fecha = fechaNacimiento.trim();
-            int añoNacimiento;
-
-            // Si contiene "/" asumimos formato dd/MM/yyyy
-            if(fecha.contains("/")) {
-                String[] partes = fecha.split("/");
-                if(partes.length >= 3) {
-                    añoNacimiento = Integer.parseInt(partes[2]); // Último elemento es el año
-                } else {
-                    return false;
-                }
-            }
-            // Si contiene "-" asumimos formato yyyy-MM-dd
-            else if(fecha.contains("-")) {
-                String[] partes = fecha.split("-");
-                if(partes.length >= 3) {
-                    añoNacimiento = Integer.parseInt(partes[0]); // Primer elemento es el año
-                } else {
-                    return false;
-                }
-            }
-            // Si es solo un número, asumimos que es el año
-            else if(fecha.matches("\\d{4}")) {
-                añoNacimiento = Integer.parseInt(fecha);
-            }
-            // Otros casos
-            else {
-                return false; // No se puede determinar
-            }
-
-            int añoActual = java.time.LocalDate.now().getYear();
-            int edad = añoActual - añoNacimiento;
-
-            return edad >= 18;
-
-        } catch (Exception e) {
-            return false; // Si hay error en el parsing, asumimos menor de edad
-        }
+        return getEdad() >= 18;
     }
 
-    //Métodos propios de Object
+    public boolean esValido() {
+        return id != null && !id.trim().isEmpty()
+                && nombre != null && !nombre.trim().isEmpty()
+                && fechaNacimiento != null
+                && telefono != null && !telefono.trim().isEmpty();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -108,20 +92,8 @@ public class Paciente {
         return Objects.equals(id, paciente.id);
     }
 
-    /*@Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }*/
-
     @Override
     public String toString() {
-        return nombre + " (" + id + ") - " + fechaNacimiento;
-    }
-
-    public boolean esValido() {
-        return id != null && !id.trim().isEmpty()
-                && nombre != null && !nombre.trim().isEmpty()
-                && fechaNacimiento != null && !fechaNacimiento.trim().isEmpty()
-                && telefono != null && !telefono.trim().isEmpty();
+        return nombre + " (" + id + ") - " + getFechaNacimientoTexto();
     }
 }
