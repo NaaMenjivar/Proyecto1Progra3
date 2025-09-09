@@ -3,18 +3,25 @@ package logica.gestores;
 import logica.entidades.*;
 import logica.excepciones.CatalogoException;
 import logica.entidades.lista.Lista;
+import java.time.LocalDate;
 
+/**
+ * Gestor único para todos los catálogos del sistema
+ * Basado en tu implementación existente pero completado
+ */
 public class GestorCatalogos {
-    // Datos en memoria - NO persistencia
+    // Datos en memoria - NO persistencia por ahora
     private Lista<Usuario> usuarios;
     private Lista<Paciente> pacientes;
     private Lista<Medicamento> medicamentos;
+    private Lista<Receta> recetas; // Para prescripciones y despacho
 
     public GestorCatalogos() {
-        // Inicializar listas vacías - datos se agregan durante ejecución
+        // Inicializar listas vacías
         this.usuarios = new Lista<>();
         this.pacientes = new Lista<>();
         this.medicamentos = new Lista<>();
+        this.recetas = new Lista<>();
     }
 
     // ================================
@@ -53,7 +60,6 @@ public class GestorCatalogos {
             throw new CatalogoException("Ya existe un usuario con el ID: " + farmaceuta.getId());
         }
 
-        // Establecer clave igual al ID por defecto
         farmaceuta.setClave(farmaceuta.getId());
         usuarios.agregarFinal(farmaceuta);
         return true;
@@ -234,6 +240,67 @@ public class GestorCatalogos {
     }
 
     // ================================
+    // GESTIÓN DE RECETAS (Prescripción y Despacho)
+    // ================================
+
+    public boolean agregarReceta(Receta receta) throws CatalogoException {
+        if (receta == null) {
+            throw new CatalogoException("Receta no puede ser null");
+        }
+
+        if (!receta.tieneDetalles()) {
+            throw new CatalogoException("Receta debe tener al menos un medicamento");
+        }
+
+        recetas.agregarFinal(receta);
+        return true;
+    }
+
+    public Lista<Receta> obtenerTodasRecetas() {
+        return recetas;
+    }
+
+    public Receta buscarReceta(String numeroReceta) {
+        return recetas.buscarPorId(numeroReceta);
+    }
+
+    public Lista<Receta> buscarRecetasPorPaciente(String idPaciente) {
+        Lista<Receta> resultado = new Lista<>();
+        for (int i = 0; i < recetas.getTam(); i++) {
+            Receta receta = recetas.obtenerPorPos(i);
+            if (receta.getIdPaciente().equals(idPaciente)) {
+                resultado.agregarFinal(receta);
+            }
+        }
+        return resultado;
+    }
+
+    public Lista<Receta> buscarRecetasPorEstado(EstadoReceta estado) {
+        Lista<Receta> resultado = new Lista<>();
+        for (int i = 0; i < recetas.getTam(); i++) {
+            Receta receta = recetas.obtenerPorPos(i);
+            if (receta.getEstado() == estado) {
+                resultado.agregarFinal(receta);
+            }
+        }
+        return resultado;
+    }
+
+    public boolean cambiarEstadoReceta(String numeroReceta, EstadoReceta nuevoEstado) throws CatalogoException {
+        Receta receta = buscarReceta(numeroReceta);
+        if (receta == null) {
+            throw new CatalogoException("Receta no encontrada: " + numeroReceta);
+        }
+
+        if (!receta.puedeAvanzarAEstado(nuevoEstado)) {
+            throw new CatalogoException("Transición de estado no válida");
+        }
+
+        receta.setEstado(nuevoEstado);
+        return true;
+    }
+
+    // ================================
     // MÉTODOS DE UTILIDAD Y VALIDACIÓN
     // ================================
 
@@ -280,8 +347,12 @@ public class GestorCatalogos {
         return buscarFarmaceutas().getTam();
     }
 
+    public int contarRecetas() {
+        return recetas.getTam();
+    }
+
     // ================================
-    // REPORTES Y ESTADÍSTICAS (antes GestorReportes)
+    // REPORTES Y ESTADÍSTICAS
     // ================================
 
     public String generarReporteGeneral() {
@@ -290,7 +361,8 @@ public class GestorCatalogos {
         sb.append("Médicos registrados: ").append(contarMedicos()).append("\n");
         sb.append("Farmaceutas registrados: ").append(contarFarmaceutas()).append("\n");
         sb.append("Pacientes registrados: ").append(contarPacientes()).append("\n");
-        sb.append("Medicamentos en catálogo: ").append(contarMedicamentos()).append("\n\n");
+        sb.append("Medicamentos en catálogo: ").append(contarMedicamentos()).append("\n");
+        sb.append("Recetas en el sistema: ").append(contarRecetas()).append("\n\n");
 
         // Medicamentos con stock bajo
         Lista<Medicamento> bajoStock = obtenerMedicamentosBajoStock(10);
@@ -379,7 +451,7 @@ public class GestorCatalogos {
     }
 
     // ================================
-    // VALIDACIONES DE NEGOCIO (antes ValidadorNegocio)
+    // VALIDACIONES DE NEGOCIO
     // ================================
 
     public boolean validarPacienteExiste(String idPaciente) {
