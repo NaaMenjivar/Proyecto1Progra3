@@ -48,7 +48,7 @@ public class PanelGestionFarmaceutas {
 
         // Configurar columnas
         list.getColumnModel().getColumn(0).setPreferredWidth(80);  // ID
-        list.getColumnModel().getColumn(1).setPreferredWidth(250); // Nombre
+        list.getColumnModel().getColumn(1).setPreferredWidth(200); // Nombre
 
         // Configurar tabla para mejor visualización
         list.setRowHeight(25);
@@ -88,6 +88,14 @@ public class PanelGestionFarmaceutas {
             }
         });
 
+        // Enter en campo de búsqueda
+        nombreBusquedaFld.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buscarFarmaceutas();
+            }
+        });
+
         // Botón Reporte
         reporte.addActionListener(new ActionListener() {
             @Override
@@ -101,110 +109,143 @@ public class PanelGestionFarmaceutas {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
-                    seleccionarFarmaceuta();
+                    cargarFarmaceutaSeleccionado();
                 }
-            }
-        });
-
-        // Enter para buscar
-        nombreBusquedaFld.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarFarmaceutas();
             }
         });
     }
 
     private void guardarFarmaceuta() {
-        String id = idFld.getText().trim();
-        String nombre = nombreFld.getText().trim();
+        try {
+            String id = idFld.getText().trim();
+            String nombre = nombreFld.getText().trim();
 
-        // Validaciones básicas en la vista
-        if (id.isEmpty() || nombre.isEmpty()) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "ID y nombre son obligatorios",
-                    "Error de validación",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (modoEdicion) {
-            // Nota: Implementar actualización cuando esté disponible en el controlador
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Función de actualización no implementada aún",
-                    "Información",
-                    JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            if (controlador.agregarFarmaceuta(id, nombre)) {
-                cargarDatos();
-                limpiarCampos();
+            if (id.isEmpty() || nombre.isEmpty()) {
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Todos los campos son obligatorios",
+                        "Datos incompletos",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
             }
+
+            if (modoEdicion) {
+                // TODO: Implementar actualización cuando esté disponible en el controlador
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Funcionalidad de edición en desarrollo",
+                        "En desarrollo",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                if (controlador.agregarFarmaceuta(id, nombre)) {
+                    limpiarCampos();
+                    cargarTodosFarmaceutas();
+                }
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al guardar farmaceuta: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void eliminarFarmaceuta() {
-        if (idSeleccionado != null) {
-            // Nota: Implementar eliminación cuando esté disponible en el controlador
-            int confirmacion = JOptionPane.showConfirmDialog(panelPrincipal,
-                    "¿Está seguro de eliminar el farmaceuta con ID: " + idSeleccionado + "?",
-                    "Confirmar eliminación",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (confirmacion == JOptionPane.YES_OPTION) {
-                JOptionPane.showMessageDialog(panelPrincipal,
-                        "Función de eliminación no implementada aún",
-                        "Información",
-                        JOptionPane.INFORMATION_MESSAGE);
-            }
-        } else {
+        if (idSeleccionado == null) {
             JOptionPane.showMessageDialog(panelPrincipal,
-                    "Seleccione un farmaceuta para eliminar",
-                    "Advertencia",
+                    "Seleccione un farmaceuta de la lista para eliminar",
+                    "Farmaceuta no seleccionado",
                     JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // TODO: Implementar eliminación cuando esté disponible en el controlador
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Funcionalidad de eliminación en desarrollo",
+                    "En desarrollo",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al eliminar farmaceuta: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void buscarFarmaceutas() {
         String criterio = nombreBusquedaFld.getText().trim();
-        if (criterio.isEmpty()) {
-            cargarDatos();
-        } else {
-            // Filtrar datos
-            Lista<Usuario> farmaceutas = controlador.getModelo().obtenerFarmaceutas();
-            Lista<Object> datosFiltrados = new Lista<>();
 
-            for (int i = 0; i < farmaceutas.getTam(); i++) {
-                Usuario farmaceuta = farmaceutas.obtenerPorPos(i);
-                if (farmaceuta instanceof Farmaceuta) {
-                    Farmaceuta farm = (Farmaceuta) farmaceuta;
-                    if (farm.getNombre().toLowerCase().contains(criterio.toLowerCase()) ||
-                            farm.getId().toLowerCase().contains(criterio.toLowerCase())) {
-                        datosFiltrados.agregarFinal(farmaceuta);
+        try {
+            if (criterio.isEmpty()) {
+                cargarTodosFarmaceutas();
+            } else {
+                Lista<Farmaceuta> farmaceutas = controlador.getModelo().obtenerFarmaceutas();
+                Lista<Object> datos = new Lista<>();
+
+                // Buscar por nombre
+                for (int i = 0; i < farmaceutas.getTam(); i++) {
+                    Farmaceuta farmaceuta = farmaceutas.obtenerPorPos(i);
+                    if (farmaceuta.getNombre().toLowerCase().contains(criterio.toLowerCase()) ||
+                            farmaceuta.getId().toLowerCase().contains(criterio.toLowerCase())) {
+                        datos.agregarFinal(farmaceuta);
                     }
                 }
-            }
 
-            tableModel.setDatos(datosFiltrados);
+                tableModel.setDatos(datos);
+
+                if (datos.getTam() == 0) {
+                    JOptionPane.showMessageDialog(panelPrincipal,
+                            "No se encontraron farmaceutas con el criterio: " + criterio,
+                            "Sin resultados",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al buscar farmaceutas: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void seleccionarFarmaceuta() {
+    private void cargarFarmaceutaSeleccionado() {
         int filaSeleccionada = list.getSelectedRow();
         if (filaSeleccionada >= 0) {
-            Object objeto = tableModel.getObjetoEnFila(filaSeleccionada);
-            if (objeto instanceof Farmaceuta) {
-                Farmaceuta farmaceuta = (Farmaceuta) objeto;
+            try {
+                Object elemento = tableModel.getObjetoEnFila(filaSeleccionada);
+                if (elemento instanceof Farmaceuta) {
+                    Farmaceuta farmaceuta = (Farmaceuta) elemento;
 
-                idFld.setText(farmaceuta.getId());
-                nombreFld.setText(farmaceuta.getNombre());
+                    idFld.setText(farmaceuta.getId());
+                    nombreFld.setText(farmaceuta.getNombre());
 
-                idSeleccionado = farmaceuta.getId();
-                modoEdicion = true;
-                guardar.setText("Actualizar");
+                    idSeleccionado = farmaceuta.getId();
+                    modoEdicion = true;
 
-                // Habilitar botón borrar
-                borrar.setEnabled(true);
+                    // Deshabilitar campo ID en modo edición
+                    idFld.setEnabled(false);
+                }
+            } catch (Exception e) {
+                limpiarCampos();
             }
+        }
+    }
+
+    private void cargarTodosFarmaceutas() {
+        try {
+            Lista<Farmaceuta> farmaceutas = controlador.getModelo().obtenerFarmaceutas();
+            Lista<Object> datos = new Lista<>();
+
+            for (int i = 0; i < farmaceutas.getTam(); i++) {
+                datos.agregarFinal(farmaceutas.obtenerPorPos(i));
+            }
+
+            tableModel.setDatos(datos);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al cargar farmaceutas: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -215,58 +256,27 @@ public class PanelGestionFarmaceutas {
 
         idSeleccionado = null;
         modoEdicion = false;
-        guardar.setText("Guardar");
-        borrar.setEnabled(false);
+        idFld.setEnabled(true);
+
         list.clearSelection();
-
-        // Recargar todos los datos
-        cargarDatos();
-    }
-
-    private void cargarDatos() {
-        Lista<Usuario> farmaceutas = controlador.getModelo().obtenerFarmaceutas();
-        Lista<Object> datos = new Lista<>();
-
-        for (int i = 0; i < farmaceutas.getTam(); i++) {
-            datos.agregarFinal(farmaceutas.obtenerPorPos(i));
-        }
-
-        tableModel.setDatos(datos);
     }
 
     private void generarReporte() {
         try {
-            String reporte = controlador.getModelo().getGestorCatalogos().generarReporteGeneral();
+            String reporte = controlador.generarReporteCompleto();
 
-            // Filtrar solo la sección de farmaceutas del reporte
-            StringBuilder reporteFarmaceutas = new StringBuilder();
-            reporteFarmaceutas.append("=== REPORTE DE FARMACEUTAS ===\n\n");
-            reporteFarmaceutas.append("Total de farmaceutas: ")
-                    .append(controlador.getModelo().getGestorCatalogos().contarFarmaceutas())
-                    .append("\n\n");
-
-            Lista<Usuario> farmaceutas = controlador.getModelo().obtenerFarmaceutas();
-            if (farmaceutas.getTam() > 0) {
-                reporteFarmaceutas.append("Lista detallada:\n");
-                for (int i = 0; i < farmaceutas.getTam(); i++) {
-                    Usuario farmaceuta = farmaceutas.obtenerPorPos(i);
-                    reporteFarmaceutas.append("- ID: ").append(farmaceuta.getId())
-                            .append(" | Nombre: ").append(farmaceuta.getNombre())
-                            .append("\n");
-                }
-            } else {
-                reporteFarmaceutas.append("No hay farmaceutas registrados en el sistema.\n");
-            }
-
-            JTextArea textArea = new JTextArea(reporteFarmaceutas.toString());
+            JTextArea textArea = new JTextArea(reporte);
             textArea.setEditable(false);
-            textArea.setFont(new java.awt.Font("Courier New", java.awt.Font.PLAIN, 12));
+            textArea.setFont(new java.awt.Font("Monospaced", 0, 12));
 
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
 
-            JOptionPane.showMessageDialog(panelPrincipal, scrollPane,
-                    "Reporte de Farmaceutas", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    scrollPane,
+                    "Reporte del Sistema",
+                    JOptionPane.INFORMATION_MESSAGE);
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
                     "Error al generar reporte: " + e.getMessage(),
@@ -275,13 +285,23 @@ public class PanelGestionFarmaceutas {
         }
     }
 
+    private void cargarDatos() {
+        cargarTodosFarmaceutas();
+    }
+
+    /**
+     * Obtiene el panel principal para ser añadido a contenedores
+     * @return JPanel principal del formulario
+     */
     public JPanel getPanel() {
         return panelPrincipal;
     }
 
-    // Método para refrescar datos desde el exterior
+    /**
+     * Método para refrescar datos desde el exterior
+     */
     public void refrescarDatos() {
-        cargarDatos();
+        cargarTodosFarmaceutas();
         limpiarCampos();
     }
 }

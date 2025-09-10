@@ -62,22 +62,9 @@ public class PanelGestionPacientes {
         list.getTableHeader().setReorderingAllowed(false);
 
         // Configurar spinner de fecha
-        configurarSpinnerFecha();
-    }
-
-    private void configurarSpinnerFecha() {
-        // Configurar spinner para fechas
-        SpinnerDateModel dateModel = new SpinnerDateModel();
-        fechaNacimientoFld.setModel(dateModel);
-
-        // Configurar formato de fecha
+        fechaNacimientoFld.setModel(new SpinnerDateModel());
         JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(fechaNacimientoFld, "dd/MM/yyyy");
         fechaNacimientoFld.setEditor(dateEditor);
-
-        // Establecer fecha por defecto (hace 30 años)
-        LocalDate fechaDefault = LocalDate.now().minusYears(30);
-        Date fecha = Date.from(fechaDefault.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        fechaNacimientoFld.setValue(fecha);
     }
 
     private void configurarEventos() {
@@ -113,6 +100,14 @@ public class PanelGestionPacientes {
             }
         });
 
+        // Enter en campo de búsqueda
+        nombreBusquedaFld.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buscarPacientes();
+            }
+        });
+
         // Botón Reporte
         reporte.addActionListener(new ActionListener() {
             @Override
@@ -126,136 +121,153 @@ public class PanelGestionPacientes {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
-                    seleccionarPaciente();
+                    cargarPacienteSeleccionado();
                 }
-            }
-        });
-
-        // Enter para buscar
-        nombreBusquedaFld.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarPacientes();
             }
         });
     }
 
     private void guardarPaciente() {
-        String id = idFld.getText().trim();
-        String nombre = nombreFld.getText().trim();
-        String telefono = telefonoFld.getText().trim();
+        try {
+            String id = idFld.getText().trim();
+            String nombre = nombreFld.getText().trim();
+            String telefono = telefonoFld.getText().trim();
 
-        // Obtener fecha del spinner
-        Date fechaDate = (Date) fechaNacimientoFld.getValue();
-        LocalDate fechaNacimiento = fechaDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-
-        // Validaciones básicas en la vista
-        if (id.isEmpty() || nombre.isEmpty()) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "ID y nombre son obligatorios",
-                    "Error de validación",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (telefono.isEmpty()) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "El teléfono es obligatorio",
-                    "Error de validación",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        // Validar que la fecha no sea futura
-        if (fechaNacimiento.isAfter(LocalDate.now())) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "La fecha de nacimiento no puede ser futura",
-                    "Error de validación",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (modoEdicion) {
-            // Nota: Implementar actualización cuando esté disponible en el controlador
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Función de actualización no implementada aún",
-                    "Información",
-                    JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            if (controlador.agregarPaciente(id, nombre, fechaNacimiento, telefono)) {
-                cargarDatos();
-                limpiarCampos();
+            if (id.isEmpty() || nombre.isEmpty()) {
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "ID y nombre son obligatorios",
+                        "Datos incompletos",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
             }
+
+            // Obtener fecha de nacimiento del spinner
+            Date fechaDate = (Date) fechaNacimientoFld.getValue();
+            LocalDate fechaNacimiento = fechaDate.toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+
+            if (modoEdicion) {
+                // TODO: Implementar actualización cuando esté disponible en el controlador
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Funcionalidad de edición en desarrollo",
+                        "En desarrollo",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                if (controlador.agregarPaciente(id, nombre, fechaNacimiento, telefono)) {
+                    limpiarCampos();
+                    cargarTodosPacientes();
+                }
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al guardar paciente: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void eliminarPaciente() {
-        if (idSeleccionado != null) {
-            int confirmacion = JOptionPane.showConfirmDialog(panelPrincipal,
-                    "¿Está seguro de eliminar el paciente con ID: " + idSeleccionado + "?",
-                    "Confirmar eliminación",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (confirmacion == JOptionPane.YES_OPTION) {
-                // Nota: Implementar eliminación cuando esté disponible en el controlador
-                JOptionPane.showMessageDialog(panelPrincipal,
-                        "Función de eliminación no implementada aún",
-                        "Información",
-                        JOptionPane.INFORMATION_MESSAGE);
-            }
-        } else {
+        if (idSeleccionado == null) {
             JOptionPane.showMessageDialog(panelPrincipal,
-                    "Seleccione un paciente para eliminar",
-                    "Advertencia",
+                    "Seleccione un paciente de la lista para eliminar",
+                    "Paciente no seleccionado",
                     JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // TODO: Implementar eliminación cuando esté disponible en el controlador
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Funcionalidad de eliminación en desarrollo",
+                    "En desarrollo",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al eliminar paciente: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void buscarPacientes() {
         String criterio = nombreBusquedaFld.getText().trim();
-        if (criterio.isEmpty()) {
-            cargarDatos();
-        } else {
-            // Usar el método de búsqueda del modelo
-            Lista<Paciente> pacientesEncontrados = controlador.getModelo().buscarPacientesPorNombre(criterio);
-            Lista<Object> datosFiltrados = new Lista<>();
 
-            for (int i = 0; i < pacientesEncontrados.getTam(); i++) {
-                datosFiltrados.agregarFinal(pacientesEncontrados.obtenerPorPos(i));
+        try {
+            if (criterio.isEmpty()) {
+                cargarTodosPacientes();
+            } else {
+                Lista<Paciente> pacientesEncontrados = controlador.getModelo().buscarPacientesPorNombre(criterio);
+                Lista<Object> datos = new Lista<>();
+
+                for (int i = 0; i < pacientesEncontrados.getTam(); i++) {
+                    datos.agregarFinal(pacientesEncontrados.obtenerPorPos(i));
+                }
+
+                tableModel.setDatos(datos);
+
+                if (pacientesEncontrados.getTam() == 0) {
+                    JOptionPane.showMessageDialog(panelPrincipal,
+                            "No se encontraron pacientes con el criterio: " + criterio,
+                            "Sin resultados",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
             }
-
-            tableModel.setDatos(datosFiltrados);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al buscar pacientes: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void seleccionarPaciente() {
+    private void cargarPacienteSeleccionado() {
         int filaSeleccionada = list.getSelectedRow();
         if (filaSeleccionada >= 0) {
-            Object objeto = tableModel.getObjetoEnFila(filaSeleccionada);
-            if (objeto instanceof Paciente) {
-                Paciente paciente = (Paciente) objeto;
+            try {
+                Object elemento = tableModel.getObjetoEnFila(filaSeleccionada);
+                if (elemento instanceof Paciente) {
+                    Paciente paciente = (Paciente) elemento;
 
-                idFld.setText(paciente.getId());
-                nombreFld.setText(paciente.getNombre());
-                telefonoFld.setText(paciente.getTelefono());
+                    idFld.setText(paciente.getId());
+                    nombreFld.setText(paciente.getNombre());
+                    telefonoFld.setText(paciente.getTelefono());
 
-                // Configurar fecha en el spinner
-                if (paciente.getFechaNacimiento() != null) {
-                    Date fecha = Date.from(paciente.getFechaNacimiento()
-                            .atStartOfDay(ZoneId.systemDefault())
-                            .toInstant());
-                    fechaNacimientoFld.setValue(fecha);
+                    // Convertir LocalDate a Date para el spinner
+                    if (paciente.getFechaNacimiento() != null) {
+                        Date fecha = Date.from(paciente.getFechaNacimiento()
+                                .atStartOfDay(ZoneId.systemDefault()).toInstant());
+                        fechaNacimientoFld.setValue(fecha);
+                    }
+
+                    idSeleccionado = paciente.getId();
+                    modoEdicion = true;
+
+                    // Deshabilitar campo ID en modo edición
+                    idFld.setEnabled(false);
                 }
-
-                idSeleccionado = paciente.getId();
-                modoEdicion = true;
-                guardar.setText("Actualizar");
-
-                // Habilitar botón borrar
-                borrar.setEnabled(true);
+            } catch (Exception e) {
+                limpiarCampos();
             }
+        }
+    }
+
+    private void cargarTodosPacientes() {
+        try {
+            Lista<Paciente> pacientes = controlador.getModelo().obtenerPacientes();
+            Lista<Object> datos = new Lista<>();
+
+            for (int i = 0; i < pacientes.getTam(); i++) {
+                datos.agregarFinal(pacientes.obtenerPorPos(i));
+            }
+
+            tableModel.setDatos(datos);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al cargar pacientes: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -263,47 +275,32 @@ public class PanelGestionPacientes {
         idFld.setText("");
         nombreFld.setText("");
         telefonoFld.setText("");
+        fechaNacimientoFld.setValue(new Date());
         nombreBusquedaFld.setText("");
-
-        // Restablecer fecha por defecto
-        LocalDate fechaDefault = LocalDate.now().minusYears(30);
-        Date fecha = Date.from(fechaDefault.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        fechaNacimientoFld.setValue(fecha);
 
         idSeleccionado = null;
         modoEdicion = false;
-        guardar.setText("Guardar");
-        borrar.setEnabled(false);
+        idFld.setEnabled(true);
+
         list.clearSelection();
-
-        // Recargar todos los datos
-        cargarDatos();
-    }
-
-    private void cargarDatos() {
-        Lista<Paciente> pacientes = controlador.getModelo().obtenerPacientes();
-        Lista<Object> datos = new Lista<>();
-
-        for (int i = 0; i < pacientes.getTam(); i++) {
-            datos.agregarFinal(pacientes.obtenerPorPos(i));
-        }
-
-        tableModel.setDatos(datos);
     }
 
     private void generarReporte() {
         try {
-            String reporte = controlador.getModelo().getGestorCatalogos().generarReportePacientes();
+            String reporte = controlador.generarReporteCompleto();
 
             JTextArea textArea = new JTextArea(reporte);
             textArea.setEditable(false);
-            textArea.setFont(new java.awt.Font("Courier New", java.awt.Font.PLAIN, 12));
+            textArea.setFont(new java.awt.Font("Monospaced", 0, 12));
 
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
 
-            JOptionPane.showMessageDialog(panelPrincipal, scrollPane,
-                    "Reporte de Pacientes", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    scrollPane,
+                    "Reporte del Sistema",
+                    JOptionPane.INFORMATION_MESSAGE);
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
                     "Error al generar reporte: " + e.getMessage(),
@@ -312,13 +309,23 @@ public class PanelGestionPacientes {
         }
     }
 
+    private void cargarDatos() {
+        cargarTodosPacientes();
+    }
+
+    /**
+     * Obtiene el panel principal para ser añadido a contenedores
+     * @return JPanel principal del formulario
+     */
     public JPanel getPanel() {
         return panelPrincipal;
     }
 
-    // Método para refrescar datos desde el exterior
+    /**
+     * Método para refrescar datos desde el exterior
+     */
     public void refrescarDatos() {
-        cargarDatos();
+        cargarTodosPacientes();
         limpiarCampos();
     }
 }

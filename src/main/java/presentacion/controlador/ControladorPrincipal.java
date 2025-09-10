@@ -1,6 +1,7 @@
 package presentacion.controlador;
 
 import logica.entidades.*;
+import logica.entidades.lista.Lista;
 import logica.excepciones.*;
 import presentacion.modelo.*;
 import presentacion.vista.sistema.VentanaLogin;
@@ -88,7 +89,7 @@ public class ControladorPrincipal {
     private void abrirVentanaSegunTipoUsuario(Usuario usuario) {
         switch (usuario.getTipo()) {
             case MEDICO:
-                abrirVentanaMedico();
+                //abrirVentanaMedico();
                 break;
             case FARMACEUTA:
             case ADMINISTRADOR:
@@ -102,10 +103,10 @@ public class ControladorPrincipal {
         ventanaPrincipal.setVisible(true);
     }
 
-    private void abrirVentanaMedico() {
+    /*private void abrirVentanaMedico() {
         ventanaMedico = new VentanaMedico(this);
         ventanaMedico.setVisible(true);
-    }
+    }*/
 
     public void cerrarSesion() {
         // Cerrar ventanas abiertas
@@ -114,10 +115,10 @@ public class ControladorPrincipal {
             ventanaPrincipal = null;
         }
 
-        if (ventanaMedico != null) {
+        /*if (ventanaMedico != null) {
             ventanaMedico.dispose();
             ventanaMedico = null;
-        }
+        }*/
 
         // Cerrar sesión en modelo
         modelo.cerrarSesion();
@@ -142,14 +143,14 @@ public class ControladorPrincipal {
             }
 
             if (modelo.cambiarClave(claveActual, claveNueva)) {
-                mostrarMensaje("Clave cambiada exitosamente");
+                mostrarMensaje("Contraseña cambiada exitosamente");
                 return true;
             } else {
-                mostrarError("La clave actual es incorrecta");
+                mostrarError("No se pudo cambiar la contraseña. Verifique la clave actual");
                 return false;
             }
         } catch (Exception e) {
-            mostrarError("Error al cambiar clave: " + e.getMessage());
+            mostrarError("Error al cambiar contraseña: " + e.getMessage());
             return false;
         }
     }
@@ -160,25 +161,14 @@ public class ControladorPrincipal {
 
     public boolean agregarMedico(String id, String nombre, String especialidad) {
         try {
-            // Validar permisos
             if (!modelo.puedeGestionarCatalogos()) {
                 mostrarError("No tiene permisos para gestionar médicos");
                 return false;
             }
 
-            // Validar datos
-            if (id == null || id.trim().isEmpty()) {
-                mostrarError("El ID del médico es obligatorio");
-                return false;
-            }
-
-            if (nombre == null || nombre.trim().isEmpty()) {
-                mostrarError("El nombre del médico es obligatorio");
-                return false;
-            }
-
-            if (especialidad == null || especialidad.trim().isEmpty()) {
-                mostrarError("La especialidad del médico es obligatoria");
+            if (id == null || id.trim().isEmpty() || nombre == null || nombre.trim().isEmpty() ||
+                    especialidad == null || especialidad.trim().isEmpty()) {
+                mostrarError("Todos los campos del médico son obligatorios");
                 return false;
             }
 
@@ -186,7 +176,7 @@ public class ControladorPrincipal {
                 mostrarMensaje("Médico agregado exitosamente");
                 return true;
             } else {
-                mostrarError("No se pudo agregar el médico. Verifique que el ID no exista");
+                mostrarError("No se pudo agregar el médico");
                 return false;
             }
         } catch (Exception e) {
@@ -195,30 +185,10 @@ public class ControladorPrincipal {
         }
     }
 
-    public boolean actualizarMedico(String id, String nombre, String especialidad) {
-        try {
-            if (!modelo.puedeGestionarCatalogos()) {
-                mostrarError("No tiene permisos para actualizar médicos");
-                return false;
-            }
-
-            if (modelo.actualizarMedico(id, nombre, especialidad)) {
-                mostrarMensaje("Médico actualizado exitosamente");
-                return true;
-            } else {
-                mostrarError("No se pudo actualizar el médico");
-                return false;
-            }
-        } catch (Exception e) {
-            mostrarError("Error al actualizar médico: " + e.getMessage());
-            return false;
-        }
-    }
-
     public boolean eliminarMedico(String id) {
         try {
             if (!modelo.puedeGestionarCatalogos()) {
-                mostrarError("No tiene permisos para eliminar médicos");
+                mostrarError("No tiene permisos para gestionar médicos");
                 return false;
             }
 
@@ -290,11 +260,6 @@ public class ControladorPrincipal {
                 return false;
             }
 
-            if (fechaNacimiento == null) {
-                mostrarError("La fecha de nacimiento es obligatoria");
-                return false;
-            }
-
             if (modelo.agregarPaciente(id, nombre, fechaNacimiento, telefono)) {
                 mostrarMensaje("Paciente agregado exitosamente");
                 return true;
@@ -319,10 +284,8 @@ public class ControladorPrincipal {
                 return false;
             }
 
-            if (codigo == null || codigo.trim().isEmpty() ||
-                    nombre == null || nombre.trim().isEmpty() ||
-                    presentacion == null || presentacion.trim().isEmpty()) {
-                mostrarError("Código, nombre y presentación son obligatorios");
+            if (codigo == null || codigo.trim().isEmpty() || nombre == null || nombre.trim().isEmpty()) {
+                mostrarError("Código y nombre del medicamento son obligatorios");
                 return false;
             }
 
@@ -345,7 +308,7 @@ public class ControladorPrincipal {
     }
 
     // ================================
-    // GESTIÓN DE PRESCRIPCIONES
+    // GESTIÓN DE PRESCRIPCIÓN
     // ================================
 
     public boolean iniciarNuevaReceta(String idPaciente, LocalDate fechaRetiro) {
@@ -355,18 +318,27 @@ public class ControladorPrincipal {
                 return false;
             }
 
-            // Buscar paciente
-            Paciente paciente = modelo.obtenerPacientes().buscarPorId(idPaciente);
-            if (paciente == null) {
-                mostrarError("Paciente no encontrado");
+            // Buscar paciente por ID
+            Lista<Paciente> pacientes = modelo.obtenerPacientes();
+            Paciente pacienteEncontrado = null;
+
+            for (int i = 0; i < pacientes.getTam(); i++) {
+                Paciente p = pacientes.obtenerPorPos(i);
+                if (p.getId().equals(idPaciente)) {
+                    pacienteEncontrado = p;
+                    break;
+                }
+            }
+
+            if (pacienteEncontrado == null) {
+                mostrarError("Paciente no encontrado con ID: " + idPaciente);
                 return false;
             }
 
-            modelo.setPacienteSeleccionado(paciente);
+            modelo.setPacienteSeleccionado(pacienteEncontrado);
             modelo.iniciarNuevaReceta(fechaRetiro);
-
-            mostrarMensaje("Nueva receta iniciada para: " + paciente.getNombre());
             return true;
+
         } catch (Exception e) {
             mostrarError("Error al iniciar receta: " + e.getMessage());
             return false;
@@ -376,38 +348,38 @@ public class ControladorPrincipal {
     public boolean agregarMedicamentoAReceta(String codigoMedicamento, int cantidad,
                                              String indicaciones, int duracionDias) {
         try {
-            if (modelo.getRecetaActual() == null) {
-                mostrarError("Debe iniciar una receta primero");
-                return false;
-            }
-
-            if (cantidad <= 0 || duracionDias <= 0) {
-                mostrarError("Cantidad y duración deben ser mayores a cero");
-                return false;
-            }
-
-            if (indicaciones == null || indicaciones.trim().isEmpty()) {
-                mostrarError("Las indicaciones son obligatorias");
+            if (!modelo.puedePrescribir()) {
+                mostrarError("No tiene permisos para prescribir");
                 return false;
             }
 
             if (modelo.agregarMedicamentoAReceta(codigoMedicamento, cantidad, indicaciones, duracionDias)) {
-                mostrarMensaje("Medicamento agregado a la receta");
                 return true;
             } else {
                 mostrarError("No se pudo agregar el medicamento a la receta");
                 return false;
             }
         } catch (Exception e) {
-            mostrarError("Error al agregar medicamento a receta: " + e.getMessage());
+            mostrarError("Error al agregar medicamento: " + e.getMessage());
             return false;
         }
     }
 
     public boolean guardarReceta() {
         try {
+            if (!modelo.puedePrescribir()) {
+                mostrarError("No tiene permisos para prescribir");
+                return false;
+            }
+
             if (modelo.getRecetaActual() == null) {
-                mostrarError("No hay receta para guardar");
+                mostrarError("No hay una receta activa");
+                return false;
+            }
+
+            if (!modelo.getRecetaActual().tieneDetalles()) {
+                mostrarError("La receta debe tener al menos un medicamento. " +
+                        "Verifique que tenga al menos un medicamento");
                 return false;
             }
 
@@ -415,7 +387,8 @@ public class ControladorPrincipal {
                 mostrarMensaje("Receta guardada exitosamente");
                 return true;
             } else {
-                mostrarError("No se pudo guardar la receta. Verifique que tenga al menos un medicamento");
+                mostrarError("No se pudo guardar la receta. " +
+                        "Verifique que tenga al menos un medicamento");
                 return false;
             }
         } catch (Exception e) {
@@ -445,6 +418,83 @@ public class ControladorPrincipal {
         } catch (Exception e) {
             mostrarError("Error al cambiar estado de receta: " + e.getMessage());
             return false;
+        }
+    }
+
+    // ================================
+    // MÉTODOS PARA HISTÓRICO - ARQUITECTURA MVC CORRECTA
+    // ================================
+
+    public Lista<Receta> obtenerRecetasDelMedicoActual() {
+        try {
+            Usuario usuarioActual = modelo.getUsuarioActual();
+            if (usuarioActual == null || usuarioActual.getTipo() != TipoUsuario.MEDICO) {
+                return new Lista<Receta>();
+            }
+
+            return modelo.obtenerRecetasPorMedico(usuarioActual.getId());
+        } catch (Exception e) {
+            mostrarError("Error al obtener recetas del médico: " + e.getMessage());
+            return new Lista<Receta>();
+        }
+    }
+
+    public Lista<Receta> buscarRecetasDelMedicoActualPorNumero(String numeroReceta) {
+        try {
+            Usuario usuarioActual = modelo.getUsuarioActual();
+            if (usuarioActual == null || usuarioActual.getTipo() != TipoUsuario.MEDICO) {
+                return new Lista<Receta>();
+            }
+
+            return modelo.buscarRecetasPorMedicoYNumero(usuarioActual.getId(), numeroReceta);
+        } catch (Exception e) {
+            mostrarError("Error al buscar recetas: " + e.getMessage());
+            return new Lista<Receta>();
+        }
+    }
+
+    public String obtenerDetallesReceta(Receta receta) {
+        try {
+            if (receta == null) {
+                return "No hay receta seleccionada";
+            }
+
+            return modelo.generarDetallesReceta(receta);
+        } catch (Exception e) {
+            mostrarError("Error al obtener detalles de receta: " + e.getMessage());
+            return "Error al cargar detalles";
+        }
+    }
+
+    // ================================
+    // MÉTODOS PARA TODAS LAS RECETAS (ADMINISTRADOR)
+    // ================================
+
+    public Lista<Receta> obtenerTodasLasRecetas() {
+        try {
+            if (!modelo.puedeGestionarCatalogos()) {
+                mostrarError("No tiene permisos para ver todas las recetas");
+                return new Lista<Receta>();
+            }
+
+            return modelo.obtenerTodasLasRecetas();
+        } catch (Exception e) {
+            mostrarError("Error al obtener recetas: " + e.getMessage());
+            return new Lista<Receta>();
+        }
+    }
+
+    public Lista<Receta> buscarRecetasPorCriterio(String criterio) {
+        try {
+            if (!modelo.puedeGestionarCatalogos()) {
+                mostrarError("No tiene permisos para buscar recetas");
+                return new Lista<Receta>();
+            }
+
+            return modelo.buscarRecetasPorCriterio(criterio);
+        } catch (Exception e) {
+            mostrarError("Error al buscar recetas: " + e.getMessage());
+            return new Lista<Receta>();
         }
     }
 

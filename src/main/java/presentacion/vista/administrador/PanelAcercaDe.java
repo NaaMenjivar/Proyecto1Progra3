@@ -22,7 +22,7 @@ public class PanelAcercaDe {
 
         JLabel lblTitulo = new JLabel("Prescripción y despacho de recetas", SwingConstants.CENTER);
         lblTitulo.setFont(new Font("Eras Medium ITC", Font.BOLD, 36));
-        lblTitulo.setForeground(new Color(95, 95, 95)); // Color gris oscuro
+        lblTitulo.setForeground(new Color(94, 218, 224)); // Color gris oscuro
 
         JLabel lblContacto = new JLabel("Hospital.Inc     @hospital.inc     +506 89765432", SwingConstants.CENTER);
         lblContacto.setFont(new Font("Courier New", Font.PLAIN, 14));
@@ -57,13 +57,9 @@ public class PanelAcercaDe {
         panelInfo.setBorder(BorderFactory.createTitledBorder("Información del Sistema"));
 
         JLabel lblVersion = new JLabel("Versión: 1.0.0", SwingConstants.CENTER);
-        JLabel lblDesarrollo = new JLabel("Desarrollado en Java con Swing", SwingConstants.CENTER);
-        JLabel lblArquitectura = new JLabel("Arquitectura: Modelo-Vista-Controlador (MVC)", SwingConstants.CENTER);
         JLabel lblFecha = new JLabel("© 2025 - Sistema de Gestión Hospitalaria", SwingConstants.CENTER);
 
         panelInfo.add(lblVersion);
-        panelInfo.add(lblDesarrollo);
-        panelInfo.add(lblArquitectura);
         panelInfo.add(lblFecha);
 
         // Agregar todo al panel principal
@@ -74,5 +70,9 @@ public class PanelAcercaDe {
 
     public JPanel getPanel() {
         return panelPrincipal;
+    }
+
+    public void refrescarDatos() {
+        // No hay datos dinámicos que refrescar en este panel
     }
 }

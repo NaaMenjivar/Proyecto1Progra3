@@ -90,6 +90,14 @@ public class PanelGestionMedicos {
             }
         });
 
+        // Enter en campo de búsqueda
+        nombreBusquedaFld.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buscarMedicos();
+            }
+        });
+
         // Botón Reporte
         reporte.addActionListener(new ActionListener() {
             @Override
@@ -103,104 +111,139 @@ public class PanelGestionMedicos {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
-                    seleccionarMedico();
+                    cargarMedicoSeleccionado();
                 }
-            }
-        });
-
-        // Enter para buscar
-        nombreBusquedaFld.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarMedicos();
             }
         });
     }
 
     private void guardarMedico() {
-        String id = idFld.getText().trim();
-        String nombre = nombreFld.getText().trim();
-        String especialidad = especialidadFld.getText().trim();
+        try {
+            String id = idFld.getText().trim();
+            String nombre = nombreFld.getText().trim();
+            String especialidad = especialidadFld.getText().trim();
 
-        // Validaciones básicas en la vista
-        if (id.isEmpty() || nombre.isEmpty() || especialidad.isEmpty()) {
+            if (id.isEmpty() || nombre.isEmpty() || especialidad.isEmpty()) {
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Todos los campos son obligatorios",
+                        "Datos incompletos",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            if (modoEdicion) {
+                // TODO: Implementar actualización cuando esté disponible en el controlador
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Funcionalidad de edición en desarrollo",
+                        "En desarrollo",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                if (controlador.agregarMedico(id, nombre, especialidad)) {
+                    limpiarCampos();
+                    cargarTodosMedicos();
+                }
+            }
+
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
-                    "Todos los campos son obligatorios",
-                    "Error de validación",
+                    "Error al guardar médico: " + e.getMessage(),
+                    "Error",
                     JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (modoEdicion) {
-            if (controlador.actualizarMedico(id, nombre, especialidad)) {
-                cargarDatos();
-                limpiarCampos();
-            }
-        } else {
-            if (controlador.agregarMedico(id, nombre, especialidad)) {
-                cargarDatos();
-                limpiarCampos();
-            }
         }
     }
 
     private void eliminarMedico() {
-        if (idSeleccionado != null) {
-            if (controlador.eliminarMedico(idSeleccionado)) {
-                cargarDatos();
-                limpiarCampos();
-            }
-        } else {
+        if (idSeleccionado == null) {
             JOptionPane.showMessageDialog(panelPrincipal,
-                    "Seleccione un médico para eliminar",
-                    "Advertencia",
+                    "Seleccione un médico de la lista para eliminar",
+                    "Médico no seleccionado",
                     JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            if (controlador.eliminarMedico(idSeleccionado)) {
+                limpiarCampos();
+                cargarTodosMedicos();
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al eliminar médico: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void buscarMedicos() {
         String criterio = nombreBusquedaFld.getText().trim();
-        if (criterio.isEmpty()) {
-            cargarDatos();
-        } else {
-            // Filtrar datos usando el tableModel
-            Lista<Usuario> medicos = controlador.getModelo().obtenerMedicos();
-            Lista<Object> datosFiltrados = new Lista<>();
 
-            for (int i = 0; i < medicos.getTam(); i++) {
-                Usuario medico = medicos.obtenerPorPos(i);
-                if (medico instanceof Medico) {
-                    Medico med = (Medico) medico;
-                    if (med.getNombre().toLowerCase().contains(criterio.toLowerCase()) ||
-                            med.getId().toLowerCase().contains(criterio.toLowerCase()) ||
-                            med.getEspecialidad().toLowerCase().contains(criterio.toLowerCase())) {
-                        datosFiltrados.agregarFinal(medico);
-                    }
+        try {
+            if (criterio.isEmpty()) {
+                cargarTodosMedicos();
+            } else {
+                Lista<Medico> medicosEncontrados = controlador.getModelo().buscarMedicosPorNombre(criterio);
+                Lista<Object> datos = new Lista<>();
+
+                for (int i = 0; i < medicosEncontrados.getTam(); i++) {
+                    datos.agregarFinal(medicosEncontrados.obtenerPorPos(i));
+                }
+
+                tableModel.setDatos(datos);
+
+                if (medicosEncontrados.getTam() == 0) {
+                    JOptionPane.showMessageDialog(panelPrincipal,
+                            "No se encontraron médicos con el criterio: " + criterio,
+                            "Sin resultados",
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
             }
-
-            tableModel.setDatos(datosFiltrados);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al buscar médicos: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void seleccionarMedico() {
+    private void cargarMedicoSeleccionado() {
         int filaSeleccionada = list.getSelectedRow();
         if (filaSeleccionada >= 0) {
-            Object objeto = tableModel.getObjetoEnFila(filaSeleccionada);
-            if (objeto instanceof Medico) {
-                Medico medico = (Medico) objeto;
+            try {
+                Object elemento = tableModel.getObjetoEnFila(filaSeleccionada);
+                if (elemento instanceof Medico) {
+                    Medico medico = (Medico) elemento;
 
-                idFld.setText(medico.getId());
-                nombreFld.setText(medico.getNombre());
-                especialidadFld.setText(medico.getEspecialidad());
+                    idFld.setText(medico.getId());
+                    nombreFld.setText(medico.getNombre());
+                    especialidadFld.setText(medico.getEspecialidad());
 
-                idSeleccionado = medico.getId();
-                modoEdicion = true;
-                guardar.setText("Actualizar");
+                    idSeleccionado = medico.getId();
+                    modoEdicion = true;
 
-                // Habilitar botón borrar
-                borrar.setEnabled(true);
+                    // Deshabilitar campo ID en modo edición
+                    idFld.setEnabled(false);
+                }
+            } catch (Exception e) {
+                limpiarCampos();
             }
+        }
+    }
+
+    private void cargarTodosMedicos() {
+        try {
+            Lista<Medico> medicos = controlador.getModelo().obtenerMedicos();
+            Lista<Object> datos = new Lista<>();
+
+            for (int i = 0; i < medicos.getTam(); i++) {
+                datos.agregarFinal(medicos.obtenerPorPos(i));
+            }
+
+            tableModel.setDatos(datos);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al cargar médicos: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -212,38 +255,27 @@ public class PanelGestionMedicos {
 
         idSeleccionado = null;
         modoEdicion = false;
-        guardar.setText("Guardar");
-        borrar.setEnabled(false);
+        idFld.setEnabled(true);
+
         list.clearSelection();
-
-        // Recargar todos los datos
-        cargarDatos();
-    }
-
-    private void cargarDatos() {
-        Lista<Usuario> medicos = controlador.getModelo().obtenerMedicos();
-        Lista<Object> datos = new Lista<>();
-
-        for (int i = 0; i < medicos.getTam(); i++) {
-            datos.agregarFinal(medicos.obtenerPorPos(i));
-        }
-
-        tableModel.setDatos(datos);
     }
 
     private void generarReporte() {
         try {
-            String reporte = controlador.getModelo().getGestorCatalogos().generarReporteMedicos();
+            String reporte = controlador.generarReporteCompleto();
 
             JTextArea textArea = new JTextArea(reporte);
             textArea.setEditable(false);
-            textArea.setFont(new java.awt.Font("Courier New", java.awt.Font.PLAIN, 12));
+            textArea.setFont(new java.awt.Font("Monospaced", 0, 12));
 
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
 
-            JOptionPane.showMessageDialog(panelPrincipal, scrollPane,
-                    "Reporte de Médicos", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    scrollPane,
+                    "Reporte del Sistema",
+                    JOptionPane.INFORMATION_MESSAGE);
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
                     "Error al generar reporte: " + e.getMessage(),
@@ -252,13 +284,23 @@ public class PanelGestionMedicos {
         }
     }
 
+    private void cargarDatos() {
+        cargarTodosMedicos();
+    }
+
+    /**
+     * Obtiene el panel principal para ser añadido a contenedores
+     * @return JPanel principal del formulario
+     */
     public JPanel getPanel() {
         return panelPrincipal;
     }
 
-    // Método para refrescar datos desde el exterior
+    /**
+     * Método para refrescar datos desde el exterior
+     */
     public void refrescarDatos() {
-        cargarDatos();
+        cargarTodosMedicos();
         limpiarCampos();
     }
 }

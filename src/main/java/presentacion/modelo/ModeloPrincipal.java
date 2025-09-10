@@ -75,9 +75,8 @@ public class ModeloPrincipal extends AbstractModel {
         Lista<Usuario> medicos = gestorCatalogos.buscarMedicos();
         for (int i = 0; i < medicos.getTam(); i++) {
             Usuario usuario = medicos.obtenerPorPos(i);
-            if (usuario.validarCredenciales(id, clave)) {
+            if (usuario.getId().equals(id) && usuario.getClave().equals(clave)) {
                 usuarioActual = usuario;
-                usuarioActual.setSesionActiva(true);
                 marcarComoModificado();
                 return true;
             }
@@ -86,40 +85,45 @@ public class ModeloPrincipal extends AbstractModel {
         Lista<Usuario> farmaceutas = gestorCatalogos.buscarFarmaceutas();
         for (int i = 0; i < farmaceutas.getTam(); i++) {
             Usuario usuario = farmaceutas.obtenerPorPos(i);
-            if (usuario.validarCredenciales(id, clave)) {
+            if (usuario.getId().equals(id) && usuario.getClave().equals(clave)) {
                 usuarioActual = usuario;
-                usuarioActual.setSesionActiva(true);
                 marcarComoModificado();
                 return true;
             }
         }
 
+        // TODO: Agregar autenticación para administradores cuando se implemente
         return false;
     }
 
-    public void cerrarSesion() {
-        if (usuarioActual != null) {
-            usuarioActual.setSesionActiva(false);
-            usuarioActual = null;
+    public boolean cambiarClave(String claveActual, String claveNueva) {
+        if (usuarioActual == null) return false;
+
+        if (!usuarioActual.getClave().equals(claveActual)) {
+            return false;
         }
-        limpiar();
+
+        try {
+            usuarioActual.setClave(claveNueva);
+            boolean resultado = gestorCatalogos.actualizarUsuario(usuarioActual);
+            if (resultado) {
+                marcarComoModificado();
+            }
+            return resultado;
+        } catch (CatalogoException e) {
+            return false;
+        }
+    }
+
+    public void cerrarSesion() {
+        usuarioActual = null;
+        pacienteSeleccionado = null;
+        recetaActual = null;
+        marcarComoModificado();
     }
 
     public Usuario getUsuarioActual() {
         return usuarioActual;
-    }
-
-    public boolean cambiarClave(String claveActual, String claveNueva) {
-        if (usuarioActual == null || !esCadenaValida(claveNueva)) {
-            return false;
-        }
-
-        if (usuarioActual.validarCredenciales(usuarioActual.getId(), claveActual)) {
-            usuarioActual.setClave(claveNueva);
-            marcarComoModificado();
-            return true;
-        }
-        return false;
     }
 
     // ================================
@@ -130,7 +134,7 @@ public class ModeloPrincipal extends AbstractModel {
         if (!antesDeModificar()) return false;
 
         try {
-            Medico medico = new Medico(id, nombre, id, especialidad); // clave = id por defecto
+            Medico medico = new Medico(id, nombre, id, especialidad); // clave = id inicialmente
             boolean resultado = gestorCatalogos.agregarMedico(medico);
             if (resultado) {
                 despuesDeModificar();
@@ -141,39 +145,44 @@ public class ModeloPrincipal extends AbstractModel {
         }
     }
 
-    public Lista<Usuario> obtenerMedicos() {
-        return gestorCatalogos.buscarMedicos();
-    }
-
-    public boolean actualizarMedico(String id, String nombre, String especialidad) {
-        try {
-            Medico medico = new Medico(id, nombre, null, especialidad);
-            // Mantener la clave existente
-            Usuario existente = gestorCatalogos.buscarMedicos().buscarPorId(id);
-            if (existente != null) {
-                medico.setClave(existente.getClave());
-            }
-
-            boolean resultado = gestorCatalogos.actualizarUsuario(medico);
-            if (resultado) {
-                marcarComoModificado();
-            }
-            return resultado;
-        } catch (CatalogoException e) {
-            return false;
-        }
-    }
-
     public boolean eliminarMedico(String id) {
+        if (!antesDeModificar()) return false;
+
         try {
             boolean resultado = gestorCatalogos.eliminarUsuario(id);
             if (resultado) {
-                marcarComoModificado();
+                despuesDeModificar();
             }
             return resultado;
         } catch (CatalogoException e) {
             return false;
         }
+    }
+
+    public Lista<Medico> obtenerMedicos() {
+        Lista<Usuario> usuarios = gestorCatalogos.buscarMedicos();
+        Lista<Medico> medicos = new Lista<>();
+
+        for (int i = 0; i < usuarios.getTam(); i++) {
+            Usuario usuario = usuarios.obtenerPorPos(i);
+            if (usuario instanceof Medico) {
+                medicos.agregarFinal((Medico) usuario);
+            }
+        }
+        return medicos;
+    }
+
+    public Lista<Medico> buscarMedicosPorNombre(String nombre) {
+        Lista<Usuario> usuarios = gestorCatalogos.buscarMedicosPorNombre(nombre);
+        Lista<Medico> medicos = new Lista<>();
+
+        for (int i = 0; i < usuarios.getTam(); i++) {
+            Usuario usuario = usuarios.obtenerPorPos(i);
+            if (usuario instanceof Medico) {
+                medicos.agregarFinal((Medico) usuario);
+            }
+        }
+        return medicos;
     }
 
     // ================================
@@ -184,7 +193,7 @@ public class ModeloPrincipal extends AbstractModel {
         if (!antesDeModificar()) return false;
 
         try {
-            Farmaceuta farmaceuta = new Farmaceuta(id, nombre, id); // clave = id por defecto
+            Farmaceuta farmaceuta = new Farmaceuta(id, nombre, id); // clave = id inicialmente
             boolean resultado = gestorCatalogos.agregarFarmaceuta(farmaceuta);
             if (resultado) {
                 despuesDeModificar();
@@ -195,8 +204,17 @@ public class ModeloPrincipal extends AbstractModel {
         }
     }
 
-    public Lista<Usuario> obtenerFarmaceutas() {
-        return gestorCatalogos.buscarFarmaceutas();
+    public Lista<Farmaceuta> obtenerFarmaceutas() {
+        Lista<Usuario> usuarios = gestorCatalogos.buscarFarmaceutas();
+        Lista<Farmaceuta> farmaceutas = new Lista<>();
+
+        for (int i = 0; i < usuarios.getTam(); i++) {
+            Usuario usuario = usuarios.obtenerPorPos(i);
+            if (usuario instanceof Farmaceuta) {
+                farmaceutas.agregarFinal((Farmaceuta) usuario);
+            }
+        }
+        return farmaceutas;
     }
 
     // ================================
@@ -331,42 +349,168 @@ public class ModeloPrincipal extends AbstractModel {
     }
 
     // ================================
-    // MÉTODOS DE UTILIDAD
+    // NUEVOS MÉTODOS PARA HISTÓRICO MVC
     // ================================
 
-    private void crearDatosPrueba() {
-        try {
-            // Crear médico de prueba
-            if (gestorCatalogos.contarMedicos() == 0) {
-                Medico medico = new Medico("MED001", "Dr. Juan Pérez", "MED001", "Medicina General");
-                gestorCatalogos.agregarMedico(medico);
-            }
-
-            // Crear farmaceuta de prueba
-            if (gestorCatalogos.contarFarmaceutas() == 0) {
-                Farmaceuta farmaceuta = new Farmaceuta("FARM001", "María González", "FARM001");
-                gestorCatalogos.agregarFarmaceuta(farmaceuta);
-            }
-
-            // Crear administrador de prueba
-            if (gestorCatalogos.contarMedicos() + gestorCatalogos.contarFarmaceutas() < 3) {
-                Administrador admin = new Administrador("ADMIN", "Administrador", "ADMIN");
-                // Como no hay método específico para agregar admin, lo agregamos como usuario
-                // Este sería un punto donde necesitarías extender el gestor
-            }
-
-        } catch (CatalogoException e) {
-            // Silenciar errores de datos de prueba
+    public Lista<Receta> obtenerRecetasPorMedico(String idMedico) {
+        if (!esCadenaValida(idMedico)) {
+            return new Lista<Receta>();
         }
+
+        return gestorCatalogos.buscarRecetasPorMedico(idMedico);
     }
 
-    private String generarNumeroReceta() {
-        // Generar número único basado en timestamp
-        return "REC" + System.currentTimeMillis();
+    public Lista<Receta> buscarRecetasPorMedicoYNumero(String idMedico, String numeroReceta) {
+        if (!esCadenaValida(idMedico) || !esCadenaValida(numeroReceta)) {
+            return new Lista<Receta>();
+        }
+
+        Lista<Receta> recetasDelMedico = obtenerRecetasPorMedico(idMedico);
+        Lista<Receta> recetasEncontradas = new Lista<Receta>();
+
+        String criterioBusqueda = numeroReceta.toLowerCase();
+
+        for (int i = 0; i < recetasDelMedico.getTam(); i++) {
+            Receta receta = recetasDelMedico.obtenerPorPos(i);
+            if (receta.getNumeroReceta().toLowerCase().contains(criterioBusqueda)) {
+                recetasEncontradas.agregarFinal(receta);
+            }
+        }
+
+        return recetasEncontradas;
     }
 
-    public String generarReporteCompleto() {
-        return gestorCatalogos.generarReporteGeneral();
+    public Lista<Receta> obtenerTodasLasRecetas() {
+        return gestorCatalogos.obtenerTodasRecetas();
+    }
+
+    public Lista<Receta> buscarRecetasPorCriterio(String criterio) {
+        if (!esCadenaValida(criterio)) {
+            return obtenerTodasLasRecetas();
+        }
+
+        Lista<Receta> todasLasRecetas = gestorCatalogos.obtenerTodasRecetas();
+        Lista<Receta> recetasEncontradas = new Lista<Receta>();
+
+        String criterioBusqueda = criterio.toLowerCase();
+
+        for (int i = 0; i < todasLasRecetas.getTam(); i++) {
+            Receta receta = todasLasRecetas.obtenerPorPos(i);
+            if (receta.getNumeroReceta().toLowerCase().contains(criterioBusqueda) ||
+                    receta.getIdPaciente().toLowerCase().contains(criterioBusqueda) ||
+                    receta.getIdMedico().toLowerCase().contains(criterioBusqueda)) {
+                recetasEncontradas.agregarFinal(receta);
+            }
+        }
+
+        return recetasEncontradas;
+    }
+
+    public String generarDetallesReceta(Receta receta) {
+        if (receta == null) {
+            return "No hay receta seleccionada";
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            // Información de la receta
+            sb.append("=== INFORMACIÓN DE LA RECETA ===\n");
+            sb.append("Número: ").append(receta.getNumeroReceta()).append("\n");
+            sb.append("Fecha de Confección: ").append(receta.getFechaConfeccion()).append("\n");
+            sb.append("Fecha de Retiro: ").append(receta.getFechaRetiro()).append("\n");
+            sb.append("Estado: ").append(receta.getEstado().getDescripcion()).append("\n");
+
+            // Información del paciente
+            sb.append("\n=== INFORMACIÓN DEL PACIENTE ===\n");
+            Paciente paciente = buscarPacientePorId(receta.getIdPaciente());
+            if (paciente != null) {
+                sb.append("ID: ").append(paciente.getId()).append("\n");
+                sb.append("Nombre: ").append(paciente.getNombre()).append("\n");
+                sb.append("Teléfono: ").append(paciente.getTelefono()).append("\n");
+            } else {
+                sb.append("ID: ").append(receta.getIdPaciente()).append("\n");
+                sb.append("(Información del paciente no encontrada)\n");
+            }
+
+            // Información del médico
+            sb.append("\n=== INFORMACIÓN DEL MÉDICO ===\n");
+            Medico medico = buscarMedicoPorId(receta.getIdMedico());
+            if (medico != null) {
+                sb.append("ID: ").append(medico.getId()).append("\n");
+                sb.append("Nombre: ").append(medico.getNombre()).append("\n");
+                sb.append("Especialidad: ").append(medico.getEspecialidad()).append("\n");
+            } else {
+                sb.append("ID: ").append(receta.getIdMedico()).append("\n");
+                sb.append("(Información del médico no encontrada)\n");
+            }
+
+            // Detalles de medicamentos
+            sb.append("\n=== MEDICAMENTOS PRESCRITOS ===\n");
+            Lista<DetalleReceta> detalles = receta.getDetalles();
+            if (detalles != null && detalles.getTam() > 0) {
+                for (int i = 0; i < detalles.getTam(); i++) {
+                    DetalleReceta detalle = detalles.obtenerPorPos(i);
+                    sb.append("\n").append(i + 1).append(". ");
+
+                    Medicamento med = buscarMedicamentoPorCodigo(detalle.getCodigoMedicamento());
+                    if (med != null) {
+                        sb.append(med.getNombre()).append(" (").append(med.getCodigo()).append(")\n");
+                        sb.append("   Presentación: ").append(med.getPresentacion()).append("\n");
+                    } else {
+                        sb.append("Código: ").append(detalle.getCodigoMedicamento()).append("\n");
+                    }
+
+                    sb.append("   Cantidad: ").append(detalle.getCantidad()).append("\n");
+                    sb.append("   Duración: ").append(detalle.getDuracionDias()).append(" días\n");
+                    sb.append("   Indicaciones: ").append(detalle.getIndicaciones()).append("\n");
+                }
+            } else {
+                sb.append("(Sin medicamentos registrados)");
+            }
+
+        } catch (Exception e) {
+            sb.append("\nError al generar detalles: ").append(e.getMessage());
+        }
+
+        return sb.toString();
+    }
+
+    // ================================
+    // MÉTODOS DE BÚSQUEDA AUXILIARES
+    // ================================
+
+    private Paciente buscarPacientePorId(String id) {
+        Lista<Paciente> pacientes = gestorCatalogos.obtenerTodosPacientes();
+        for (int i = 0; i < pacientes.getTam(); i++) {
+            Paciente p = pacientes.obtenerPorPos(i);
+            if (p.getId().equals(id)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    private Medico buscarMedicoPorId(String id) {
+        Lista<Usuario> medicos = gestorCatalogos.buscarMedicos();
+        for (int i = 0; i < medicos.getTam(); i++) {
+            Usuario u = medicos.obtenerPorPos(i);
+            if (u instanceof Medico && u.getId().equals(id)) {
+                return (Medico) u;
+            }
+        }
+        return null;
+    }
+
+    private Medicamento buscarMedicamentoPorCodigo(String codigo) {
+        Lista<Medicamento> medicamentos = gestorCatalogos.obtenerTodosMedicamentos();
+        for (int i = 0; i < medicamentos.getTam(); i++) {
+            Medicamento m = medicamentos.obtenerPorPos(i);
+            if (m.getCodigo().equals(codigo)) {
+                return m;
+            }
+        }
+        return null;
     }
 
     // ================================
@@ -386,5 +530,40 @@ public class ModeloPrincipal extends AbstractModel {
     public boolean puedeDespachar() {
         return usuarioActual != null &&
                 usuarioActual.getTipo() == TipoUsuario.FARMACEUTA;
+    }
+
+    // ================================
+    // MÉTODOS DE UTILIDAD
+    // ================================
+
+    private void crearDatosPrueba() {
+        try {
+            // Crear médico de prueba
+            if (gestorCatalogos.contarMedicos() == 0) {
+                Medico medico = new Medico("MED001", "Dr. Juan Pérez", "MED001", "Medicina General");
+                gestorCatalogos.agregarMedico(medico);
+            }
+
+            // Crear farmaceuta de prueba
+            if (gestorCatalogos.contarFarmaceutas() == 0) {
+                Farmaceuta farmaceuta = new Farmaceuta("FARM001", "María González", "FARM001");
+                gestorCatalogos.agregarFarmaceuta(farmaceuta);
+            }
+
+            // Crear administrador de prueba
+            // TODO: Implementar cuando se tenga la clase Administrador
+
+        } catch (CatalogoException e) {
+            // Silenciar errores de datos de prueba
+        }
+    }
+
+    private String generarNumeroReceta() {
+        // Generar número único basado en timestamp
+        return "REC" + System.currentTimeMillis();
+    }
+
+    public String generarReporteCompleto() {
+        return gestorCatalogos.generarReporteGeneral();
     }
 }

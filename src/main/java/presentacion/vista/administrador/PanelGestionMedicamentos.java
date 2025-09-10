@@ -52,26 +52,11 @@ public class PanelGestionMedicamentos {
         list.getColumnModel().getColumn(0).setPreferredWidth(80);  // Código
         list.getColumnModel().getColumn(1).setPreferredWidth(200); // Nombre
         list.getColumnModel().getColumn(2).setPreferredWidth(150); // Presentación
-        list.getColumnModel().getColumn(3).setPreferredWidth(60);  // Stock
+        list.getColumnModel().getColumn(3).setPreferredWidth(80);  // Stock
 
         // Configurar tabla para mejor visualización
         list.setRowHeight(25);
         list.getTableHeader().setReorderingAllowed(false);
-
-        // Configurar campo de stock para solo números
-        configurarCampoStock();
-    }
-
-    private void configurarCampoStock() {
-        // Agregar validación para que solo acepte números
-        stockFld.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                char c = evt.getKeyChar();
-                if (!Character.isDigit(c) && c != java.awt.event.KeyEvent.VK_BACK_SPACE) {
-                    evt.consume();
-                }
-            }
-        });
     }
 
     private void configurarEventos() {
@@ -107,6 +92,14 @@ public class PanelGestionMedicamentos {
             }
         });
 
+        // Enter en campo de búsqueda
+        nombreBusquedaFld.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buscarMedicamentos();
+            }
+        });
+
         // Botón Reporte
         reporte.addActionListener(new ActionListener() {
             @Override
@@ -120,127 +113,160 @@ public class PanelGestionMedicamentos {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
-                    seleccionarMedicamento();
+                    cargarMedicamentoSeleccionado();
                 }
-            }
-        });
-
-        // Enter para buscar
-        nombreBusquedaFld.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarMedicamentos();
             }
         });
     }
 
     private void guardarMedicamento() {
-        String codigo = codigoFld.getText().trim();
-        String nombre = nombreFld.getText().trim();
-        String presentacion = presentacionFld.getText().trim();
-        String stockTexto = stockFld.getText().trim();
+        try {
+            String codigo = codigoFld.getText().trim();
+            String nombre = nombreFld.getText().trim();
+            String presentacion = presentacionFld.getText().trim();
+            String stockTexto = stockFld.getText().trim();
 
-        // Validaciones básicas en la vista
-        if (codigo.isEmpty() || nombre.isEmpty() || presentacion.isEmpty()) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Código, nombre y presentación son obligatorios",
-                    "Error de validación",
-                    JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+            if (codigo.isEmpty() || nombre.isEmpty()) {
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Código y nombre son obligatorios",
+                        "Datos incompletos",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
-        int stock = 0;
-        if (!stockTexto.isEmpty()) {
+            int stock = 0;
             try {
                 stock = Integer.parseInt(stockTexto);
                 if (stock < 0) {
                     JOptionPane.showMessageDialog(panelPrincipal,
                             "El stock no puede ser negativo",
-                            "Error de validación",
-                            JOptionPane.ERROR_MESSAGE);
+                            "Stock inválido",
+                            JOptionPane.WARNING_MESSAGE);
                     return;
                 }
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(panelPrincipal,
                         "El stock debe ser un número válido",
-                        "Error de validación",
-                        JOptionPane.ERROR_MESSAGE);
+                        "Stock inválido",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
-        }
 
-        if (modoEdicion) {
-            // Nota: Implementar actualización cuando esté disponible en el controlador
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Función de actualización no implementada aún",
-                    "Información",
-                    JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            if (controlador.agregarMedicamento(codigo, nombre, presentacion, stock)) {
-                cargarDatos();
-                limpiarCampos();
+            if (modoEdicion) {
+                // TODO: Implementar actualización cuando esté disponible en el controlador
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Funcionalidad de edición en desarrollo",
+                        "En desarrollo",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                if (controlador.agregarMedicamento(codigo, nombre, presentacion, stock)) {
+                    limpiarCampos();
+                    cargarTodosMedicamentos();
+                }
             }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al guardar medicamento: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void eliminarMedicamento() {
-        if (codigoSeleccionado != null) {
-            int confirmacion = JOptionPane.showConfirmDialog(panelPrincipal,
-                    "¿Está seguro de eliminar el medicamento con código: " + codigoSeleccionado + "?",
-                    "Confirmar eliminación",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (confirmacion == JOptionPane.YES_OPTION) {
-                // Nota: Implementar eliminación cuando esté disponible en el controlador
-                JOptionPane.showMessageDialog(panelPrincipal,
-                        "Función de eliminación no implementada aún",
-                        "Información",
-                        JOptionPane.INFORMATION_MESSAGE);
-            }
-        } else {
+        if (codigoSeleccionado == null) {
             JOptionPane.showMessageDialog(panelPrincipal,
-                    "Seleccione un medicamento para eliminar",
-                    "Advertencia",
+                    "Seleccione un medicamento de la lista para eliminar",
+                    "Medicamento no seleccionado",
                     JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // TODO: Implementar eliminación cuando esté disponible en el controlador
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Funcionalidad de eliminación en desarrollo",
+                    "En desarrollo",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al eliminar medicamento: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void buscarMedicamentos() {
         String criterio = nombreBusquedaFld.getText().trim();
-        if (criterio.isEmpty()) {
-            cargarDatos();
-        } else {
-            // Usar el método de búsqueda del modelo
-            Lista<Medicamento> medicamentosEncontrados = controlador.getModelo().buscarMedicamentosPorDescripcion(criterio);
-            Lista<Object> datosFiltrados = new Lista<>();
 
-            for (int i = 0; i < medicamentosEncontrados.getTam(); i++) {
-                datosFiltrados.agregarFinal(medicamentosEncontrados.obtenerPorPos(i));
+        try {
+            if (criterio.isEmpty()) {
+                cargarTodosMedicamentos();
+            } else {
+                Lista<Medicamento> medicamentosEncontrados = controlador.getModelo().buscarMedicamentosPorDescripcion(criterio);
+                Lista<Object> datos = new Lista<>();
+
+                for (int i = 0; i < medicamentosEncontrados.getTam(); i++) {
+                    datos.agregarFinal(medicamentosEncontrados.obtenerPorPos(i));
+                }
+
+                tableModel.setDatos(datos);
+
+                if (medicamentosEncontrados.getTam() == 0) {
+                    JOptionPane.showMessageDialog(panelPrincipal,
+                            "No se encontraron medicamentos con el criterio: " + criterio,
+                            "Sin resultados",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
             }
-
-            tableModel.setDatos(datosFiltrados);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al buscar medicamentos: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void seleccionarMedicamento() {
+    private void cargarMedicamentoSeleccionado() {
         int filaSeleccionada = list.getSelectedRow();
         if (filaSeleccionada >= 0) {
-            Object objeto = tableModel.getObjetoEnFila(filaSeleccionada);
-            if (objeto instanceof Medicamento) {
-                Medicamento medicamento = (Medicamento) objeto;
+            try {
+                Object elemento = tableModel.getObjetoEnFila(filaSeleccionada);
+                if (elemento instanceof Medicamento) {
+                    Medicamento medicamento = (Medicamento) elemento;
 
-                codigoFld.setText(medicamento.getCodigo());
-                nombreFld.setText(medicamento.getNombre());
-                presentacionFld.setText(medicamento.getPresentacion());
-                stockFld.setText(String.valueOf(medicamento.getStock()));
+                    codigoFld.setText(medicamento.getCodigo());
+                    nombreFld.setText(medicamento.getNombre());
+                    presentacionFld.setText(medicamento.getPresentacion());
+                    stockFld.setText(String.valueOf(medicamento.getStock()));
 
-                codigoSeleccionado = medicamento.getCodigo();
-                modoEdicion = true;
-                guardar.setText("Actualizar");
+                    codigoSeleccionado = medicamento.getCodigo();
+                    modoEdicion = true;
 
-                // Habilitar botón borrar
-                borrar.setEnabled(true);
+                    // Deshabilitar campo código en modo edición
+                    codigoFld.setEnabled(false);
+                }
+            } catch (Exception e) {
+                limpiarCampos();
             }
+        }
+    }
+
+    private void cargarTodosMedicamentos() {
+        try {
+            Lista<Medicamento> medicamentos = controlador.getModelo().obtenerMedicamentos();
+            Lista<Object> datos = new Lista<>();
+
+            for (int i = 0; i < medicamentos.getTam(); i++) {
+                datos.agregarFinal(medicamentos.obtenerPorPos(i));
+            }
+
+            tableModel.setDatos(datos);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al cargar medicamentos: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -253,38 +279,27 @@ public class PanelGestionMedicamentos {
 
         codigoSeleccionado = null;
         modoEdicion = false;
-        guardar.setText("Guardar");
-        borrar.setEnabled(false);
+        codigoFld.setEnabled(true);
+
         list.clearSelection();
-
-        // Recargar todos los datos
-        cargarDatos();
-    }
-
-    private void cargarDatos() {
-        Lista<Medicamento> medicamentos = controlador.getModelo().obtenerMedicamentos();
-        Lista<Object> datos = new Lista<>();
-
-        for (int i = 0; i < medicamentos.getTam(); i++) {
-            datos.agregarFinal(medicamentos.obtenerPorPos(i));
-        }
-
-        tableModel.setDatos(datos);
     }
 
     private void generarReporte() {
         try {
-            String reporte = controlador.getModelo().getGestorCatalogos().generarReporteMedicamentos();
+            String reporte = controlador.generarReporteCompleto();
 
             JTextArea textArea = new JTextArea(reporte);
             textArea.setEditable(false);
-            textArea.setFont(new java.awt.Font("Courier New", java.awt.Font.PLAIN, 12));
+            textArea.setFont(new java.awt.Font("Monospaced", 0, 12));
 
             JScrollPane scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new java.awt.Dimension(600, 400));
 
-            JOptionPane.showMessageDialog(panelPrincipal, scrollPane,
-                    "Reporte de Medicamentos", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    scrollPane,
+                    "Reporte del Sistema",
+                    JOptionPane.INFORMATION_MESSAGE);
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
                     "Error al generar reporte: " + e.getMessage(),
@@ -293,53 +308,23 @@ public class PanelGestionMedicamentos {
         }
     }
 
+    private void cargarDatos() {
+        cargarTodosMedicamentos();
+    }
+
+    /**
+     * Obtiene el panel principal para ser añadido a contenedores
+     * @return JPanel principal del formulario
+     */
     public JPanel getPanel() {
         return panelPrincipal;
     }
 
-    // Método para refrescar datos desde el exterior
+    /**
+     * Método para refrescar datos desde el exterior
+     */
     public void refrescarDatos() {
-        cargarDatos();
+        cargarTodosMedicamentos();
         limpiarCampos();
-    }
-
-    // Método para mostrar medicamentos con stock bajo
-    public void mostrarMedicamentosBajoStock() {
-        try {
-            Lista<Medicamento> medicamentosBajoStock = controlador.getModelo()
-                    .getGestorCatalogos()
-                    .obtenerMedicamentosBajoStock(10);
-
-            if (medicamentosBajoStock.getTam() > 0) {
-                StringBuilder mensaje = new StringBuilder();
-                mensaje.append("Medicamentos con stock bajo (≤10 unidades):\n\n");
-
-                for (int i = 0; i < medicamentosBajoStock.getTam(); i++) {
-                    Medicamento med = medicamentosBajoStock.obtenerPorPos(i);
-                    mensaje.append("• ").append(med.getCodigoYNombre())
-                            .append(" - Stock: ").append(med.getStock()).append("\n");
-                }
-
-                JTextArea textArea = new JTextArea(mensaje.toString());
-                textArea.setEditable(false);
-
-                JScrollPane scrollPane = new JScrollPane(textArea);
-                scrollPane.setPreferredSize(new java.awt.Dimension(400, 300));
-
-                JOptionPane.showMessageDialog(panelPrincipal, scrollPane,
-                        "Alerta de Stock Bajo",
-                        JOptionPane.WARNING_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(panelPrincipal,
-                        "Todos los medicamentos tienen stock suficiente",
-                        "Stock Normal",
-                        JOptionPane.INFORMATION_MESSAGE);
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Error al verificar stock: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
     }
 }
