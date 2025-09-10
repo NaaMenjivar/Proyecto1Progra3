@@ -296,4 +296,8 @@ public class PanelDespacho {
         recetaSeleccionada = null;
         cambiarEstado.setEnabled(false);
     }
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
 }

@@ -303,4 +303,8 @@ public class PanelGestionMedicos {
         cargarTodosMedicos();
         limpiarCampos();
     }
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
 }

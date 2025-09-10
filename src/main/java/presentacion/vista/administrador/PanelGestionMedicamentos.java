@@ -327,4 +327,8 @@ public class PanelGestionMedicamentos {
         cargarTodosMedicamentos();
         limpiarCampos();
     }
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
 }

@@ -304,4 +304,8 @@ public class PanelGestionFarmaceutas {
         cargarTodosFarmaceutas();
         limpiarCampos();
     }
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
 }

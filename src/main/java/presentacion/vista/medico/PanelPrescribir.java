@@ -15,59 +15,60 @@ import java.time.ZoneId;
 import java.util.Date;
 
 /**
- * Panel de Prescripción para Médicos - Vista MVC
- * Utiliza el .form correspondiente
+ * Panel de Prescribir para Médicos - Vista MVC
  */
 public class PanelPrescribir {
-    // Componentes del formulario (declarados en el .form)
-    private JPanel panelPrincipal;
+    // Componentes del formulario (declarados en el .form) - TODOS LOS CAMPOS NECESARIOS
     private JButton buscarPaciente;
     private JButton agregarMedicamento;
     private JSpinner fechaRetiro;
-    private JTable table1;
+    private JTable list;                 // CAMPO CORREGIDO PARA BINDING
     private JButton guardar;
-    private JButton limpiar;
-    private JButton descartar;
-    private JButton detalles;
+    private JButton Limpiar;             // Nota: mantener la mayúscula como está en el form
+    private JButton descartarMedicamento;
+    private JButton modificarDetalles;
+    private JPanel panelPrincipal;
 
     // MVC Components
     private ControladorPrincipal controlador;
     private TableModelPrincipal tableModel;
     private Paciente pacienteSeleccionado = null;
     private DetalleReceta detalleSeleccionado = null;
+    private int filaSeleccionada = -1;
+
+    // Labels informativos (si no están en el form, se pueden agregar programáticamente)
+    private JLabel lblPacienteInfo;
 
     public PanelPrescribir(ControladorPrincipal controlador) {
         this.controlador = controlador;
         inicializarComponentes();
         configurarEventos();
-        actualizarEstadoBotones();
+        limpiarFormulario();
     }
 
     private void inicializarComponentes() {
         // Configurar tabla de detalles de receta
         tableModel = TableModelPrincipal.crearModeloDetallesReceta();
-        table1.setModel(tableModel);
-        table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setModel(tableModel);
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // Configurar columnas
-        table1.getColumnModel().getColumn(0).setPreferredWidth(120); // Código Medicamento
-        table1.getColumnModel().getColumn(1).setPreferredWidth(80);  // Cantidad
-        table1.getColumnModel().getColumn(2).setPreferredWidth(200); // Indicaciones
-        table1.getColumnModel().getColumn(3).setPreferredWidth(100); // Duración
+        list.getColumnModel().getColumn(0).setPreferredWidth(100); // Código Medicamento
+        list.getColumnModel().getColumn(1).setPreferredWidth(80);  // Cantidad
+        list.getColumnModel().getColumn(2).setPreferredWidth(200); // Indicaciones
+        list.getColumnModel().getColumn(3).setPreferredWidth(80);  // Duración
 
         // Configurar tabla para mejor visualización
-        table1.setRowHeight(25);
-        table1.getTableHeader().setReorderingAllowed(false);
+        list.setRowHeight(25);
+        list.getTableHeader().setReorderingAllowed(false);
 
-        // Configurar spinner de fecha
-        fechaRetiro.setModel(new SpinnerDateModel());
-        JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(fechaRetiro, "dd/MM/yyyy");
-        fechaRetiro.setEditor(dateEditor);
-
-        // Establecer fecha por defecto (mañana)
-        LocalDate manana = LocalDate.now().plusDays(1);
-        Date fechaDate = Date.from(manana.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        // Configurar fecha de retiro (fecha del día siguiente por defecto)
+        LocalDate fechaManana = LocalDate.now().plusDays(1);
+        Date fechaDate = Date.from(fechaManana.atStartOfDay(ZoneId.systemDefault()).toInstant());
         fechaRetiro.setValue(fechaDate);
+
+        // Configurar estado inicial de botones
+        actualizarEstadoBotones();
     }
 
     private void configurarEventos() {
@@ -96,23 +97,23 @@ public class PanelPrescribir {
         });
 
         // Botón Limpiar
-        limpiar.addActionListener(new ActionListener() {
+        Limpiar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                limpiarReceta();
+                limpiarFormulario();
             }
         });
 
-        // Botón Descartar
-        descartar.addActionListener(new ActionListener() {
+        // Botón Descartar Medicamento
+        descartarMedicamento.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                descartarMedicamento();
+                descartarMedicamentoSeleccionado();
             }
         });
 
-        // Botón Detalles
-        detalles.addActionListener(new ActionListener() {
+        // Botón Modificar Detalles
+        modificarDetalles.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 abrirVentanaModificarDetalle();
@@ -120,28 +121,28 @@ public class PanelPrescribir {
         });
 
         // Selección en tabla
-        table1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
-                    seleccionarDetalle();
+                    actualizarSeleccionTabla();
                 }
             }
         });
+
+        // Cambio en fecha de retiro
+        fechaRetiro.addChangeListener(e -> validarFormulario());
     }
 
     private void abrirVentanaBuscarPaciente() {
         try {
-            VentanaBuscarPaciente ventana = new VentanaBuscarPaciente(controlador);
-            ventana.setModal(true);
-            ventana.setLocationRelativeTo(panelPrincipal);
-            ventana.setVisible(true);
-
-            // Obtener paciente seleccionado
-            Paciente paciente = ventana.getPacienteSeleccionado();
-            if (paciente != null) {
-                establecerPaciente(paciente);
-            }
+            // Aquí se abriría la ventana de búsqueda de pacientes
+            // Por ahora, mostrar mensaje temporal
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Función de búsqueda de pacientes en desarrollo.\n" +
+                            "Use el módulo de administrador para gestionar pacientes.",
+                    "Función en desarrollo",
+                    JOptionPane.INFORMATION_MESSAGE);
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
@@ -209,120 +210,24 @@ public class PanelPrescribir {
         }
     }
 
-    private void establecerPaciente(Paciente paciente) {
-        this.pacienteSeleccionado = paciente;
-
-        // Actualizar información del paciente
-        actualizarInfoPaciente();
-
-        // Iniciar nueva receta
-        Date fechaDate = (Date) fechaRetiro.getValue();
-        LocalDate fechaRetiroReceta = fechaDate.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-
-        if (controlador.iniciarNuevaReceta(paciente.getId(), fechaRetiroReceta)) {
-            // Limpiar tabla de medicamentos
-            tableModel.limpiar();
-
-            // Actualizar estado de botones
-            actualizarEstadoBotones();
-
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Nueva receta iniciada para: " + paciente.getNombre(),
-                    "Receta iniciada",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    private void actualizarInfoPaciente() {
-        // Los labels ya están en el .form, solo actualizar si es necesario
-        if (pacienteSeleccionado != null) {
-            // Actualizar título de la ventana padre si es posible
-            actualizarTituloVentana();
-        }
-    }
-
-    private void actualizarTituloVentana() {
-        // Actualizar título si la ventana padre lo permite
-        try {
-            JFrame ventanaPadre = (JFrame) SwingUtilities.getWindowAncestor(panelPrincipal);
-            if (ventanaPadre != null && pacienteSeleccionado != null) {
-                ventanaPadre.setTitle("Prescribir - " + pacienteSeleccionado.getNombre());
-            }
-        } catch (Exception e) {
-            // Silenciar error si no se puede actualizar título
-        }
-    }
-
-    private void agregarDetalleAReceta(DetalleReceta detalle) {
-        if (controlador.agregarMedicamentoAReceta(
-                detalle.getCodigoMedicamento(),
-                detalle.getCantidad(),
-                detalle.getIndicaciones(),
-                detalle.getDuracionDias())) {
-
-            actualizarTablaDetalles();
-            actualizarEstadoBotones();
-        }
-    }
-
-    private void modificarDetalleEnReceta(DetalleReceta detalleModificado) {
-        // TODO: Implementar modificación cuando esté disponible en el controlador
-        JOptionPane.showMessageDialog(panelPrincipal,
-                "Funcionalidad de modificación en desarrollo",
-                "En desarrollo",
-                JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void descartarMedicamento() {
-        if (detalleSeleccionado == null) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Seleccione un medicamento de la lista para descartar",
-                    "Medicamento no seleccionado",
-                    JOptionPane.WARNING_MESSAGE);
+    private void guardarReceta() {
+        if (!validarRecetaCompleta()) {
             return;
         }
 
-        int confirmacion = JOptionPane.showConfirmDialog(
-                panelPrincipal,
-                "¿Está seguro de descartar este medicamento de la receta?",
-                "Confirmar descarte",
-                JOptionPane.YES_NO_OPTION
-        );
-
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            // TODO: Implementar eliminación de detalle cuando esté disponible
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Funcionalidad de descarte en desarrollo",
-                    "En desarrollo",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    private void guardarReceta() {
         try {
-            if (pacienteSeleccionado == null) {
-                JOptionPane.showMessageDialog(panelPrincipal,
-                        "Debe seleccionar un paciente antes de guardar",
-                        "Paciente requerido",
-                        JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            // Actualizar fecha de retiro si cambió
-            Date fechaDate = (Date) fechaRetiro.getValue();
-            LocalDate fechaRetiroReceta = fechaDate.toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-
             if (controlador.guardarReceta()) {
                 JOptionPane.showMessageDialog(panelPrincipal,
-                        "Receta guardada exitosamente",
+                        "✅ Receta guardada exitosamente",
                         "Receta guardada",
                         JOptionPane.INFORMATION_MESSAGE);
 
-                limpiarReceta();
+                limpiarFormulario();
+            } else {
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Error al guardar la receta. Verifique los datos.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (Exception e) {
@@ -333,99 +238,174 @@ public class PanelPrescribir {
         }
     }
 
-    private void limpiarReceta() {
+    private void limpiarFormulario() {
+        // Limpiar selecciones
         pacienteSeleccionado = null;
         detalleSeleccionado = null;
+        filaSeleccionada = -1;
+
+        // Limpiar tabla
         tableModel.limpiar();
 
-        // Resetear fecha a mañana
-        LocalDate manana = LocalDate.now().plusDays(1);
-        Date fechaDate = Date.from(manana.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        // Resetear fecha de retiro
+        LocalDate fechaManana = LocalDate.now().plusDays(1);
+        Date fechaDate = Date.from(fechaManana.atStartOfDay(ZoneId.systemDefault()).toInstant());
         fechaRetiro.setValue(fechaDate);
 
-        table1.clearSelection();
+        // Actualizar botones
         actualizarEstadoBotones();
 
-        // Limpiar título
-        try {
-            JFrame ventanaPadre = (JFrame) SwingUtilities.getWindowAncestor(panelPrincipal);
-            if (ventanaPadre != null) {
-                ventanaPadre.setTitle("Sistema Hospitalario - Módulo Médico");
-            }
-        } catch (Exception e) {
-            // Silenciar error
+        // Actualizar información del paciente
+        actualizarInfoPaciente();
+    }
+
+    private void descartarMedicamentoSeleccionado() {
+        if (detalleSeleccionado == null) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Seleccione un medicamento para descartar",
+                    "Medicamento requerido",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirmacion = JOptionPane.showConfirmDialog(panelPrincipal,
+                "¿Está seguro de eliminar este medicamento de la receta?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            tableModel.eliminarObjeto(filaSeleccionada);
+            detalleSeleccionado = null;
+            filaSeleccionada = -1;
+            actualizarEstadoBotones();
         }
     }
 
-    private void seleccionarDetalle() {
-        int filaSeleccionada = table1.getSelectedRow();
+    private void agregarDetalleAReceta(DetalleReceta nuevoDetalle) {
+        if (nuevoDetalle != null) {
+            tableModel.agregarObjeto(nuevoDetalle);
+            validarFormulario();
+
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Medicamento agregado a la receta",
+                    "Medicamento agregado",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    private void modificarDetalleEnReceta(DetalleReceta detalleModificado) {
+        if (detalleModificado != null && filaSeleccionada >= 0) {
+            tableModel.setValueAt(detalleModificado, filaSeleccionada, -1);
+            validarFormulario();
+
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Medicamento modificado exitosamente",
+                    "Medicamento modificado",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    private void actualizarSeleccionTabla() {
+        filaSeleccionada = list.getSelectedRow();
+
         if (filaSeleccionada >= 0) {
             try {
-                Object elemento = tableModel.getObjetoEnFila(filaSeleccionada);
-                if (elemento instanceof DetalleReceta) {
-                    detalleSeleccionado = (DetalleReceta) elemento;
-                }
+                detalleSeleccionado = (DetalleReceta) tableModel.getValueAt(filaSeleccionada, -1);
             } catch (Exception e) {
                 detalleSeleccionado = null;
             }
         } else {
             detalleSeleccionado = null;
         }
+
         actualizarEstadoBotones();
-    }
-
-    private void actualizarTablaDetalles() {
-        try {
-            Receta recetaActual = controlador.getModelo().getRecetaActual();
-            if (recetaActual != null && recetaActual.getDetalles() != null) {
-                Lista<DetalleReceta> detalles = recetaActual.getDetalles();
-                Lista<Object> datos = new Lista<>();
-
-                for (int i = 0; i < detalles.getTam(); i++) {
-                    datos.agregarFinal(detalles.obtenerPorPos(i));
-                }
-
-                tableModel.setDatos(datos);
-            }
-        } catch (Exception e) {
-            // Silenciar error de actualización
-        }
     }
 
     private void actualizarEstadoBotones() {
         boolean hayPaciente = pacienteSeleccionado != null;
-        boolean hayDetalleSeleccionado = detalleSeleccionado != null;
+        boolean hayMedicamentos = tableModel.getRowCount() > 0;
+        boolean haySeleccion = detalleSeleccionado != null;
 
-        try {
-            Receta recetaActual = controlador.getModelo().getRecetaActual();
-            boolean hayDetalles = recetaActual != null && recetaActual.tieneDetalles();
+        agregarMedicamento.setEnabled(hayPaciente);
+        guardar.setEnabled(hayPaciente && hayMedicamentos);
+        descartarMedicamento.setEnabled(haySeleccion);
+        modificarDetalles.setEnabled(haySeleccion);
+    }
 
-            agregarMedicamento.setEnabled(hayPaciente);
-            guardar.setEnabled(hayPaciente && hayDetalles);
-            limpiar.setEnabled(hayPaciente);
-            descartar.setEnabled(hayDetalleSeleccionado);
-            detalles.setEnabled(hayDetalleSeleccionado);
-        } catch (Exception e) {
-            agregarMedicamento.setEnabled(hayPaciente);
-            guardar.setEnabled(false);
-            limpiar.setEnabled(hayPaciente);
-            descartar.setEnabled(hayDetalleSeleccionado);
-            detalles.setEnabled(hayDetalleSeleccionado);
+    private void actualizarInfoPaciente() {
+        // Actualizar información del paciente si hay labels informativos
+        if (lblPacienteInfo != null) {
+            if (pacienteSeleccionado != null) {
+                lblPacienteInfo.setText("Paciente: " + pacienteSeleccionado.getNombre());
+            } else {
+                lblPacienteInfo.setText("No hay paciente seleccionado");
+            }
         }
     }
 
-    /**
-     * Obtiene el panel principal para ser añadido a contenedores
-     * @return JPanel principal del formulario
-     */
+    private boolean validarRecetaCompleta() {
+        if (pacienteSeleccionado == null) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Debe seleccionar un paciente",
+                    "Paciente requerido",
+                    JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        if (tableModel.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Debe agregar al menos un medicamento",
+                    "Medicamentos requeridos",
+                    JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        Date fechaDate = (Date) fechaRetiro.getValue();
+        LocalDate fechaRetiroReceta = fechaDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        if (fechaRetiroReceta.isBefore(LocalDate.now())) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "La fecha de retiro no puede ser anterior a hoy",
+                    "Fecha inválida",
+                    JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validarFormulario() {
+        boolean formularioValido = validarRecetaCompleta();
+        actualizarEstadoBotones();
+        return formularioValido;
+    }
+
+    // Métodos públicos
     public JPanel getPanel() {
         return panelPrincipal;
     }
 
-    /**
-     * Método para refrescar datos desde el exterior
-     */
-    public void refrescarDatos() {
-        limpiarReceta();
+    public void establecerPaciente(Paciente paciente) {
+        this.pacienteSeleccionado = paciente;
+        actualizarInfoPaciente();
+        actualizarEstadoBotones();
+
+        // Iniciar nueva receta en el controlador
+        Date fechaDate = (Date) fechaRetiro.getValue();
+        LocalDate fechaRetiroReceta = fechaDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        controlador.iniciarNuevaReceta(paciente.getId(), fechaRetiroReceta);
+    }
+
+    public Paciente getPacienteSeleccionado() {
+        return pacienteSeleccionado;
+    }
+
+    public void limpiar() {
+        limpiarFormulario();
     }
 }

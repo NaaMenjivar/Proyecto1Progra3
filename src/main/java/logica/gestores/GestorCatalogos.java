@@ -253,19 +253,6 @@ public class GestorCatalogos {
     // GESTIÓN DE RECETAS (Prescripción y Despacho)
     // ================================
 
-    public boolean agregarReceta(Receta receta) throws CatalogoException {
-        if (receta == null) {
-            throw new CatalogoException("Receta no puede ser null");
-        }
-
-        if (!receta.tieneDetalles()) {
-            throw new CatalogoException("Receta debe tener al menos un medicamento");
-        }
-
-        recetas.agregarFinal(receta);
-        return true;
-    }
-
     public Lista<Receta> obtenerTodasRecetas() {
         return recetas;
     }
@@ -341,10 +328,6 @@ public class GestorCatalogos {
         return buscarFarmaceutas().getTam();
     }
 
-    public int contarRecetas() {
-        return recetas.getTam();
-    }
-
     // ================================
     // REPORTES Y ESTADÍSTICAS
     // ================================
@@ -398,5 +381,80 @@ public class GestorCatalogos {
 
     private boolean existeMedicamento(String codigo) {
         return medicamentos.buscarPorId(codigo) != null;
+    }
+
+    /**
+     * Obtiene todas las recetas del sistema
+     */
+    public Lista<Receta> obtenerTodasLasRecetas() {
+        return recetas; // Retorna la lista completa de recetas
+    }
+
+    /**
+     * Obtiene las recetas de un médico específico
+     */
+    public Lista<Receta> obtenerRecetasPorMedico(String idMedico) {
+        Lista<Receta> recetasMedico = new Lista<>();
+
+        for (int i = 0; i < recetas.getTam(); i++) {
+            Receta receta = recetas.obtenerPorPos(i);
+            if (receta.getIdMedico().equals(idMedico)) {
+                recetasMedico.agregarFinal(receta);
+            }
+        }
+
+        return recetasMedico;
+    }
+
+    /**
+     * Busca una receta por su número
+     */
+    public Receta buscarRecetaPorNumero(String numeroReceta) {
+        for (int i = 0; i < recetas.getTam(); i++) {
+            Receta receta = recetas.obtenerPorPos(i);
+            if (receta.getNumeroReceta().equals(numeroReceta)) {
+                return receta;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Obtiene recetas por estado
+     */
+    public Lista<Receta> obtenerRecetasPorEstado(String estado) {
+        Lista<Receta> recetasPorEstado = new Lista<>();
+
+        for (int i = 0; i < recetas.getTam(); i++) {
+            Receta receta = recetas.obtenerPorPos(i);
+            if (receta.getEstado().equals(estado)) {
+                recetasPorEstado.agregarFinal(receta);
+            }
+        }
+
+        return recetasPorEstado;
+    }
+
+    /**
+     * Obtiene el total de recetas en el sistema
+     */
+    public int contarRecetas() {
+        return recetas.getTam();
+    }
+
+    /**
+     * Agrega una receta al sistema (para prescripciones)
+     */
+    public boolean agregarReceta(Receta receta) throws CatalogoException {
+        if (receta == null) {
+            throw new CatalogoException("La receta no puede ser null");
+        }
+
+        if (buscarRecetaPorNumero(receta.getNumeroReceta()) != null) {
+            throw new CatalogoException("Ya existe una receta con el número: " + receta.getNumeroReceta());
+        }
+
+        recetas.agregarFinal(receta);
+        return true;
     }
 }

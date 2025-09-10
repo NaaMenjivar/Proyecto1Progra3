@@ -2,8 +2,6 @@ package presentacion.vista.principal;
 
 import presentacion.controlador.ControladorPrincipal;
 import presentacion.vista.administrador.*;
-import logica.entidades.Usuario;
-import logica.entidades.TipoUsuario;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,12 +9,12 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 /**
- * Ventana Principal del Sistema - Para Administradores y Farmaceutas
- * Utiliza la estructura de .form existente con JTabbedPane
+ * Ventana Principal del Sistema - Vista para Administradores y Farmaceutas
+ * Contiene todos los paneles de gestión en pestañas organizadas
  */
 public class VentanaPrincipal extends JFrame {
 
-    // Componentes del .form
+    // Componentes del formulario (vinculados desde el .form)
     private JPanel panelPrincipal;
     private JTabbedPane panelTabs;
     private JPanel medicosPanel;
@@ -24,9 +22,12 @@ public class VentanaPrincipal extends JFrame {
     private JPanel pacientesPanel;
     private JPanel medicamentosPanel;
     private JPanel despachoPanel;
-    // private JPanel dashboardPanel;  // Dashboard comentado
+    private JPanel dashboardPanel;
     private JPanel historicoPanel;
     private JPanel acercaDePanel;
+
+    // Controlador MVC
+    private ControladorPrincipal controlador;
 
     // Instancias de los paneles de gestión
     private PanelGestionMedicos panelGestionMedicos;
@@ -34,237 +35,188 @@ public class VentanaPrincipal extends JFrame {
     private PanelGestionPacientes panelGestionPacientes;
     private PanelGestionMedicamentos panelGestionMedicamentos;
     private PanelDespacho panelDespacho;
-    // private PanelDashboard panelDashboard;  // Dashboard comentado
+    private PanelDashboard panelDashboard;
     private PanelHistorico panelHistorico;
     private PanelAcercaDe panelAcercaDe;
-
-    // Controlador MVC
-    private ControladorPrincipal controlador;
 
     public VentanaPrincipal(ControladorPrincipal controlador) {
         this.controlador = controlador;
         inicializarVentana();
-        inicializarPaneles();
+        crearPaneles();
+        integrarPanelesEnTabs();
         configurarEventos();
     }
 
     private void inicializarVentana() {
-        setTitle("Sistema Hospitalario - Gestión de Recetas");
+        setTitle("Sistema de Recetas - Administración");
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        setSize(1024, 768);
-        setMinimumSize(new Dimension(800, 600));
+        setSize(1000, 700);
         setLocationRelativeTo(null);
-
-        // Usar el panelPrincipal del .form
         setContentPane(panelPrincipal);
 
-        // Actualizar título con información del usuario
-        actualizarTituloVentana();
-
-        // Crear menú
-        crearMenuBar();
-    }
-
-    private void crearMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
-
-        // Menú Sistema
-        JMenu menuSistema = new JMenu("Sistema");
-
-        JMenuItem itemCambiarClave = new JMenuItem("Cambiar Contraseña");
-        itemCambiarClave.addActionListener(e -> mostrarCambiarContrasena());
-
-        JMenuItem itemCerrarSesion = new JMenuItem("Cerrar Sesión");
-        itemCerrarSesion.addActionListener(e -> cerrarSesion());
-
-        JMenuItem itemSalir = new JMenuItem("Salir");
-        itemSalir.addActionListener(e -> salirAplicacion());
-
-        menuSistema.add(itemCambiarClave);
-        menuSistema.addSeparator();
-        menuSistema.add(itemCerrarSesion);
-        menuSistema.add(itemSalir);
-
-        // Menú Ayuda
-        JMenu menuAyuda = new JMenu("Ayuda");
-        JMenuItem itemAcercaDe = new JMenuItem("Acerca de");
-        itemAcercaDe.addActionListener(e -> panelTabs.setSelectedComponent(acercaDePanel));
-        menuAyuda.add(itemAcercaDe);
-
-        menuBar.add(menuSistema);
-        menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(menuAyuda);
-
-        setJMenuBar(menuBar);
-    }
-
-    private void actualizarTituloVentana() {
+        // Configurar icono de la ventana
         try {
-            Usuario usuario = controlador.getModelo().getUsuarioActual();
-            if (usuario != null) {
-                String tipoUsuario = usuario.getTipo() == TipoUsuario.ADMINISTRADOR ? "Administrador" : "Farmaceuta";
-                setTitle("Sistema Hospitalario - " + tipoUsuario + ": " + usuario.getNombre());
-            }
+            ImageIcon icon = new ImageIcon(getClass().getResource("/iconos/hospital.png"));
+            setIconImage(icon.getImage());
         } catch (Exception e) {
-            setTitle("Sistema Hospitalario - Gestión de Recetas");
+            // Continuar sin icono si no se encuentra
         }
     }
 
-    private void inicializarPaneles() {
-        try {
-            Usuario usuario = controlador.getModelo().getUsuarioActual();
-
-            if (usuario.getTipo() == TipoUsuario.ADMINISTRADOR) {
-                inicializarPanelesAdministrador();
-            } else if (usuario.getTipo() == TipoUsuario.FARMACEUTA) {
-                inicializarPanelesFarmaceuta();
-            }
-
-            inicializarPanelesComunes();
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Error al inicializar paneles: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void inicializarPanelesAdministrador() {
-        // Panel Gestión Médicos
+    private void crearPaneles() {
+        // Crear instancias de todos los paneles de gestión
         panelGestionMedicos = new PanelGestionMedicos(controlador);
-        medicosPanel.setLayout(new BorderLayout());
-        medicosPanel.add(panelGestionMedicos.getPanel(), BorderLayout.CENTER);
-
-        // Panel Gestión Farmaceutas
         panelGestionFarmaceutas = new PanelGestionFarmaceutas(controlador);
-        farmaceutasPanel.setLayout(new BorderLayout());
-        farmaceutasPanel.add(panelGestionFarmaceutas.getPanel(), BorderLayout.CENTER);
-
-        // Panel Gestión Pacientes
         panelGestionPacientes = new PanelGestionPacientes(controlador);
-        pacientesPanel.setLayout(new BorderLayout());
-        pacientesPanel.add(panelGestionPacientes.getPanel(), BorderLayout.CENTER);
-
-        // Panel Gestión Medicamentos
         panelGestionMedicamentos = new PanelGestionMedicamentos(controlador);
-        medicamentosPanel.setLayout(new BorderLayout());
-        medicamentosPanel.add(panelGestionMedicamentos.getPanel(), BorderLayout.CENTER);
-    }
-
-    private void inicializarPanelesFarmaceuta() {
-        // Para farmaceuta, quitar pestañas de gestión
-        panelTabs.remove(medicosPanel);
-        panelTabs.remove(farmaceutasPanel);
-        panelTabs.remove(pacientesPanel);
-        panelTabs.remove(medicamentosPanel);
-
-        // Panel Despacho
         panelDespacho = new PanelDespacho(controlador);
-        despachoPanel.setLayout(new BorderLayout());
-        despachoPanel.add(panelDespacho.getPanel(), BorderLayout.CENTER);
+        //panelDashboard = new PanelDashboard(controlador);
+        panelHistorico = new PanelHistorico(controlador);
+        panelAcercaDe = new PanelAcercaDe();
     }
 
-    private void inicializarPanelesComunes() {
-        // Panel Dashboard - COMENTADO
-        /*panelDashboard = new PanelDashboard(controlador);
+    private void integrarPanelesEnTabs() {
+        // Limpiar paneles existentes del formulario
+        medicosPanel.removeAll();
+        farmaceutasPanel.removeAll();
+        pacientesPanel.removeAll();
+        medicamentosPanel.removeAll();
+        despachoPanel.removeAll();
+        dashboardPanel.removeAll();
+        historicoPanel.removeAll();
+        acercaDePanel.removeAll();
+
+        // Configurar layout para cada panel del tab
+        medicosPanel.setLayout(new BorderLayout());
+        farmaceutasPanel.setLayout(new BorderLayout());
+        pacientesPanel.setLayout(new BorderLayout());
+        medicamentosPanel.setLayout(new BorderLayout());
+        despachoPanel.setLayout(new BorderLayout());
         dashboardPanel.setLayout(new BorderLayout());
-        dashboardPanel.add(panelDashboard.getPanel(), BorderLayout.CENTER);*/
-
-        // Panel Histórico
-        panelHistorico = new PanelHistorico(controlador);
         historicoPanel.setLayout(new BorderLayout());
-        historicoPanel.add(panelHistorico.getPanel(), BorderLayout.CENTER);
-
-        // Panel Acerca De
-        panelAcercaDe = new PanelAcercaDe();
         acercaDePanel.setLayout(new BorderLayout());
-        acercaDePanel.add(panelAcercaDe.getPanel(), BorderLayout.CENTER);
+
+        // Integrar cada panel de gestión en su respectivo tab
+        medicosPanel.add(panelGestionMedicos.getPanelPrincipal(), BorderLayout.CENTER);
+        farmaceutasPanel.add(panelGestionFarmaceutas.getPanelPrincipal(), BorderLayout.CENTER);
+        pacientesPanel.add(panelGestionPacientes.getPanelPrincipal(), BorderLayout.CENTER);
+        medicamentosPanel.add(panelGestionMedicamentos.getPanelPrincipal(), BorderLayout.CENTER);
+        despachoPanel.add(panelDespacho.getPanelPrincipal(), BorderLayout.CENTER);
+        //dashboardPanel.add(panelDashboard.getPanelPrincipal(), BorderLayout.CENTER);
+        historicoPanel.add(panelHistorico.getPanelPrincipal(), BorderLayout.CENTER);
+        acercaDePanel.add(panelAcercaDe.getPanelPrincipal(), BorderLayout.CENTER);
+
+        // Configurar iconos para las pestañas (si están disponibles)
+        configurarIconosPestanas();
+
+        // Revalidar y repintar para mostrar los cambios
+        panelTabs.revalidate();
+        panelTabs.repaint();
+    }
+
+    private void configurarIconosPestanas() {
+        try {
+            // Configurar iconos para cada pestaña
+            panelTabs.setIconAt(0, new ImageIcon(getClass().getResource("/iconos/medico_small.png")));
+            panelTabs.setIconAt(1, new ImageIcon(getClass().getResource("/iconos/farmaceuta_small.png")));
+            panelTabs.setIconAt(2, new ImageIcon(getClass().getResource("/iconos/paciente_small.png")));
+            panelTabs.setIconAt(3, new ImageIcon(getClass().getResource("/iconos/medicamento_small.png")));
+            panelTabs.setIconAt(4, new ImageIcon(getClass().getResource("/iconos/despacho_small.png")));
+            panelTabs.setIconAt(5, new ImageIcon(getClass().getResource("/iconos/dashboard_small.png")));
+            panelTabs.setIconAt(6, new ImageIcon(getClass().getResource("/iconos/historico_small.png")));
+            panelTabs.setIconAt(7, new ImageIcon(getClass().getResource("/iconos/info_small.png")));
+        } catch (Exception e) {
+            // Continuar sin iconos si no se encuentran
+            System.out.println("Iconos no encontrados, continuando sin iconos en pestañas");
+        }
     }
 
     private void configurarEventos() {
         // Evento de cierre de ventana
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                salirAplicacion();
+                cerrarSistema();
             }
         });
 
-        // Evento de cambio de pestaña
-        panelTabs.addChangeListener(e -> actualizarPanelActivo());
+        // Evento de cambio de pestaña (opcional para optimizaciones)
+        panelTabs.addChangeListener(e -> {
+            int tabSeleccionado = panelTabs.getSelectedIndex();
+            onCambioDeTab(tabSeleccionado);
+        });
     }
 
-    private void actualizarPanelActivo() {
-        int indiceSeleccionado = panelTabs.getSelectedIndex();
-        if (indiceSeleccionado >= 0) {
-            Component panelActivo = panelTabs.getComponentAt(indiceSeleccionado);
-
-            if (panelActivo == medicosPanel && panelGestionMedicos != null) {
+    private void onCambioDeTab(int indiceTab) {
+        // Actualizar datos cuando se cambie de pestaña (si es necesario)
+        switch (indiceTab) {
+            case 0: // Médicos
                 panelGestionMedicos.refrescarDatos();
-            } else if (panelActivo == farmaceutasPanel && panelGestionFarmaceutas != null) {
+                break;
+            case 1: // Farmaceutas
                 panelGestionFarmaceutas.refrescarDatos();
-            } else if (panelActivo == pacientesPanel && panelGestionPacientes != null) {
+                break;
+            case 2: // Pacientes
                 panelGestionPacientes.refrescarDatos();
-            } else if (panelActivo == medicamentosPanel && panelGestionMedicamentos != null) {
+                break;
+            case 3: // Medicamentos
                 panelGestionMedicamentos.refrescarDatos();
-            } else if (panelActivo == despachoPanel && panelDespacho != null) {
+                break;
+            case 4: // Despacho
                 panelDespacho.refrescarDatos();
-                // Dashboard comentado
-            /*} else if (panelActivo == dashboardPanel && panelDashboard != null) {
-                panelDashboard.actualizarDatos();*/
-            } else if (panelActivo == historicoPanel && panelHistorico != null) {
+                break;
+            //case 5: // Dashboard
+              //  panelDashboard.refrescarDatos();
+                //break;
+            case 6: // Histórico
                 panelHistorico.refrescarDatos();
-            } else if (panelActivo == acercaDePanel && panelAcercaDe != null) {
-                panelAcercaDe.refrescarDatos();
-            }
+                break;
+            // AcercaDe no necesita refrescar datos
         }
     }
 
-    private void mostrarCambiarContrasena() {
-        try {
-            // VentanaCambiarClave ventana = new VentanaCambiarClave(controlador);
-            // ventana.setLocationRelativeTo(this);
-            // ventana.setVisible(true);
-
-            JOptionPane.showMessageDialog(this,
-                    "Funcionalidad de cambio de contraseña pendiente de implementar",
-                    "En desarrollo",
-                    JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Error al abrir ventana de cambio de contraseña: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void cerrarSesion() {
-        int confirmacion = JOptionPane.showConfirmDialog(this,
-                "¿Está seguro que desea cerrar la sesión?",
-                "Confirmar cierre de sesión",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            controlador.cerrarSesion();
-        }
-    }
-
-    private void salirAplicacion() {
-        int confirmacion = JOptionPane.showConfirmDialog(this,
-                "¿Está seguro que desea salir del sistema?",
+    private void cerrarSistema() {
+        int opcion = JOptionPane.showConfirmDialog(
+                this,
+                "¿Está seguro que desea cerrar el sistema?",
                 "Confirmar salida",
                 JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
+                JOptionPane.QUESTION_MESSAGE
+        );
 
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            System.exit(0);
+        if (opcion == JOptionPane.YES_OPTION) {
+            controlador.cerrarSesion();
+            dispose();
         }
     }
 
-    // Getters para acceso desde el controlador si es necesario
+    // ================================
+    // MÉTODOS PÚBLICOS PARA EL CONTROLADOR
+    // ================================
+
+    public void mostrarMensaje(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void mostrarError(String error) {
+        JOptionPane.showMessageDialog(this, error, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public void mostrarAdvertencia(String advertencia) {
+        JOptionPane.showMessageDialog(this, advertencia, "Advertencia", JOptionPane.WARNING_MESSAGE);
+    }
+
+    public void seleccionarTab(int indice) {
+        if (indice >= 0 && indice < panelTabs.getTabCount()) {
+            panelTabs.setSelectedIndex(indice);
+        }
+    }
+
+    public void actualizarTitulo(String nuevoTitulo) {
+        setTitle("Sistema de Recetas - " + nuevoTitulo);
+    }
+
+    // Métodos para acceder a paneles específicos desde el controlador
     public PanelGestionMedicos getPanelGestionMedicos() {
         return panelGestionMedicos;
     }
@@ -283,6 +235,10 @@ public class VentanaPrincipal extends JFrame {
 
     public PanelDespacho getPanelDespacho() {
         return panelDespacho;
+    }
+
+    public PanelDashboard getPanelDashboard() {
+        return panelDashboard;
     }
 
     public PanelHistorico getPanelHistorico() {

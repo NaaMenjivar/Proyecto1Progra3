@@ -12,7 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Panel Histórico para Administrador - Vista MVC
+ * Panel Histórico para todos los usuarios - Vista MVC
+ * Permite visualizar recetas a MÉDICOS, FARMACEUTAS y ADMINISTRADORES
  */
 public class PanelHistorico {
     // Componentes del formulario (declarados en el .form)
@@ -44,198 +45,238 @@ public class PanelHistorico {
         list.getColumnModel().getColumn(0).setPreferredWidth(100); // Número
         list.getColumnModel().getColumn(1).setPreferredWidth(80);  // ID Paciente
         list.getColumnModel().getColumn(2).setPreferredWidth(80);  // ID Médico
-        list.getColumnModel().getColumn(3).setPreferredWidth(100); // Fecha
-        list.getColumnModel().getColumn(4).setPreferredWidth(100); // Estado
-
-        // Configurar tabla para mejor visualización
-        list.setRowHeight(25);
-        list.getTableHeader().setReorderingAllowed(false);
+        list.getColumnModel().getColumn(3).setPreferredWidth(120); // Fecha Confección
+        list.getColumnModel().getColumn(4).setPreferredWidth(80);  // Estado
 
         // Configurar área de detalles
         detalles.setEditable(false);
-        detalles.setLineWrap(true);
         detalles.setWrapStyleWord(true);
-        detalles.setFont(new java.awt.Font("Monospaced", 0, 12));
-        detalles.setText("Seleccione una receta para ver sus detalles...");
+        detalles.setLineWrap(true);
     }
 
     private void configurarEventos() {
-        // Botón Buscar
-        buscar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarReceta();
-            }
-        });
-
-        // Enter en campo de búsqueda
-        numFld.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarReceta();
-            }
-        });
-
-        // Selección en tabla
+        // Evento de selección en tabla
         list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
-                    mostrarDetallesReceta();
+                    seleccionarReceta();
                 }
+            }
+        });
+
+        // Evento del botón buscar
+        buscar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buscarRecetas();
+            }
+        });
+
+        // Buscar al presionar Enter en el campo
+        numFld.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                buscarRecetas();
             }
         });
     }
 
-    private void buscarReceta() {
-        String numeroReceta = numFld.getText().trim();
-
+    private void cargarTodasLasRecetas() {
         try {
-            if (numeroReceta.isEmpty()) {
-                // Si no hay criterio, mostrar todas las recetas
-                cargarTodasLasRecetas();
-            } else {
-                // Buscar receta específica a través del controlador
-                Lista<Receta> recetasEncontradas = controlador.buscarRecetasPorCriterio(numeroReceta);
-                Lista<Object> datos = new Lista<>();
+            // Verificar que el usuario tiene permisos
+            Usuario usuarioActual = controlador.getModelo().getUsuarioActual();
 
-                for (int i = 0; i < recetasEncontradas.getTam(); i++) {
-                    datos.agregarFinal(recetasEncontradas.obtenerPorPos(i));
-                }
-
-                tableModel.setDatos(datos);
-
-                if (recetasEncontradas.getTam() == 0) {
-                    JOptionPane.showMessageDialog(panelPrincipal,
-                            "No se encontraron recetas con el criterio especificado",
-                            "Búsqueda sin resultados",
-                            JOptionPane.INFORMATION_MESSAGE);
-                    limpiarDetalles();
-                } else {
-                    limpiarDetalles();
-                }
+            if (usuarioActual == null) {
+                mostrarError("Debe autenticarse para acceder al histórico");
+                return;
             }
+
+            // Verificar permisos - MÉDICOS, FARMACEUTAS y ADMINISTRADORES pueden ver histórico
+            TipoUsuario tipoUsuario = usuarioActual.getTipo();
+            if (tipoUsuario != TipoUsuario.MEDICO &&
+                    tipoUsuario != TipoUsuario.FARMACEUTA &&
+                    tipoUsuario != TipoUsuario.ADMINISTRADOR) {
+                mostrarError("No tiene permisos para acceder al histórico de recetas");
+                return;
+            }
+
+            // Obtener todas las recetas según el tipo de usuario
+            Lista<Receta> recetas = obtenerRecetasSegunPermisos(usuarioActual);
+
+            if (recetas == null || recetas.getTam() == 0) {
+                // No mostrar error si no hay recetas, solo limpiar la tabla
+                Lista<Object> datosVacios = new Lista<>();
+                tableModel.setDatos(datosVacios);
+                detalles.setText("No hay recetas para mostrar.");
+                return;
+            }
+
+            // Convertir a lista de Object para el modelo de tabla
+            Lista<Object> datosRecetas = new Lista<>();
+            for (int i = 0; i < recetas.getTam(); i++) {
+                datosRecetas.agregarFinal(recetas.obtenerPorPos(i));
+            }
+
+            tableModel.setDatos(datosRecetas);
+            detalles.setText("Total de recetas: " + recetas.getTam());
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Error al buscar recetas: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            mostrarError("Error al cargar recetas: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private void mostrarDetallesReceta() {
+    private Lista<Receta> obtenerRecetasSegunPermisos(Usuario usuario) {
+        try {
+            switch (usuario.getTipo()) {
+                case ADMINISTRADOR:
+                case FARMACEUTA:
+                    // Administradores y farmaceutas pueden ver TODAS las recetas
+                    return controlador.getModelo().obtenerTodasLasRecetas();
+
+                case MEDICO:
+                    // Médicos solo pueden ver sus propias recetas
+                    return controlador.getModelo().obtenerRecetasPorMedico(usuario.getId());
+
+                default:
+                    throw new SecurityException("Tipo de usuario no autorizado para acceder al histórico");
+            }
+        } catch (Exception e) {
+            System.err.println("Error al obtener recetas según permisos: " + e.getMessage());
+            return new Lista<>(); // Retornar lista vacía en caso de error
+        }
+    }
+
+    private void seleccionarReceta() {
         int filaSeleccionada = list.getSelectedRow();
         if (filaSeleccionada >= 0) {
             try {
-                Object elemento = tableModel.getObjetoEnFila(filaSeleccionada);
-                if (elemento instanceof Receta) {
-                    recetaSeleccionada = (Receta) elemento;
-
-                    // Delegar al controlador la generación de detalles
-                    String detallesTexto = controlador.obtenerDetallesReceta(recetaSeleccionada);
-
-                    detalles.setText(detallesTexto);
-                    detalles.setCaretPosition(0);
-                }
+                // Obtener la receta seleccionada del modelo
+                recetaSeleccionada = (Receta) tableModel.getDatos().obtenerPorPos(filaSeleccionada);
+                mostrarDetallesReceta(recetaSeleccionada);
             } catch (Exception e) {
-                detalles.setText("Error al mostrar detalles: " + e.getMessage());
+                mostrarError("Error al seleccionar receta: " + e.getMessage());
             }
         } else {
-            limpiarDetalles();
+            recetaSeleccionada = null;
+            detalles.setText("");
         }
     }
 
-    private void cargarTodasLasRecetas() {
+    private void mostrarDetallesReceta(Receta receta) {
+        if (receta == null) {
+            detalles.setText("");
+            return;
+        }
+
+        StringBuilder detallesTexto = new StringBuilder();
+        detallesTexto.append("=== DETALLES DE LA RECETA ===\n\n");
+        detallesTexto.append("Número: ").append(receta.getNumeroReceta()).append("\n");
+        detallesTexto.append("Paciente: ").append(receta.getIdPaciente()).append("\n");
+        detallesTexto.append("Médico: ").append(receta.getIdMedico()).append("\n");
+        detallesTexto.append("Fecha de Confección: ").append(receta.getFechaConfeccion()).append("\n");
+        detallesTexto.append("Fecha de Retiro: ").append(receta.getFechaRetiro()).append("\n");
+        detallesTexto.append("Estado: ").append(receta.getEstado()).append("\n\n");
+
+        // Mostrar medicamentos de la receta
+        if (receta.getDetalles() != null && receta.getDetalles().getTam() > 0) {
+            detallesTexto.append("=== MEDICAMENTOS PRESCRITOS ===\n\n");
+
+            for (int i = 0; i < receta.getDetalles().getTam(); i++) {
+                DetalleReceta detalle = receta.getDetalles().obtenerPorPos(i);
+                detallesTexto.append("• Medicamento: ").append(detalle.getCodigoMedicamento()).append("\n");
+                detallesTexto.append("  Cantidad: ").append(detalle.getCantidad()).append("\n");
+                detallesTexto.append("  Duración: ").append(detalle.getDuracionTexto()).append(" días\n");
+                detallesTexto.append("  Indicaciones: ").append(detalle.getIndicaciones()).append("\n\n");
+            }
+        } else {
+            detallesTexto.append("No hay medicamentos registrados en esta receta.\n");
+        }
+
+        detalles.setText(detallesTexto.toString());
+        detalles.setCaretPosition(0); // Scroll al inicio
+    }
+
+    private void buscarRecetas() {
+        String numeroReceta = numFld.getText().trim();
+
+        if (numeroReceta.isEmpty()) {
+            // Si el campo está vacío, mostrar todas las recetas
+            cargarTodasLasRecetas();
+            return;
+        }
+
         try {
-            Lista<Receta> todasLasRecetas = controlador.obtenerTodasLasRecetas();
-            Lista<Object> datos = new Lista<>();
+            Usuario usuarioActual = controlador.getModelo().getUsuarioActual();
+            if (usuarioActual == null) {
+                mostrarError("Debe autenticarse para buscar recetas");
+                return;
+            }
+
+            // Buscar receta específica
+            Lista<Receta> todasLasRecetas = obtenerRecetasSegunPermisos(usuarioActual);
+            Lista<Object> recetasFiltradas = new Lista<>();
 
             for (int i = 0; i < todasLasRecetas.getTam(); i++) {
-                datos.agregarFinal(todasLasRecetas.obtenerPorPos(i));
+                Receta receta = todasLasRecetas.obtenerPorPos(i);
+                if (receta.getNumeroReceta().toLowerCase().contains(numeroReceta.toLowerCase())) {
+                    recetasFiltradas.agregarFinal(receta);
+                }
             }
 
-            tableModel.setDatos(datos);
+            tableModel.setDatos(recetasFiltradas);
 
-            if (todasLasRecetas.getTam() > 0) {
-                limpiarDetalles();
+            if (recetasFiltradas.getTam() == 0) {
+                detalles.setText("No se encontraron recetas con el criterio: " + numeroReceta);
             } else {
-                detalles.setText("No hay recetas registradas en el sistema.");
+                detalles.setText("Se encontraron " + recetasFiltradas.getTam() + " receta(s)");
             }
+
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Error al cargar recetas: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            mostrarError("Error al buscar recetas: " + e.getMessage());
         }
     }
 
-    private void limpiarDetalles() {
-        detalles.setText("Seleccione una receta para ver sus detalles...");
-        recetaSeleccionada = null;
+    private void mostrarError(String mensaje) {
+        JOptionPane.showMessageDialog(panelPrincipal, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
+    // ================================
+    // MÉTODOS REQUERIDOS PARA LA INTEGRACIÓN
+    // ================================
+
     /**
-     * Obtiene el panel principal para ser añadido a contenedores
-     * @return JPanel principal del formulario
+     * Retorna el panel principal para ser integrado en VentanaPrincipal
      */
-    public JPanel getPanel() {
+    public JPanel getPanelPrincipal() {
         return panelPrincipal;
     }
 
     /**
-     * Método para refrescar datos desde el exterior
+     * Refresca los datos del panel cuando se selecciona la pestaña
      */
     public void refrescarDatos() {
-        cargarTodasLasRecetas();
+        // Limpiar selección actual
+        list.clearSelection();
+        recetaSeleccionada = null;
         numFld.setText("");
+        detalles.setText("");
+
+        // Recargar todas las recetas
+        cargarTodasLasRecetas();
+    }
+
+    // Método para limpiar campos (útil para el controlador)
+    public void limpiarCampos() {
+        numFld.setText("");
+        detalles.setText("");
+        list.clearSelection();
         recetaSeleccionada = null;
     }
 
-    /**
-     * Método para buscar recetas por estado
-     */
-    public void filtrarPorEstado(EstadoReceta estado) {
-        try {
-            Lista<Receta> recetasPorEstado = controlador.getModelo().obtenerRecetasPorEstado(estado);
-            Lista<Object> datos = new Lista<>();
-
-            for (int i = 0; i < recetasPorEstado.getTam(); i++) {
-                datos.agregarFinal(recetasPorEstado.obtenerPorPos(i));
-            }
-
-            tableModel.setDatos(datos);
-            detalles.setText("Mostrando " + recetasPorEstado.getTam() +
-                    " receta(s) en estado: " + estado.getDescripcion() +
-                    "\nSeleccione una para ver detalles.");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Error al filtrar recetas: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    /**
-     * Método para buscar recetas por paciente
-     */
-    public void filtrarPorPaciente(String idPaciente) {
-        try {
-            Lista<Receta> recetasPaciente = controlador.getModelo().obtenerRecetasPorPaciente(idPaciente);
-            Lista<Object> datos = new Lista<>();
-
-            for (int i = 0; i < recetasPaciente.getTam(); i++) {
-                datos.agregarFinal(recetasPaciente.obtenerPorPos(i));
-            }
-
-            tableModel.setDatos(datos);
-            detalles.setText("Mostrando " + recetasPaciente.getTam() +
-                    " receta(s) para el paciente: " + idPaciente +
-                    "\nSeleccione una para ver detalles.");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Error al filtrar recetas por paciente: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+    // Método para obtener la receta seleccionada (útil para el controlador)
+    public Receta getRecetaSeleccionada() {
+        return recetaSeleccionada;
     }
 }

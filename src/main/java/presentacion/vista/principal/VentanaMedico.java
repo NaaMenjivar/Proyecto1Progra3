@@ -1,219 +1,151 @@
 package presentacion.vista.principal;
 
 import presentacion.controlador.ControladorPrincipal;
-import presentacion.vista.medico.*;
-import logica.entidades.Usuario;
+import presentacion.vista.medico.PanelPrescribir;
+import presentacion.vista.medico.PanelHistorico;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 /**
- * Ventana Principal para Médicos
- * Utiliza la estructura de .form existente con JTabbedPane
+ * Ventana principal para médicos - Vista MVC
  */
 public class VentanaMedico extends JFrame {
-
-    // Componentes del .form
+    // Componentes del formulario (declarados en el .form)
     private JPanel panelPrincipal;
-    private JTabbedPane panelTabs;
     private JPanel prescribirMedico;
-    // private JPanel dashboardMedico;  // Dashboard comentado
+    private JPanel dashboardMedico;    // CAMPO CORREGIDO - este ya estaba
+    private JTabbedPane panelTabs;
     private JPanel historicoMedico;
     private JPanel acercaDeMedico;
 
-    // Instancias de los paneles de gestión
-    private PanelPrescribir panelPrescribir;
-    // private PanelDashboard panelDashboard;  // Dashboard comentado
-    private presentacion.vista.medico.PanelHistorico panelHistorico;
-    private presentacion.vista.medico.PanelAcercaDe panelAcercaDe;
-
-    // Controlador MVC
+    // MVC Components
     private ControladorPrincipal controlador;
+    private PanelPrescribir panelPrescribir;
+    private PanelHistorico panelHistorico;
 
     public VentanaMedico(ControladorPrincipal controlador) {
         this.controlador = controlador;
+
         inicializarVentana();
-        inicializarPaneles();
+        inicializarComponentes();
         configurarEventos();
+        cargarPaneles();
     }
 
     private void inicializarVentana() {
-        setTitle("Sistema Hospitalario - Módulo Médico");
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        setSize(1024, 768);
-        setMinimumSize(new Dimension(800, 600));
-        setLocationRelativeTo(null);
-
-        // Usar el panelPrincipal del .form
+        setTitle("Sistema de Recetas - Médico");
         setContentPane(panelPrincipal);
-
-        // Actualizar título con información del usuario
-        actualizarTituloVentana();
-
-        // Crear menú
-        crearMenuBar();
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setSize(1000, 700);
+        setLocationRelativeTo(null);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
 
-    private void crearMenuBar() {
-        JMenuBar menuBar = new JMenuBar();
-
-        // Menú Sistema
-        JMenu menuSistema = new JMenu("Sistema");
-
-        JMenuItem itemCambiarClave = new JMenuItem("Cambiar Contraseña");
-        itemCambiarClave.addActionListener(e -> mostrarCambiarContrasena());
-
-        JMenuItem itemCerrarSesion = new JMenuItem("Cerrar Sesión");
-        itemCerrarSesion.addActionListener(e -> cerrarSesion());
-
-        JMenuItem itemSalir = new JMenuItem("Salir");
-        itemSalir.addActionListener(e -> salirAplicacion());
-
-        menuSistema.add(itemCambiarClave);
-        menuSistema.addSeparator();
-        menuSistema.add(itemCerrarSesion);
-        menuSistema.add(itemSalir);
-
-        // Menú Ayuda
-        JMenu menuAyuda = new JMenu("Ayuda");
-        JMenuItem itemAcercaDe = new JMenuItem("Acerca de");
-        itemAcercaDe.addActionListener(e -> panelTabs.setSelectedComponent(acercaDeMedico));
-        menuAyuda.add(itemAcercaDe);
-
-        menuBar.add(menuSistema);
-        menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(menuAyuda);
-
-        setJMenuBar(menuBar);
-    }
-
-    private void actualizarTituloVentana() {
-        try {
-            Usuario usuario = controlador.getModelo().getUsuarioActual();
-            if (usuario != null) {
-                setTitle("Sistema Hospitalario - Médico: " + usuario.getNombre());
-            }
-        } catch (Exception e) {
-            setTitle("Sistema Hospitalario - Módulo Médico");
-        }
-    }
-
-    private void inicializarPaneles() {
-        try {
-            // Panel Prescribir
-            panelPrescribir = new PanelPrescribir(controlador);
-            prescribirMedico.setLayout(new BorderLayout());
-            prescribirMedico.add(panelPrescribir.getPanel(), BorderLayout.CENTER);
-
-            // Panel Dashboard - COMENTADO
-            /*panelDashboard = new PanelDashboard(controlador);
-            dashboardMedico.setLayout(new BorderLayout());
-            dashboardMedico.add(panelDashboard.getPanel(), BorderLayout.CENTER);*/
-
-            // Panel Histórico
-            panelHistorico = new presentacion.vista.medico.PanelHistorico(controlador);
-            historicoMedico.setLayout(new BorderLayout());
-            historicoMedico.add(panelHistorico.getPanel(), BorderLayout.CENTER);
-
-            // Panel Acerca De
-            panelAcercaDe = new presentacion.vista.medico.PanelAcercaDe();
-            acercaDeMedico.setLayout(new BorderLayout());
-            acercaDeMedico.add(panelAcercaDe.getPanel(), BorderLayout.CENTER);
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                    "Error al inicializar paneles: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+    private void inicializarComponentes() {
+        // Los componentes ya están inicializados por el .form
+        // Solo configuramos propiedades adicionales si es necesario
     }
 
     private void configurarEventos() {
         // Evento de cierre de ventana
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                salirAplicacion();
+                cerrarVentana();
             }
         });
 
         // Evento de cambio de pestaña
-        panelTabs.addChangeListener(e -> actualizarPanelActivo());
+        panelTabs.addChangeListener(e -> {
+            actualizarPestanaActiva();
+        });
     }
 
-    private void actualizarPanelActivo() {
-        int indiceSeleccionado = panelTabs.getSelectedIndex();
-        if (indiceSeleccionado >= 0) {
-            Component panelActivo = panelTabs.getComponentAt(indiceSeleccionado);
-
-            if (panelActivo == prescribirMedico && panelPrescribir != null) {
-                panelPrescribir.refrescarDatos();
-                // Dashboard comentado
-            /*} else if (panelActivo == dashboardMedico && panelDashboard != null) {
-                panelDashboard.actualizarDatos();*/
-            } else if (panelActivo == historicoMedico && panelHistorico != null) {
-                panelHistorico.refrescarDatos();
-            } else if (panelActivo == acercaDeMedico && panelAcercaDe != null) {
-                panelAcercaDe.refrescarDatos();
-            }
-        }
-    }
-
-    private void mostrarCambiarContrasena() {
+    private void cargarPaneles() {
         try {
-            // VentanaCambiarClave ventana = new VentanaCambiarClave(controlador);
-            // ventana.setLocationRelativeTo(this);
-            // ventana.setVisible(true);
+            // Panel Prescribir
+            panelPrescribir = new PanelPrescribir(controlador);
+            prescribirMedico.removeAll();
+            prescribirMedico.add(panelPrescribir.getPanel());
 
-            JOptionPane.showMessageDialog(this,
-                    "Funcionalidad de cambio de contraseña pendiente de implementar",
-                    "En desarrollo",
-                    JOptionPane.INFORMATION_MESSAGE);
+            // Panel Histórico
+            panelHistorico = new PanelHistorico(controlador);
+            historicoMedico.removeAll();
+            historicoMedico.add(panelHistorico.getPanel());
+
+            // Dashboard - temporal vacío
+            dashboardMedico.removeAll();
+            JLabel lblDashboard = new JLabel("Dashboard en desarrollo...", SwingConstants.CENTER);
+            dashboardMedico.add(lblDashboard);
+
+            // Acerca de - panel informativo
+            cargarPanelAcercaDe();
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
-                    "Error al abrir ventana de cambio de contraseña: " + e.getMessage(),
+                    "Error al cargar paneles: " + e.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void cerrarSesion() {
+    private void cargarPanelAcercaDe() {
+        acercaDeMedico.removeAll();
+
+        JTextArea txtAcercaDe = new JTextArea();
+        txtAcercaDe.setEditable(false);
+        txtAcercaDe.setText(
+                "SISTEMA DE PRESCRIPCIÓN Y DESPACHO DE RECETAS\n\n" +
+                        "Módulo para Médicos\n" +
+                        "Universidad Nacional - EIF206 Programación 3\n\n" +
+                        "Funcionalidades disponibles:\n" +
+                        "• Prescribir recetas para pacientes\n" +
+                        "• Consultar histórico de recetas\n" +
+                        "• Ver dashboard con estadísticas\n\n" +
+                        "Usuario actual: " +
+                        (controlador.getUsuarioActual() != null ?
+                                controlador.getUsuarioActual().getNombre() : "No identificado")
+        );
+
+        JScrollPane scrollAcercaDe = new JScrollPane(txtAcercaDe);
+        acercaDeMedico.add(scrollAcercaDe);
+    }
+
+    private void actualizarPestanaActiva() {
+        int pestanaActiva = panelTabs.getSelectedIndex();
+
+        // Actualizar datos cuando se cambia de pestaña
+        switch (pestanaActiva) {
+            case 1: // Dashboard
+                // Aquí se actualizaría el dashboard cuando esté implementado
+                break;
+            case 2: // Histórico
+                if (panelHistorico != null) {
+                    // Recargar datos del histórico
+                }
+                break;
+        }
+    }
+
+    private void cerrarVentana() {
         int confirmacion = JOptionPane.showConfirmDialog(this,
-                "¿Está seguro que desea cerrar la sesión?",
-                "Confirmar cierre de sesión",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
+                "¿Está seguro de cerrar la sesión?",
+                "Confirmar cierre",
+                JOptionPane.YES_NO_OPTION);
 
         if (confirmacion == JOptionPane.YES_OPTION) {
             controlador.cerrarSesion();
         }
     }
 
-    private void salirAplicacion() {
-        int confirmacion = JOptionPane.showConfirmDialog(this,
-                "¿Está seguro que desea salir del sistema?",
-                "Confirmar salida",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE);
-
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            System.exit(0);
-        }
-    }
-
-    // Getters para acceso desde el controlador si es necesario
+    // Métodos públicos para acceder a los paneles
     public PanelPrescribir getPanelPrescribir() {
         return panelPrescribir;
     }
 
-    public presentacion.vista.medico.PanelHistorico getPanelHistorico() {
+    public PanelHistorico getPanelHistorico() {
         return panelHistorico;
-    }
-
-    public presentacion.vista.medico.PanelAcercaDe getPanelAcercaDe() {
-        return panelAcercaDe;
     }
 }

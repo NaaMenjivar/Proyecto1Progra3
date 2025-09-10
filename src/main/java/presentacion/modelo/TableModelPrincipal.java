@@ -4,124 +4,117 @@ import logica.entidades.*;
 import logica.entidades.lista.Lista;
 
 /**
- * Clase principal que contiene todos los modelos de tabla como clases internas
- * Soluciona el problema de múltiples clases públicas en un archivo
+ * Modelo de tabla principal que maneja diferentes tipos de datos
+ * SIN usar enum para evitar problemas de inicialización
  */
 public class TableModelPrincipal extends AbstractTableModelPrincipal {
 
-    private TipoTabla tipoTabla;
+    // Usar constantes en lugar de enum para evitar problemas
+    public static final int TIPO_MEDICOS = 1;
+    public static final int TIPO_FARMACEUTAS = 2;
+    public static final int TIPO_PACIENTES = 3;
+    public static final int TIPO_MEDICAMENTOS = 4;
+    public static final int TIPO_RECETAS = 5;
+    public static final int TIPO_DETALLES_RECETA = 6;
 
-    public enum TipoTabla {
-        MEDICOS, FARMACEUTAS, PACIENTES, MEDICAMENTOS, RECETAS, DETALLES_RECETA
-    }
+    private int tipoTabla;
 
-    public TableModelPrincipal(TipoTabla tipo) {
+    public TableModelPrincipal(int tipo) {
         super();
         this.tipoTabla = tipo;
+        inicializarColumnas();
     }
 
-    public TableModelPrincipal(TipoTabla tipo, Lista<Object> datos) {
+    public TableModelPrincipal(int tipo, Lista<Object> datos) {
         super(datos);
         this.tipoTabla = tipo;
+        inicializarColumnas();
+    }
+
+    private void inicializarColumnas() {
+        this.nombreColumnas = definirNombresColumnas();
+        this.tiposColumnas = definirTiposColumnas();
     }
 
     @Override
     protected String[] definirNombresColumnas() {
         switch (tipoTabla) {
-            case MEDICOS:
+            case TIPO_MEDICOS:
                 return new String[]{"ID", "Nombre", "Especialidad"};
-            case FARMACEUTAS:
+            case TIPO_FARMACEUTAS:
                 return new String[]{"ID", "Nombre"};
-            case PACIENTES:
+            case TIPO_PACIENTES:
                 return new String[]{"ID", "Nombre", "Fecha Nacimiento", "Teléfono"};
-            case MEDICAMENTOS:
+            case TIPO_MEDICAMENTOS:
                 return new String[]{"Código", "Nombre", "Presentación", "Stock"};
-            case RECETAS:
+            case TIPO_RECETAS:
                 return new String[]{"Número", "ID Paciente", "ID Médico", "Fecha Confección", "Estado"};
-            case DETALLES_RECETA:
+            case TIPO_DETALLES_RECETA:
                 return new String[]{"Código Medicamento", "Cantidad", "Indicaciones", "Duración (días)"};
             default:
-                return new String[]{};
+                return new String[]{"Datos"};
         }
     }
 
     @Override
     protected Class<?>[] definirTiposColumnas() {
         switch (tipoTabla) {
-            case MEDICOS:
+            case TIPO_MEDICOS:
                 return new Class<?>[]{String.class, String.class, String.class};
-            case FARMACEUTAS:
+            case TIPO_FARMACEUTAS:
                 return new Class<?>[]{String.class, String.class};
-            case PACIENTES:
+            case TIPO_PACIENTES:
                 return new Class<?>[]{String.class, String.class, String.class, String.class};
-            case MEDICAMENTOS:
+            case TIPO_MEDICAMENTOS:
                 return new Class<?>[]{String.class, String.class, String.class, Integer.class};
-            case RECETAS:
+            case TIPO_RECETAS:
                 return new Class<?>[]{String.class, String.class, String.class, String.class, String.class};
-            case DETALLES_RECETA:
+            case TIPO_DETALLES_RECETA:
                 return new Class<?>[]{String.class, Integer.class, String.class, Integer.class};
             default:
-                return new Class<?>[]{};
+                return new Class<?>[]{String.class};
         }
     }
 
     @Override
     protected Object obtenerValorEspecifico(Object objeto, int columna) {
         switch (tipoTabla) {
-            case MEDICOS:
+            case TIPO_MEDICOS:
                 return obtenerValorMedico(objeto, columna);
-            case FARMACEUTAS:
+            case TIPO_FARMACEUTAS:
                 return obtenerValorFarmaceuta(objeto, columna);
-            case PACIENTES:
+            case TIPO_PACIENTES:
                 return obtenerValorPaciente(objeto, columna);
-            case MEDICAMENTOS:
+            case TIPO_MEDICAMENTOS:
                 return obtenerValorMedicamento(objeto, columna);
-            case RECETAS:
+            case TIPO_RECETAS:
                 return obtenerValorReceta(objeto, columna);
-            case DETALLES_RECETA:
+            case TIPO_DETALLES_RECETA:
                 return obtenerValorDetalleReceta(objeto, columna);
             default:
-                return "";
+                return objeto != null ? objeto.toString() : "";
         }
     }
 
     @Override
     protected boolean esObjetoValido(Object objeto) {
+        if (objeto == null) return false;
+
         switch (tipoTabla) {
-            case MEDICOS:
+            case TIPO_MEDICOS:
                 return objeto instanceof Medico;
-            case FARMACEUTAS:
+            case TIPO_FARMACEUTAS:
                 return objeto instanceof Farmaceuta;
-            case PACIENTES:
+            case TIPO_PACIENTES:
                 return objeto instanceof Paciente;
-            case MEDICAMENTOS:
+            case TIPO_MEDICAMENTOS:
                 return objeto instanceof Medicamento;
-            case RECETAS:
+            case TIPO_RECETAS:
                 return objeto instanceof Receta;
-            case DETALLES_RECETA:
+            case TIPO_DETALLES_RECETA:
                 return objeto instanceof DetalleReceta;
             default:
-                return false;
-        }
-    }
-
-    @Override
-    protected boolean coincideConCriterio(Object objeto, String criterio) {
-        switch (tipoTabla) {
-            case MEDICOS:
-                return coincideCriterioMedico(objeto, criterio);
-            case FARMACEUTAS:
-                return coincideCriterioFarmaceuta(objeto, criterio);
-            case PACIENTES:
-                return coincideCriterioPaciente(objeto, criterio);
-            case MEDICAMENTOS:
-                return coincideCriterioMedicamento(objeto, criterio);
-            case RECETAS:
-                return coincideCriterioReceta(objeto, criterio);
-            case DETALLES_RECETA:
-                return coincideCriterioDetalleReceta(objeto, criterio);
-            default:
-                return false;
+                return true;
         }
     }
 
@@ -131,7 +124,6 @@ public class TableModelPrincipal extends AbstractTableModelPrincipal {
 
     private Object obtenerValorMedico(Object objeto, int columna) {
         if (!(objeto instanceof Medico)) return "";
-
         Medico medico = (Medico) objeto;
         switch (columna) {
             case 0: return medico.getId();
@@ -143,7 +135,6 @@ public class TableModelPrincipal extends AbstractTableModelPrincipal {
 
     private Object obtenerValorFarmaceuta(Object objeto, int columna) {
         if (!(objeto instanceof Farmaceuta)) return "";
-
         Farmaceuta farmaceuta = (Farmaceuta) objeto;
         switch (columna) {
             case 0: return farmaceuta.getId();
@@ -154,7 +145,6 @@ public class TableModelPrincipal extends AbstractTableModelPrincipal {
 
     private Object obtenerValorPaciente(Object objeto, int columna) {
         if (!(objeto instanceof Paciente)) return "";
-
         Paciente paciente = (Paciente) objeto;
         switch (columna) {
             case 0: return paciente.getId();
@@ -167,7 +157,6 @@ public class TableModelPrincipal extends AbstractTableModelPrincipal {
 
     private Object obtenerValorMedicamento(Object objeto, int columna) {
         if (!(objeto instanceof Medicamento)) return "";
-
         Medicamento medicamento = (Medicamento) objeto;
         switch (columna) {
             case 0: return medicamento.getCodigo();
@@ -180,14 +169,14 @@ public class TableModelPrincipal extends AbstractTableModelPrincipal {
 
     private Object obtenerValorReceta(Object objeto, int columna) {
         if (!(objeto instanceof Receta)) return "";
-
         Receta receta = (Receta) objeto;
         switch (columna) {
             case 0: return receta.getNumeroReceta();
             case 1: return receta.getIdPaciente();
             case 2: return receta.getIdMedico();
             case 3: return receta.getFechaConfeccion() != null ?
-                    receta.getFechaConfeccion().toString() : "";
+                    receta.getFechaConfeccion().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) :
+                    "N/A";
             case 4: return receta.getEstado().getDescripcion();
             default: return "";
         }
@@ -195,7 +184,6 @@ public class TableModelPrincipal extends AbstractTableModelPrincipal {
 
     private Object obtenerValorDetalleReceta(Object objeto, int columna) {
         if (!(objeto instanceof DetalleReceta)) return "";
-
         DetalleReceta detalle = (DetalleReceta) objeto;
         switch (columna) {
             case 0: return detalle.getCodigoMedicamento();
@@ -207,124 +195,68 @@ public class TableModelPrincipal extends AbstractTableModelPrincipal {
     }
 
     // ================================
-    // MÉTODOS DE CRITERIO DE BÚSQUEDA
-    // ================================
-
-    private boolean coincideCriterioMedico(Object objeto, String criterio) {
-        if (!(objeto instanceof Medico)) return false;
-
-        Medico medico = (Medico) objeto;
-        return medico.getId().toLowerCase().contains(criterio) ||
-                medico.getNombre().toLowerCase().contains(criterio) ||
-                medico.getEspecialidad().toLowerCase().contains(criterio);
-    }
-
-    private boolean coincideCriterioFarmaceuta(Object objeto, String criterio) {
-        if (!(objeto instanceof Farmaceuta)) return false;
-
-        Farmaceuta farmaceuta = (Farmaceuta) objeto;
-        return farmaceuta.getId().toLowerCase().contains(criterio) ||
-                farmaceuta.getNombre().toLowerCase().contains(criterio);
-    }
-
-    private boolean coincideCriterioPaciente(Object objeto, String criterio) {
-        if (!(objeto instanceof Paciente)) return false;
-
-        Paciente paciente = (Paciente) objeto;
-        return paciente.getId().toLowerCase().contains(criterio) ||
-                paciente.getNombre().toLowerCase().contains(criterio) ||
-                paciente.getTelefono().toLowerCase().contains(criterio);
-    }
-
-    private boolean coincideCriterioMedicamento(Object objeto, String criterio) {
-        if (!(objeto instanceof Medicamento)) return false;
-
-        Medicamento medicamento = (Medicamento) objeto;
-        return medicamento.getCodigo().toLowerCase().contains(criterio) ||
-                medicamento.getNombre().toLowerCase().contains(criterio) ||
-                medicamento.getPresentacion().toLowerCase().contains(criterio);
-    }
-
-    private boolean coincideCriterioReceta(Object objeto, String criterio) {
-        if (!(objeto instanceof Receta)) return false;
-
-        Receta receta = (Receta) objeto;
-        return receta.getNumeroReceta().toLowerCase().contains(criterio) ||
-                receta.getIdPaciente().toLowerCase().contains(criterio) ||
-                receta.getIdMedico().toLowerCase().contains(criterio) ||
-                receta.getEstado().getDescripcion().toLowerCase().contains(criterio);
-    }
-
-    private boolean coincideCriterioDetalleReceta(Object objeto, String criterio) {
-        if (!(objeto instanceof DetalleReceta)) return false;
-
-        DetalleReceta detalle = (DetalleReceta) objeto;
-        return detalle.getCodigoMedicamento().toLowerCase().contains(criterio) ||
-                detalle.getIndicaciones().toLowerCase().contains(criterio);
-    }
-
-    // ================================
     // MÉTODOS FACTORY ESTÁTICOS
     // ================================
 
     public static TableModelPrincipal crearModeloMedicos() {
-        return new TableModelPrincipal(TipoTabla.MEDICOS);
+        return new TableModelPrincipal(TIPO_MEDICOS);
     }
 
     public static TableModelPrincipal crearModeloMedicos(Lista<Object> datos) {
-        return new TableModelPrincipal(TipoTabla.MEDICOS, datos);
+        return new TableModelPrincipal(TIPO_MEDICOS, datos);
     }
 
     public static TableModelPrincipal crearModeloFarmaceutas() {
-        return new TableModelPrincipal(TipoTabla.FARMACEUTAS);
+        return new TableModelPrincipal(TIPO_FARMACEUTAS);
     }
 
     public static TableModelPrincipal crearModeloFarmaceutas(Lista<Object> datos) {
-        return new TableModelPrincipal(TipoTabla.FARMACEUTAS, datos);
+        return new TableModelPrincipal(TIPO_FARMACEUTAS, datos);
     }
 
     public static TableModelPrincipal crearModeloPacientes() {
-        return new TableModelPrincipal(TipoTabla.PACIENTES);
+        return new TableModelPrincipal(TIPO_PACIENTES);
     }
 
     public static TableModelPrincipal crearModeloPacientes(Lista<Object> datos) {
-        return new TableModelPrincipal(TipoTabla.PACIENTES, datos);
+        return new TableModelPrincipal(TIPO_PACIENTES, datos);
     }
 
     public static TableModelPrincipal crearModeloMedicamentos() {
-        return new TableModelPrincipal(TipoTabla.MEDICAMENTOS);
+        return new TableModelPrincipal(TIPO_MEDICAMENTOS);
     }
 
     public static TableModelPrincipal crearModeloMedicamentos(Lista<Object> datos) {
-        return new TableModelPrincipal(TipoTabla.MEDICAMENTOS, datos);
+        return new TableModelPrincipal(TIPO_MEDICAMENTOS, datos);
     }
 
     public static TableModelPrincipal crearModeloRecetas() {
-        return new TableModelPrincipal(TipoTabla.RECETAS);
+        return new TableModelPrincipal(TIPO_RECETAS);
     }
 
     public static TableModelPrincipal crearModeloRecetas(Lista<Object> datos) {
-        return new TableModelPrincipal(TipoTabla.RECETAS, datos);
+        return new TableModelPrincipal(TIPO_RECETAS, datos);
     }
 
     public static TableModelPrincipal crearModeloDetallesReceta() {
-        return new TableModelPrincipal(TipoTabla.DETALLES_RECETA);
+        return new TableModelPrincipal(TIPO_DETALLES_RECETA);
     }
 
     public static TableModelPrincipal crearModeloDetallesReceta(Lista<Object> datos) {
-        return new TableModelPrincipal(TipoTabla.DETALLES_RECETA, datos);
+        return new TableModelPrincipal(TIPO_DETALLES_RECETA, datos);
     }
 
     // ================================
     // GETTERS Y SETTERS
     // ================================
 
-    public TipoTabla getTipoTabla() {
+    public int getTipoTabla() {
         return tipoTabla;
     }
 
-    public void setTipoTabla(TipoTabla tipoTabla) {
+    public void setTipoTabla(int tipoTabla) {
         this.tipoTabla = tipoTabla;
+        inicializarColumnas();
         fireTableStructureChanged();
     }
 }

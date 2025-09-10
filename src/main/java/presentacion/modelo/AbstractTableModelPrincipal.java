@@ -14,14 +14,16 @@ public abstract class AbstractTableModelPrincipal extends AbstractTableModel {
 
     public AbstractTableModelPrincipal() {
         this.datos = new Lista<>();
-        this.nombreColumnas = definirNombresColumnas();
-        this.tiposColumnas = definirTiposColumnas();
+        // Inicialización básica segura - sin llamadas a métodos abstractos
+        this.nombreColumnas = new String[]{};
+        this.tiposColumnas = new Class<?>[]{};
     }
 
     public AbstractTableModelPrincipal(Lista<Object> datos) {
         this.datos = datos != null ? datos : new Lista<>();
-        this.nombreColumnas = definirNombresColumnas();
-        this.tiposColumnas = definirTiposColumnas();
+        // Inicialización básica segura - sin llamadas a métodos abstractos
+        this.nombreColumnas = new String[]{};
+        this.tiposColumnas = new Class<?>[]{};
     }
 
     // ================================
@@ -59,12 +61,12 @@ public abstract class AbstractTableModelPrincipal extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return nombreColumnas.length;
+        return nombreColumnas != null ? nombreColumnas.length : 0;
     }
 
     @Override
     public String getColumnName(int column) {
-        if (column >= 0 && column < nombreColumnas.length) {
+        if (nombreColumnas != null && column >= 0 && column < nombreColumnas.length) {
             return nombreColumnas[column];
         }
         return "";
@@ -72,7 +74,7 @@ public abstract class AbstractTableModelPrincipal extends AbstractTableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (columnIndex >= 0 && columnIndex < tiposColumnas.length) {
+        if (tiposColumnas != null && columnIndex >= 0 && columnIndex < tiposColumnas.length) {
             return tiposColumnas[columnIndex];
         }
         return String.class;
@@ -86,7 +88,7 @@ public abstract class AbstractTableModelPrincipal extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         if (rowIndex < 0 || rowIndex >= datos.getTam() ||
-                columnIndex < 0 || columnIndex >= nombreColumnas.length) {
+                columnIndex < 0 || (nombreColumnas != null && columnIndex >= nombreColumnas.length)) {
             return "";
         }
 
@@ -152,7 +154,16 @@ public abstract class AbstractTableModelPrincipal extends AbstractTableModel {
     public boolean actualizarObjeto(int fila, Object objetoActualizado) {
         if (fila >= 0 && fila < datos.getTam() && esObjetoValido(objetoActualizado)) {
             // Como Lista no tiene método de actualización por posición,
-            // necesitaríamos implementarlo o hacer eliminate + insert
+            // creamos una nueva lista con el objeto actualizado
+            Lista<Object> nuevaLista = new Lista<>();
+            for (int i = 0; i < datos.getTam(); i++) {
+                if (i == fila) {
+                    nuevaLista.agregarFinal(objetoActualizado);
+                } else {
+                    nuevaLista.agregarFinal(datos.obtenerPorPos(i));
+                }
+            }
+            datos = nuevaLista;
             fireTableRowsUpdated(fila, fila);
             return true;
         }
@@ -167,19 +178,10 @@ public abstract class AbstractTableModelPrincipal extends AbstractTableModel {
         fireTableDataChanged();
     }
 
-    /**
-     * Verifica si la tabla está vacía
-     */
-    public boolean estaVacia() {
-        return datos.getTam() == 0;
-    }
-
-    /**
-     * Obtiene el número de filas
-     */
-    public int getNumeroFilas() {
-        return datos.getTam();
-    }
+    // Métodos alias para compatibilidad
+    public void agregarFila(Object objeto) { agregarObjeto(objeto); }
+    public void eliminarFila(int indice) { eliminarObjeto(indice); }
+    public void actualizarFila(int indice, Object objeto) { actualizarObjeto(indice, objeto); }
 
     /**
      * Obtiene todos los datos
@@ -188,79 +190,13 @@ public abstract class AbstractTableModelPrincipal extends AbstractTableModel {
         return datos;
     }
 
-    // ================================
-    // MÉTODOS DE BÚSQUEDA Y FILTRADO
-    // ================================
-
-    /**
-     * Busca la fila que contiene un objeto específico
-     */
-    public int buscarFila(Object objeto) {
-        for (int i = 0; i < datos.getTam(); i++) {
-            Object obj = datos.obtenerPorPos(i);
-            if (obj != null && obj.equals(objeto)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Filtra los datos según un criterio de texto
-     */
-    public void filtrarPorTexto(Lista<Object> datosOriginales, String criterio) {
-        if (criterio == null || criterio.trim().isEmpty()) {
-            setDatos(datosOriginales);
-            return;
-        }
-
-        Lista<Object> datosFiltrados = new Lista<>();
-        String criterioBusqueda = criterio.toLowerCase();
-
-        for (int i = 0; i < datosOriginales.getTam(); i++) {
-            Object objeto = datosOriginales.obtenerPorPos(i);
-            if (coincideConCriterio(objeto, criterioBusqueda)) {
-                datosFiltrados.agregarFinal(objeto);
-            }
-        }
-
-        setDatos(datosFiltrados);
-    }
-
     /**
      * Determina si un objeto coincide con el criterio de búsqueda
-     * Las subclases pueden sobrescribir este método para criterios específicos
      */
     protected boolean coincideConCriterio(Object objeto, String criterio) {
         if (objeto == null || criterio == null) {
             return false;
         }
-
-        // Búsqueda básica en la representación toString del objeto
         return objeto.toString().toLowerCase().contains(criterio);
-    }
-
-    // ================================
-    // MÉTODOS DE UTILIDAD
-    // ================================
-
-    /**
-     * Obtiene información sobre el estado de la tabla
-     */
-    public String getInfoTabla() {
-        return "Tabla: " + getClass().getSimpleName() +
-                " - Filas: " + getRowCount() +
-                " - Columnas: " + getColumnCount();
-    }
-
-    /**
-     * Representación en cadena del modelo de tabla
-     */
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "{" +
-                "filas=" + getRowCount() +
-                ", columnas=" + getColumnCount() +
-                '}';
     }
 }

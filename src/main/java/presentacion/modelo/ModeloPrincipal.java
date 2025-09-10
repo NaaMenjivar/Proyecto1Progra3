@@ -352,13 +352,6 @@ public class ModeloPrincipal extends AbstractModel {
     // NUEVOS MÉTODOS PARA HISTÓRICO MVC
     // ================================
 
-    public Lista<Receta> obtenerRecetasPorMedico(String idMedico) {
-        if (!esCadenaValida(idMedico)) {
-            return new Lista<Receta>();
-        }
-
-        return gestorCatalogos.buscarRecetasPorMedico(idMedico);
-    }
 
     public Lista<Receta> buscarRecetasPorMedicoYNumero(String idMedico, String numeroReceta) {
         if (!esCadenaValida(idMedico) || !esCadenaValida(numeroReceta)) {
@@ -380,9 +373,6 @@ public class ModeloPrincipal extends AbstractModel {
         return recetasEncontradas;
     }
 
-    public Lista<Receta> obtenerTodasLasRecetas() {
-        return gestorCatalogos.obtenerTodasRecetas();
-    }
 
     public Lista<Receta> buscarRecetasPorCriterio(String criterio) {
         if (!esCadenaValida(criterio)) {
@@ -565,5 +555,83 @@ public class ModeloPrincipal extends AbstractModel {
 
     public String generarReporteCompleto() {
         return gestorCatalogos.generarReporteGeneral();
+    }
+
+    /**
+     * Obtiene todas las recetas del sistema (solo para ADMINISTRADORES y FARMACEUTAS)
+     */
+    public Lista<Receta> obtenerTodasLasRecetas() {
+        try {
+            // Verificar permisos
+            if (usuarioActual == null) {
+                throw new SecurityException("Usuario no autenticado");
+            }
+
+            TipoUsuario tipo = usuarioActual.getTipo();
+            if (tipo != TipoUsuario.ADMINISTRADOR && tipo != TipoUsuario.FARMACEUTA) {
+                throw new SecurityException("No tiene permisos para ver todas las recetas");
+            }
+
+            return gestorCatalogos.obtenerTodasLasRecetas();
+
+        } catch (Exception e) {
+            System.err.println("Error al obtener todas las recetas: " + e.getMessage());
+            return new Lista<>();
+        }
+    }
+
+    /**
+     * Obtiene las recetas de un médico específico
+     */
+    public Lista<Receta> obtenerRecetasPorMedico(String idMedico) {
+        try {
+            // Verificar permisos
+            if (usuarioActual == null) {
+                throw new SecurityException("Usuario no autenticado");
+            }
+
+            // Los médicos solo pueden ver sus propias recetas
+            if (usuarioActual.getTipo() == TipoUsuario.MEDICO &&
+                    !usuarioActual.getId().equals(idMedico)) {
+                throw new SecurityException("Los médicos solo pueden ver sus propias recetas");
+            }
+
+            return gestorCatalogos.obtenerRecetasPorMedico(idMedico);
+
+        } catch (Exception e) {
+            System.err.println("Error al obtener recetas del médico: " + e.getMessage());
+            return new Lista<>();
+        }
+    }
+
+    /**
+     * Busca una receta por su número
+     */
+    public Receta buscarRecetaPorNumero(String numeroReceta) {
+        try {
+            if (usuarioActual == null) {
+                throw new SecurityException("Usuario no autenticado");
+            }
+
+            return gestorCatalogos.buscarRecetaPorNumero(numeroReceta);
+
+        } catch (Exception e) {
+            System.err.println("Error al buscar receta: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Verifica si el usuario actual puede acceder al histórico de recetas
+     */
+    public boolean puedeAccederHistorico() {
+        if (usuarioActual == null) {
+            return false;
+        }
+
+        TipoUsuario tipo = usuarioActual.getTipo();
+        return tipo == TipoUsuario.MEDICO ||
+                tipo == TipoUsuario.FARMACEUTA ||
+                tipo == TipoUsuario.ADMINISTRADOR;
     }
 }

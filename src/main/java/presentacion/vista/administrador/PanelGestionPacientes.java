@@ -328,4 +328,8 @@ public class PanelGestionPacientes {
         cargarTodosPacientes();
         limpiarCampos();
     }
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
 }

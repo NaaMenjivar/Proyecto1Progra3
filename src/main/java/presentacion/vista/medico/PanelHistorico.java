@@ -12,13 +12,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Panel Histórico para Médico - Vista MVC CORRECTA
- * Respeta arquitectura MVC y principios SOLID
+ * Panel Histórico para Médicos - Vista MVC
  */
 public class PanelHistorico {
     // Componentes del formulario (declarados en el .form)
     private JPanel panelPrincipal;
-    private JTextField numFld;
+    private JTextField numeroRecetaFld;  // CAMPO CORREGIDO - antes faltaba
     private JButton buscar;
     private JTable list;
     private JTextArea detalles;
@@ -32,7 +31,7 @@ public class PanelHistorico {
         this.controlador = controlador;
         inicializarComponentes();
         configurarEventos();
-        cargarRecetasDelMedico();
+        cargarTodasLasRecetas();
     }
 
     private void inicializarComponentes() {
@@ -54,9 +53,9 @@ public class PanelHistorico {
 
         // Configurar área de detalles
         detalles.setEditable(false);
-        detalles.setLineWrap(true);
         detalles.setWrapStyleWord(true);
-        detalles.setFont(new java.awt.Font("Monospaced", 0, 12));
+        detalles.setLineWrap(true);
+        detalles.setFont(new java.awt.Font("Monospaced", java.awt.Font.PLAIN, 12));
     }
 
     private void configurarEventos() {
@@ -64,15 +63,15 @@ public class PanelHistorico {
         buscar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                buscarRecetaPorNumero();
+                buscarReceta();
             }
         });
 
         // Enter en campo de búsqueda
-        numFld.addActionListener(new ActionListener() {
+        numeroRecetaFld.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                buscarRecetaPorNumero();
+                buscarReceta();
             }
         });
 
@@ -87,67 +86,135 @@ public class PanelHistorico {
         });
     }
 
-    // ================================
-    // MÉTODOS QUE RESPETAN MVC
-    // ================================
+    private void buscarReceta() {
+        String numeroReceta = numeroRecetaFld.getText().trim();
 
-    private void buscarRecetaPorNumero() {
-        String numeroReceta = numFld.getText().trim();
+        if (numeroReceta.isEmpty()) {
+            cargarTodasLasRecetas();
+            return;
+        }
 
         try {
-            Lista<Receta> recetasEncontradas;
+            Lista<Receta> recetasEncontradas = controlador.getModelo()
+                    .getGestorCatalogos().obtenerTodasRecetas();
+            Lista<Object> resultados = new Lista<>();
 
-            if (numeroReceta.isEmpty()) {
-                // Si no hay criterio, cargar todas las recetas del médico
-                recetasEncontradas = controlador.obtenerRecetasDelMedicoActual();
-            } else {
-                // Buscar por número específico a través del controlador
-                recetasEncontradas = controlador.buscarRecetasDelMedicoActualPorNumero(numeroReceta);
-            }
-
-            // Convertir a datos para tabla
-            Lista<Object> datos = new Lista<>();
             for (int i = 0; i < recetasEncontradas.getTam(); i++) {
-                datos.agregarFinal(recetasEncontradas.obtenerPorPos(i));
+                Receta receta = recetasEncontradas.obtenerPorPos(i);
+                if (receta.getNumeroReceta().toLowerCase().contains(numeroReceta.toLowerCase())) {
+                    resultados.agregarFinal(receta);
+                }
             }
 
-            tableModel.setDatos(datos);
+            tableModel.setDatos(resultados);
 
-            if (recetasEncontradas.getTam() == 0) {
-                String mensaje = numeroReceta.isEmpty() ?
-                        "No hay recetas registradas para este médico" :
-                        "No se encontraron recetas con ese número";
-
-                JOptionPane.showMessageDialog(panelPrincipal,
-                        mensaje,
-                        "Sin resultados",
-                        JOptionPane.INFORMATION_MESSAGE);
-                limpiarDetalles();
+            if (resultados.getTam() == 0) {
+                detalles.setText("No se encontraron recetas que coincidan con: " + numeroReceta);
             } else {
-                limpiarDetalles();
+                detalles.setText("Se encontraron " + resultados.getTam() +
+                        " receta(s) que coinciden con la búsqueda.");
             }
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
-                    "Error al buscar recetas: " + e.getMessage(),
+                    "Error al buscar receta: " + e.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void cargarRecetasDelMedico() {
-        try {
-            // Delegar al controlador la lógica de obtener recetas del médico actual
-            Lista<Receta> recetasDelMedico = controlador.obtenerRecetasDelMedicoActual();
+    private void mostrarDetallesRecetaSeleccionada() {
+        int filaSeleccionada = list.getSelectedRow();
 
-            // Convertir a datos para tabla
+        if (filaSeleccionada == -1) {
+            recetaSeleccionada = null;
+            return;
+        }
+
+        try {
+            recetaSeleccionada = (Receta) tableModel.getValueAt(filaSeleccionada, -1);
+            mostrarDetallesReceta(recetaSeleccionada);
+        } catch (Exception e) {
+            detalles.setText("Error al cargar detalles de la receta seleccionada.");
+        }
+    }
+
+    private void mostrarDetallesReceta(Receta receta) {
+        if (receta == null) {
+            detalles.setText("No se puede mostrar información de la receta.");
+            return;
+        }
+
+        StringBuilder detallesTexto = new StringBuilder();
+
+        // Información básica de la receta
+        detallesTexto.append("INFORMACIÓN DE LA RECETA\n");
+        detallesTexto.append("═".repeat(50)).append("\n");
+        detallesTexto.append("Número:           ").append(receta.getNumeroReceta()).append("\n");
+        detallesTexto.append("Paciente:         ").append(receta.getIdPaciente()).append("\n");
+        detallesTexto.append("Médico:           ").append(receta.getIdMedico()).append("\n");
+        detallesTexto.append("Fecha Confección: ").append(
+                receta.getFechaConfeccion() != null ?
+                        receta.getFechaConfeccion().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) :
+                        "N/A"
+        ).append("\n");
+        detallesTexto.append("Fecha Retiro:     ").append(
+                receta.getFechaRetiro() != null ?
+                        receta.getFechaRetiro().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) :
+                        "N/A"
+        ).append("\n");
+        detallesTexto.append("Estado:           ").append(receta.getEstado().getDescripcion()).append("\n\n");
+
+        // Detalles de medicamentos
+        detallesTexto.append("MEDICAMENTOS PRESCRITOS:\n");
+        detallesTexto.append("─".repeat(30)).append("\n");
+
+        if (receta.tieneDetalles()) {
+            Lista<DetalleReceta> detallesList = receta.getDetalles();
+
+            for (int i = 0; i < detallesList.getTam(); i++) {
+                DetalleReceta detalle = detallesList.obtenerPorPos(i);
+
+                detallesTexto.append((i + 1)).append(". ");
+                detallesTexto.append("Medicamento: ").append(detalle.getCodigoMedicamento()).append("\n");
+                detallesTexto.append("   Cantidad:     ").append(detalle.getCantidadTexto()).append("\n");
+                detallesTexto.append("   Duración:     ").append(detalle.getDuracionTexto()).append("\n");
+                detallesTexto.append("   Indicaciones: ").append(detalle.getIndicaciones()).append("\n");
+
+                if (i < detallesList.getTam() - 1) {
+                    detallesTexto.append("\n");
+                }
+            }
+
+            detallesTexto.append("\n");
+            detallesTexto.append("Total de medicamentos: ").append(receta.getTotalMedicamentos()).append("\n");
+        } else {
+            detallesTexto.append("   Esta receta no tiene medicamentos registrados.\n\n");
+        }
+
+        // Mostrar en el área de texto
+        detalles.setText(detallesTexto.toString());
+        detalles.setCaretPosition(0); // Ir al inicio del texto
+    }
+
+    private void cargarTodasLasRecetas() {
+        try {
+            Lista<Receta> todasLasRecetas = controlador.getModelo()
+                    .getGestorCatalogos().obtenerTodasRecetas();
             Lista<Object> datos = new Lista<>();
-            for (int i = 0; i < recetasDelMedico.getTam(); i++) {
-                datos.agregarFinal(recetasDelMedico.obtenerPorPos(i));
+
+            for (int i = 0; i < todasLasRecetas.getTam(); i++) {
+                datos.agregarFinal(todasLasRecetas.obtenerPorPos(i));
             }
 
             tableModel.setDatos(datos);
-            limpiarDetalles();
+
+            if (todasLasRecetas.getTam() > 0) {
+                detalles.setText("Se cargaron " + todasLasRecetas.getTam() +
+                        " receta(s). Seleccione una para ver detalles.");
+            } else {
+                detalles.setText("No hay recetas registradas en el sistema.");
+            }
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
@@ -157,50 +224,12 @@ public class PanelHistorico {
         }
     }
 
-    private void mostrarDetallesRecetaSeleccionada() {
-        int filaSeleccionada = list.getSelectedRow();
-        if (filaSeleccionada >= 0) {
-            try {
-                Object elemento = tableModel.getObjetoEnFila(filaSeleccionada);
-                if (elemento instanceof Receta) {
-                    recetaSeleccionada = (Receta) elemento;
-
-                    // Delegar al controlador la generación de detalles
-                    String detallesTexto = controlador.obtenerDetallesReceta(recetaSeleccionada);
-
-                    detalles.setText(detallesTexto);
-                    detalles.setCaretPosition(0);
-                }
-            } catch (Exception e) {
-                detalles.setText("Error al mostrar detalles: " + e.getMessage());
-            }
-        } else {
-            limpiarDetalles();
-        }
-    }
-
-    private void limpiarDetalles() {
-        detalles.setText("Seleccione una receta para ver sus detalles...");
-        recetaSeleccionada = null;
-    }
-
-    // ================================
-    // MÉTODOS PÚBLICOS PARA INTEGRACIÓN
-    // ================================
-
-    /**
-     * Obtiene el panel principal para ser añadido a contenedores
-     * @return JPanel principal del formulario
-     */
     public JPanel getPanel() {
         return panelPrincipal;
     }
 
-    /**
-     * Método para refrescar datos
-     */
-    public void refrescarDatos() {
-        cargarRecetasDelMedico();
-        numFld.setText("");
+    public void limpiarBusqueda() {
+        numeroRecetaFld.setText("");
+        cargarTodasLasRecetas();
     }
 }

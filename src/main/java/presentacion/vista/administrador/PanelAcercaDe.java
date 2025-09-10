@@ -75,4 +75,8 @@ public class PanelAcercaDe {
     public void refrescarDatos() {
         // No hay datos dinámicos que refrescar en este panel
     }
+
+    public JPanel getPanelPrincipal() {
+        return panelPrincipal;
+    }
 }
