@@ -1,14 +1,12 @@
+import presentacion.controlador.ControladorLogin;
 import presentacion.controlador.ControladorPrincipal;
+import presentacion.modelo.ModeloLogin;
 import presentacion.vista.principal.VentanaPrincipal;
 import presentacion.modelo.ModeloPrincipal;
+import presentacion.vista.sistema.VentanaLogin;
+
 import javax.swing.*;
 
-/**
- * Clase principal de la aplicación del Sistema de Prescripción y Despacho de Recetas
- * Universidad Nacional - EIF206 Programación 3
- *
- * VERSIÓN DE PRUEBA PARA VENTANA PRINCIPAL ÚNICAMENTE
- */
 public class Application {
 
     private static ControladorPrincipal controlador;
@@ -32,7 +30,7 @@ public class Application {
             try {
                 inicializarSistema();
                 mostrarInformacionSistema();
-                abrirVentanaPrincipal();
+                //abrirVentanaPrincipal();
             } catch (Exception e) {
                 mostrarErrorFatal("Error al inicializar el sistema", e);
             }

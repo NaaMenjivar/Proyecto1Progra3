@@ -2,16 +2,12 @@ package presentacion.controlador;
 
 import logica.entidades.*;
 import logica.entidades.lista.Lista;
-import logica.excepciones.*;
 import presentacion.modelo.*;
 import presentacion.vista.sistema.VentanaLogin;
-import presentacion.vista.sistema.VentanaCambiarClave;
 import presentacion.vista.principal.VentanaPrincipal;
 import presentacion.vista.principal.VentanaMedico;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDate;
 
 /**
@@ -24,7 +20,7 @@ public class ControladorPrincipal {
     private ModeloPrincipal modelo;
 
     // Vistas principales
-    private VentanaLogin ventanaLogin;
+    private ControladorLogin controladorLogin;
     private VentanaPrincipal ventanaPrincipal;
     private VentanaMedico ventanaMedico;
 
@@ -44,13 +40,10 @@ public class ControladorPrincipal {
             // Crear modelo principal
             modelo = new ModeloPrincipal();
 
-            // Crear ventana de login
-            //ventanaLogin = new VentanaLogin(this);
+            //Crear ventana de login
+            controladorLogin = new ControladorLogin(new VentanaLogin(),this);
+            controladorLogin.iniciarLogin();
 
-            // Mostrar ventana de login
-            /*SwingUtilities.invokeLater(() -> {
-                ventanaLogin.setVisible(true);
-            });*/
 
             sistemaIniciado = true;
 
@@ -68,13 +61,8 @@ public class ControladorPrincipal {
         try {
             if (modelo.autenticarUsuario(id, clave)) {
                 Usuario usuario = modelo.getUsuarioActual();
-
-                // Ocultar ventana de login
-                //ventanaLogin.setVisible(false);
-
                 // Abrir ventana apropiada según tipo de usuario
                 abrirVentanaSegunTipoUsuario(usuario);
-
                 return true;
             } else {
                 mostrarError("Credenciales incorrectas");

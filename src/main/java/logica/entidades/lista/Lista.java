@@ -6,13 +6,38 @@ import logica.entidades.Usuario;
 import logica.entidades.Receta;
 import logica.entidades.Paciente;
 
-public class Lista<T> {
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class Lista<T> implements Iterable<T>{
     private Nodo<T> cabeza;
     private int tam;
 
     public Lista() {
         cabeza = null;
         tam = 0;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            private Nodo<T> actual = cabeza;
+
+            @Override
+            public boolean hasNext() {
+                return actual != null;
+            }
+
+            @Override
+            public T next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                T dato = actual.getDato();
+                actual = actual.getSiguiente();
+                return dato;
+            }
+        };
     }
 
     public int getTam() {

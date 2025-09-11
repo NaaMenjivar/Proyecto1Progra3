@@ -101,7 +101,7 @@ public class VentanaPrincipal extends JFrame {
         farmaceutasPanel.add(panelGestionFarmaceutas.getPanelPrincipal(), BorderLayout.CENTER);
         pacientesPanel.add(panelGestionPacientes.getPanelPrincipal(), BorderLayout.CENTER);
         medicamentosPanel.add(panelGestionMedicamentos.getPanelPrincipal(), BorderLayout.CENTER);
-        despachoPanel.add(panelDespacho.getPanelPrincipal(), BorderLayout.CENTER);
+        //despachoPanel.add(panelDespacho.getPanelPrincipal(), BorderLayout.CENTER);
         //dashboardPanel.add(panelDashboard.getPanelPrincipal(), BorderLayout.CENTER);
         historicoPanel.add(panelHistorico.getPanelPrincipal(), BorderLayout.CENTER);
         acercaDePanel.add(panelAcercaDe.getPanelPrincipal(), BorderLayout.CENTER);
