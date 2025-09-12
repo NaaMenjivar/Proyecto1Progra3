@@ -6,10 +6,6 @@ import logica.entidades.*;
 import logica.excepciones.CatalogoException;
 import java.time.LocalDate;
 
-/**
- * Modelo principal del sistema que extiende AbstractModel
- * Maneja todos los datos y operaciones principales
- */
 public class ModeloPrincipal extends AbstractModel {
 
     // Estado actual del sistema
@@ -96,6 +92,7 @@ public class ModeloPrincipal extends AbstractModel {
         usuarioActual = null;
         pacienteSeleccionado = null;
         recetaActual = null;
+        gestorCatalogos.guardarDatos();
         marcarComoModificado();
     }
 
@@ -122,11 +119,45 @@ public class ModeloPrincipal extends AbstractModel {
         }
     }
 
-    public boolean eliminarMedico(String id) {
-        if (!antesDeModificar()) return false;
+    public boolean eliminarMedicamento(String codigo){
+        try{
+            boolean resultado = gestorCatalogos.eliminarMedicamento(codigo);
+            if(resultado){
+                despuesDeModificar();
+            }
+            return resultado;
+        }catch (Exception e){
+            return false;
+        }
+    }
 
+    public boolean eliminarFarmaceuta(String id){
+        try{
+            boolean resultado = gestorCatalogos.eliminarFarmaceuta(id);
+            if(resultado){
+                despuesDeModificar();
+            }
+            return resultado;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    public boolean eliminarMedico(String id) {
         try {
-            boolean resultado = gestorCatalogos.eliminarUsuario(id);
+            boolean resultado = gestorCatalogos.eliminarMedico(id);
+            if (resultado) {
+                despuesDeModificar();
+            }
+            return resultado;
+        } catch (CatalogoException e) {
+            return false;
+        }
+    }
+
+    public boolean eliminarPaciente(String id) {
+        try {
+            boolean resultado = gestorCatalogos.eliminarPaciente(id);
             if (resultado) {
                 despuesDeModificar();
             }
@@ -554,9 +585,6 @@ public class ModeloPrincipal extends AbstractModel {
         }
     }
 
-    /**
-     * Verifica si el usuario actual puede acceder al histórico de recetas
-     */
     public boolean puedeAccederHistorico() {
         if (usuarioActual == null) {
             return false;

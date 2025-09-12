@@ -1,2 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<CatalogoMedicamentos/>
+<CatalogoMedicamentos>
+  <Medicamento>
+    <Codigo>02</Codigo>
+    <Nombre>BioTos</Nombre>
+    <Presentacion>Bebible</Presentacion>
+    <Stock>15</Stock>
+  </Medicamento>
+  <Medicamento>
+    <Codigo>01</Codigo>
+    <Nombre>Acetaminofen</Nombre>
+    <Presentacion>Tableta</Presentacion>
+    <Stock>2</Stock>
+  </Medicamento>
+</CatalogoMedicamentos>

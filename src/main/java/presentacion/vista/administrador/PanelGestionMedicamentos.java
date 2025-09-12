@@ -34,7 +34,6 @@ public class PanelGestionMedicamentos {
     // MVC Components
     private ControladorPrincipal controlador;
     private TableModelPrincipal tableModel;
-    private boolean modoEdicion = false;
     private String codigoSeleccionado = null;
 
     public PanelGestionMedicamentos(ControladorPrincipal controlador) {
@@ -153,20 +152,10 @@ public class PanelGestionMedicamentos {
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
-
-            if (modoEdicion) {
-                // TODO: Implementar actualización cuando esté disponible en el controlador
-                JOptionPane.showMessageDialog(panelPrincipal,
-                        "Funcionalidad de edición en desarrollo",
-                        "En desarrollo",
-                        JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                if (controlador.agregarMedicamento(codigo, nombre, presentacion, stock)) {
-                    limpiarCampos();
-                    cargarTodosMedicamentos();
-                }
+            if (controlador.agregarMedicamento(codigo, nombre, presentacion, stock)) {
+                limpiarCampos();
+                cargarTodosMedicamentos();
             }
-
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
                     "Error al guardar medicamento: " + e.getMessage(),
@@ -185,11 +174,7 @@ public class PanelGestionMedicamentos {
         }
 
         try {
-            // TODO: Implementar eliminación cuando esté disponible en el controlador
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Funcionalidad de eliminación en desarrollo",
-                    "En desarrollo",
-                    JOptionPane.INFORMATION_MESSAGE);
+            controlador.eliminarMedicamento(codigoSeleccionado);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
                     "Error al eliminar medicamento: " + e.getMessage(),
@@ -205,7 +190,7 @@ public class PanelGestionMedicamentos {
             if (criterio.isEmpty()) {
                 cargarTodosMedicamentos();
             } else {
-                Medicamento medicamentosEncontrados = controlador.getModelo().buscarMedicamentosPorDescripcion(criterio);
+                Medicamento medicamentosEncontrados = controlador.buscarMedicamentoPorDescripcion(criterio);
                 Lista<Object> datos = new Lista<>();
 
                 datos.agregarInicio(medicamentosEncontrados);
@@ -241,9 +226,7 @@ public class PanelGestionMedicamentos {
                     stockFld.setText(String.valueOf(medicamento.getStock()));
 
                     codigoSeleccionado = medicamento.getCodigo();
-                    modoEdicion = true;
 
-                    // Deshabilitar campo código en modo edición
                     codigoFld.setEnabled(false);
                 }
             } catch (Exception e) {
@@ -258,7 +241,7 @@ public class PanelGestionMedicamentos {
             Lista<Object> datos = new Lista<>();
 
             for (Medicamento medicamento : medicamentos) {
-                datos.agregarFinal(medicamentos);
+                datos.agregarFinal(medicamento);
             }
 
             tableModel.setDatos(datos);
@@ -278,7 +261,6 @@ public class PanelGestionMedicamentos {
         nombreBusquedaFld.setText("");
 
         codigoSeleccionado = null;
-        modoEdicion = false;
         codigoFld.setEnabled(true);
 
         list.clearSelection();
@@ -312,17 +294,10 @@ public class PanelGestionMedicamentos {
         cargarTodosMedicamentos();
     }
 
-    /**
-     * Obtiene el panel principal para ser añadido a contenedores
-     * @return JPanel principal del formulario
-     */
     public JPanel getPanel() {
         return panelPrincipal;
     }
 
-    /**
-     * Método para refrescar datos desde el exterior
-     */
     public void refrescarDatos() {
         cargarTodosMedicamentos();
         limpiarCampos();

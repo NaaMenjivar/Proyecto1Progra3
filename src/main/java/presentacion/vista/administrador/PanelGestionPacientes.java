@@ -179,11 +179,7 @@ public class PanelGestionPacientes {
         }
 
         try {
-            // TODO: Implementar eliminación cuando esté disponible en el controlador
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Funcionalidad de eliminación en desarrollo",
-                    "En desarrollo",
-                    JOptionPane.INFORMATION_MESSAGE);
+            controlador.eliminarPaciente(idSeleccionado);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
                     "Error al eliminar paciente: " + e.getMessage(),

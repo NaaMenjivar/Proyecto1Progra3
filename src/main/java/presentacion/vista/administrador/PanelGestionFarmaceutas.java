@@ -160,11 +160,7 @@ public class PanelGestionFarmaceutas {
         }
 
         try {
-            // TODO: Implementar eliminación cuando esté disponible en el controlador
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Funcionalidad de eliminación en desarrollo",
-                    "En desarrollo",
-                    JOptionPane.INFORMATION_MESSAGE);
+            controlador.eliminarFarmaceuta(idSeleccionado);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
                     "Error al eliminar farmaceuta: " + e.getMessage(),
@@ -180,7 +176,7 @@ public class PanelGestionFarmaceutas {
             if (criterio.isEmpty()) {
                 cargarTodosFarmaceutas();
             } else {
-                Farmaceuta farmaceuta = controlador.getModelo().buscarFarmaceutaId(criterio);
+                Farmaceuta farmaceuta = controlador.getModelo().obtenerFarmaceutas().buscarFarmaceutaNombre(criterio);
                 Lista<Object> datos = new Lista<>();
 
                 datos.agregarFinal(farmaceuta);
@@ -283,17 +279,10 @@ public class PanelGestionFarmaceutas {
         cargarTodosFarmaceutas();
     }
 
-    /**
-     * Obtiene el panel principal para ser añadido a contenedores
-     * @return JPanel principal del formulario
-     */
     public JPanel getPanel() {
         return panelPrincipal;
     }
 
-    /**
-     * Método para refrescar datos desde el exterior
-     */
     public void refrescarDatos() {
         cargarTodosFarmaceutas();
         limpiarCampos();

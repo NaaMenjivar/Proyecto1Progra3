@@ -13,9 +13,6 @@ public class Application {
     private static ControladorPrincipal controlador;
     private static VentanaPrincipal ventanaPrincipal;
 
-    /**
-     * Método principal que inicia la aplicación
-     */
     public static void main(String[] args) {
         System.out.println("=".repeat(60));
         System.out.println("SISTEMA DE PRESCRIPCIÓN Y DESPACHO DE RECETAS");

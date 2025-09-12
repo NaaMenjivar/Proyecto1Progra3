@@ -133,6 +133,14 @@ public class GestorCatalogos {
         return listaUsuarios.eliminarUsuario(id);
     }
 
+    public boolean eliminarFarmaceuta(String id) throws CatalogoException {
+        return listaFarmaceutas.eliminarFarmaceuta(id);
+    }
+
+    public boolean eliminarMedico(String id) throws CatalogoException {
+        return listaMedicos.eliminarMedico(id);
+    }
+
     // ================================
     // GESTIÓN DE PACIENTES
     // ================================

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Usuarios>
+  <Usuario tipo="Farmaceuta">
+    <ID>37637</ID>
+    <Nombre>ABI</Nombre>
+    <Clave>37637</Clave>
+  </Usuario>
   <Usuario tipo="Administrador">
     <ID>ADMIN</ID>
     <Nombre>Administrador</Nombre>

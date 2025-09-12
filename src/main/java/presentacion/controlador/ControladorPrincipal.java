@@ -131,13 +131,59 @@ public class ControladorPrincipal {
         }
     }
 
+    public Medicamento buscarMedicamentoPorDescripcion(String descripcion) {
+        return modelo.buscarMedicamentosPorDescripcion(descripcion);
+    }
+
+    public boolean eliminarFarmaceuta(String id) {
+        try {
+            int confirmacion = JOptionPane.showConfirmDialog(
+                    null,
+                    "¿Está seguro de eliminar el Medicamento con el ID: " + id + "?",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                if (modelo.eliminarFarmaceuta(id)) {
+                    mostrarMensaje("Farmaceuta eliminado exitosamente");
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            mostrarError("Error al eliminar médico: " + e.getMessage());
+            return false;
+        }
+    }
+    public boolean eliminarMedicamento(String codigo){
+        try {
+            int confirmacion = JOptionPane.showConfirmDialog(
+                    null,
+                    "¿Está seguro de eliminar el Medicamento con el Codigo: " + codigo + "?",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                if (modelo.eliminarMedicamento(codigo)) {
+                    mostrarMensaje("Médico eliminado exitosamente");
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            mostrarError("Error al eliminar médico: " + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean eliminarMedico(String id) {
         try {
-            /*if (!modelo.puedeGestionarCatalogos()) {
-                mostrarError("No tiene permisos para gestionar médicos");
-                return false;
-            }*/
-
             int confirmacion = JOptionPane.showConfirmDialog(
                     null,
                     "¿Está seguro de eliminar el médico con ID: " + id + "?",
@@ -148,6 +194,30 @@ public class ControladorPrincipal {
             if (confirmacion == JOptionPane.YES_OPTION) {
                 if (modelo.eliminarMedico(id)) {
                     mostrarMensaje("Médico eliminado exitosamente");
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            mostrarError("Error al eliminar médico: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean eliminarPaciente(String id) {
+        try {
+            int confirmacion = JOptionPane.showConfirmDialog(
+                    null,
+                    "¿Está seguro de eliminar el Paciente con ID: " + id + "?",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                if (modelo.eliminarPaciente(id)) {
+                    mostrarMensaje("Paciente eliminado exitosamente");
                     return true;
                 } else {
                     return false;

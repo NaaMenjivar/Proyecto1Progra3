@@ -105,7 +105,7 @@ public class VentanaPrincipal extends JFrame {
                 farmaceutasPanel.add(panelGestionFarmaceutas.getPanelPrincipal(), BorderLayout.CENTER);
                 pacientesPanel.add(panelGestionPacientes.getPanelPrincipal(), BorderLayout.CENTER);
                 medicamentosPanel.add(panelGestionMedicamentos.getPanelPrincipal(), BorderLayout.CENTER);
-                //despachoPanel.add(panelDespacho.getPanelPrincipal(), BorderLayout.CENTER);
+                despachoPanel.add(panelDespacho.getPanelPrincipal(), BorderLayout.CENTER);
                 dashboardPanel.add(panelDashboard.getPanelPrincipal(), BorderLayout.CENTER);
                 historicoPanel.add(panelHistorico.getPanelPrincipal(), BorderLayout.CENTER);
                 acercaDePanel.add(panelAcercaDe.getPanelPrincipal(), BorderLayout.CENTER);
@@ -121,21 +121,29 @@ public class VentanaPrincipal extends JFrame {
 
         }break;
             case MEDICO:{
+                despachoPanel.setLayout(new BorderLayout());
                 dashboardPanel.setLayout(new BorderLayout());
                 historicoPanel.setLayout(new BorderLayout());
                 acercaDePanel.setLayout(new BorderLayout());
 
+                despachoPanel.add(panelDespacho.getPanelPrincipal(), BorderLayout.CENTER);
                 dashboardPanel.add(panelDashboard.getPanelPrincipal(), BorderLayout.CENTER);
                 historicoPanel.add(panelHistorico.getPanelPrincipal(), BorderLayout.CENTER);
                 acercaDePanel.add(panelAcercaDe.getPanelPrincipal(), BorderLayout.CENTER);
 
+                panelTabs.addTab("Despacho", ajustarIcono("/Iconos/despacho.png",30,30), despachoPanel);
                 panelTabs.addTab("Dashboard", ajustarIcono("/Iconos/dashboard.png",30,30), dashboardPanel);
                 panelTabs.addTab("Histórico", ajustarIcono("/Iconos/historico.png",30,30), historicoPanel);
                 panelTabs.addTab("Acerca de", ajustarIcono("/Iconos/info.png",30,30), acercaDePanel);
             }break;
             case FARMACEUTA:{
+                despachoPanel.setLayout(new BorderLayout());
                 medicamentosPanel.setLayout(new BorderLayout());
+
+                despachoPanel.add(panelDespacho.getPanelPrincipal(), BorderLayout.CENTER);
                 medicamentosPanel.add(panelGestionMedicamentos.getPanelPrincipal(), BorderLayout.CENTER);
+
+                panelTabs.addTab("Despacho", ajustarIcono("/Iconos/despacho.png",30,30), despachoPanel);
                 panelTabs.addTab("Medicamentos", ajustarIcono("/Iconos/medicamentos.png",30,30), medicamentosPanel);
             }break;
         }

@@ -96,19 +96,19 @@ public class ListaMedicos implements Iterable<Medico> {
         return false;
     }
 
-    public Boolean eliminarMedico(Medico farmaceuta) {
-        if (farmaceuta == null || cabeza == null) {
+    public Boolean eliminarMedico(String id) {
+        if (id == null || cabeza == null) {
             return false;
         }
 
-        if (cabeza.getDato().equals(farmaceuta)) {
+        if (cabeza.getDato().getId().equals(id)) {
             cabeza = cabeza.getSiguiente();
             return true;
         }
 
         Nodo<Medico> actual = cabeza;
         while (actual.getSiguiente() != null) {
-            if (actual.getSiguiente().getDato().equals(farmaceuta)) {
+            if (actual.getSiguiente().getDato().getId().equals(id)) {
                 actual.setSiguiente(actual.getSiguiente().getSiguiente());
                 return true;
             }

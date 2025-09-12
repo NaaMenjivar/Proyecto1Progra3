@@ -95,19 +95,19 @@ public class ListaFarmaceutas implements Iterable<Farmaceuta> {
         return false;
     }
 
-    public Boolean eliminarFarmaceuta(Farmaceuta farmaceuta) {
-        if (farmaceuta == null || cabeza == null) {
+    public Boolean eliminarFarmaceuta(String id) {
+        if (id == null || cabeza == null) {
             return false;
         }
 
-        if (cabeza.getDato().equals(farmaceuta)) {
+        if (cabeza.getDato().getId().equals(id)) {
             cabeza = cabeza.getSiguiente();
             return true;
         }
 
         Nodo<Farmaceuta> actual = cabeza;
         while (actual.getSiguiente() != null) {
-            if (actual.getSiguiente().getDato().equals(farmaceuta)) {
+            if (actual.getSiguiente().getDato().getId().equals(id)) {
                 actual.setSiguiente(actual.getSiguiente().getSiguiente());
                 return true;
             }
