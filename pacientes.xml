@@ -6,10 +6,4 @@
     <FechaNacimiento>23/09/2006</FechaNacimiento>
     <Telefono>88383</Telefono>
   </Paciente>
-  <Paciente>
-    <ID>389293772</ID>
-    <Nombre>Daniela</Nombre>
-    <FechaNacimiento>17/12/2004</FechaNacimiento>
-    <Telefono>7875876</Telefono>
-  </Paciente>
 </Pacientes>
