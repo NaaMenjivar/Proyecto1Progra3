@@ -10,10 +10,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
 
-/**
- * Ventana Principal del Sistema - Vista para Administradores y Farmaceutas
- * Contiene todos los paneles de gestión en pestañas organizadas
- */
 public class VentanaPrincipal extends JFrame {
 
     private JPanel panelPrincipal;
@@ -27,9 +23,8 @@ public class VentanaPrincipal extends JFrame {
     private JPanel historicoPanel;
     private JPanel acercaDePanel;
 
-    private ControladorPrincipal controlador;
+    private final ControladorPrincipal controlador;
 
-    // Instancias de los paneles de gestión
     private PanelGestionMedicos panelGestionMedicos;
     private PanelGestionFarmaceutas panelGestionFarmaceutas;
     private PanelGestionPacientes panelGestionPacientes;
@@ -39,7 +34,7 @@ public class VentanaPrincipal extends JFrame {
     private PanelHistorico panelHistorico;
     private PanelAcercaDe panelAcercaDe;
 
-    private TipoUsuario tipoUsuario;
+    private final TipoUsuario tipoUsuario;
 
     public VentanaPrincipal(ControladorPrincipal controlador, TipoUsuario tipoUsuario) {
         this.controlador = controlador;
@@ -68,76 +63,84 @@ public class VentanaPrincipal extends JFrame {
     }
 
     private void crearPaneles() {
-        // Crear instancias de todos los paneles de gestión
 
-        if(tipoUsuario.getDescripcion().equals("Administrador")){
-            panelGestionMedicos = new PanelGestionMedicos(controlador);
-            panelGestionFarmaceutas = new PanelGestionFarmaceutas(controlador);
-            panelGestionPacientes = new PanelGestionPacientes(controlador);
-            panelGestionMedicamentos = new PanelGestionMedicamentos(controlador);
-            panelDespacho = new PanelDespacho(controlador);
-            panelDashboard = new PanelDashboard(controlador);
-            panelHistorico = new PanelHistorico(controlador);
-            panelAcercaDe = new PanelAcercaDe();
-        }else if(tipoUsuario.getDescripcion().equals("Medico")){
-            //prescribir
-            panelDashboard = new PanelDashboard(controlador);
-            panelHistorico = new PanelHistorico(controlador);
-            panelAcercaDe = new PanelAcercaDe();
-        }else if(tipoUsuario.getDescripcion().equals("Farmaceuta")){
-
+        switch(tipoUsuario){
+            case ADMINISTRADOR:{
+                panelGestionMedicos = new PanelGestionMedicos(controlador);
+                panelGestionFarmaceutas = new PanelGestionFarmaceutas(controlador);
+                panelGestionPacientes = new PanelGestionPacientes(controlador);
+                panelGestionMedicamentos = new PanelGestionMedicamentos(controlador);
+                panelDespacho = new PanelDespacho(controlador);
+                panelDashboard = new PanelDashboard(controlador);
+                panelHistorico = new PanelHistorico(controlador);
+                panelAcercaDe = new PanelAcercaDe();
+            }break;
+            case MEDICO:{
+                panelDashboard = new PanelDashboard(controlador);
+                panelHistorico = new PanelHistorico(controlador);
+                panelAcercaDe = new PanelAcercaDe();
+            }break;
+            case FARMACEUTA:{
+                panelGestionMedicamentos = new PanelGestionMedicamentos(controlador);
+            }break;
         }
 
     }
 
     private void integrarPanelesEnTabs() {
-        // Limpiar paneles existentes del formulario
-        if(tipoUsuario.getDescripcion().equals("Administrador")){
-            medicosPanel.removeAll();
-            farmaceutasPanel.removeAll();
-            pacientesPanel.removeAll();
-            medicamentosPanel.removeAll();
-            despachoPanel.removeAll();
-            dashboardPanel.removeAll();
-            historicoPanel.removeAll();
-            acercaDePanel.removeAll();
+        panelTabs.removeAll();
+        switch(tipoUsuario){
+            case ADMINISTRADOR:{
+                medicosPanel.setLayout(new BorderLayout());
+                farmaceutasPanel.setLayout(new BorderLayout());
+                pacientesPanel.setLayout(new BorderLayout());
+                medicamentosPanel.setLayout(new BorderLayout());
+                despachoPanel.setLayout(new BorderLayout());
+                dashboardPanel.setLayout(new BorderLayout());
+                historicoPanel.setLayout(new BorderLayout());
+                acercaDePanel.setLayout(new BorderLayout());
 
-            // Configurar layout para cada panel del tab
-            medicosPanel.setLayout(new BorderLayout());
-            farmaceutasPanel.setLayout(new BorderLayout());
-            pacientesPanel.setLayout(new BorderLayout());
-            medicamentosPanel.setLayout(new BorderLayout());
-            despachoPanel.setLayout(new BorderLayout());
-            dashboardPanel.setLayout(new BorderLayout());
-            historicoPanel.setLayout(new BorderLayout());
-            acercaDePanel.setLayout(new BorderLayout());
 
-            // Integrar cada panel de gestión en su respectivo tab
-            medicosPanel.add(panelGestionMedicos.getPanelPrincipal(), BorderLayout.CENTER);
-            farmaceutasPanel.add(panelGestionFarmaceutas.getPanelPrincipal(), BorderLayout.CENTER);
-            pacientesPanel.add(panelGestionPacientes.getPanelPrincipal(), BorderLayout.CENTER);
-            medicamentosPanel.add(panelGestionMedicamentos.getPanelPrincipal(), BorderLayout.CENTER);
-            //despachoPanel.add(panelDespacho.getPanelPrincipal(), BorderLayout.CENTER);
-            dashboardPanel.add(panelDashboard.getPanelPrincipal(), BorderLayout.CENTER);
-            historicoPanel.add(panelHistorico.getPanelPrincipal(), BorderLayout.CENTER);
-            acercaDePanel.add(panelAcercaDe.getPanelPrincipal(), BorderLayout.CENTER);
-        }else if(tipoUsuario.getDescripcion().equals("Medico")){
-            //prescribir
-            dashboardPanel.removeAll();
-            historicoPanel.removeAll();
-            acercaDePanel.removeAll();
+                medicosPanel.add(panelGestionMedicos.getPanelPrincipal(), BorderLayout.CENTER);
+                farmaceutasPanel.add(panelGestionFarmaceutas.getPanelPrincipal(), BorderLayout.CENTER);
+                pacientesPanel.add(panelGestionPacientes.getPanelPrincipal(), BorderLayout.CENTER);
+                medicamentosPanel.add(panelGestionMedicamentos.getPanelPrincipal(), BorderLayout.CENTER);
+                //despachoPanel.add(panelDespacho.getPanelPrincipal(), BorderLayout.CENTER);
+                dashboardPanel.add(panelDashboard.getPanelPrincipal(), BorderLayout.CENTER);
+                historicoPanel.add(panelHistorico.getPanelPrincipal(), BorderLayout.CENTER);
+                acercaDePanel.add(panelAcercaDe.getPanelPrincipal(), BorderLayout.CENTER);
 
-            dashboardPanel.setLayout(new BorderLayout());
-            historicoPanel.setLayout(new BorderLayout());
-            acercaDePanel.setLayout(new BorderLayout());
+                panelTabs.addTab("Médicos", ajustarIcono("/Iconos/medico.png",30,30), medicosPanel);
+                panelTabs.addTab("Farmacéutas", ajustarIcono("/Iconos/farmaceuta.png",30,30), farmaceutasPanel);
+                panelTabs.addTab("Pacientes", ajustarIcono("/Iconos/pasciente.png",30,30), pacientesPanel);
+                panelTabs.addTab("Medicamentos", ajustarIcono("/Iconos/medicamentos.png",30,30), medicamentosPanel);
+                panelTabs.addTab("Despacho", ajustarIcono("/Iconos/despacho.png",30,30), despachoPanel);
+                panelTabs.addTab("Dashboard", ajustarIcono("/Iconos/dashboard.png",30,30), dashboardPanel);
+                panelTabs.addTab("Histórico", ajustarIcono("/Iconos/historico.png",30,30), historicoPanel);
+                panelTabs.addTab("Acerca de", ajustarIcono("/Iconos/info.png",30,30), acercaDePanel);
 
-            dashboardPanel.add(panelDashboard.getPanelPrincipal(), BorderLayout.CENTER);
-            historicoPanel.add(panelHistorico.getPanelPrincipal(), BorderLayout.CENTER);
-            acercaDePanel.add(panelAcercaDe.getPanelPrincipal(), BorderLayout.CENTER);
-        }else if(tipoUsuario.getDescripcion().equals("Farmaceuta")){
+        }break;
+            case MEDICO:{
+                dashboardPanel.setLayout(new BorderLayout());
+                historicoPanel.setLayout(new BorderLayout());
+                acercaDePanel.setLayout(new BorderLayout());
 
+                dashboardPanel.add(panelDashboard.getPanelPrincipal(), BorderLayout.CENTER);
+                historicoPanel.add(panelHistorico.getPanelPrincipal(), BorderLayout.CENTER);
+                acercaDePanel.add(panelAcercaDe.getPanelPrincipal(), BorderLayout.CENTER);
+
+                panelTabs.addTab("Dashboard", ajustarIcono("/Iconos/dashboard.png",30,30), dashboardPanel);
+                panelTabs.addTab("Histórico", ajustarIcono("/Iconos/historico.png",30,30), historicoPanel);
+                panelTabs.addTab("Acerca de", ajustarIcono("/Iconos/info.png",30,30), acercaDePanel);
+            }break;
+            case FARMACEUTA:{
+                medicamentosPanel.setLayout(new BorderLayout());
+                medicamentosPanel.add(panelGestionMedicamentos.getPanelPrincipal(), BorderLayout.CENTER);
+                panelTabs.addTab("Medicamentos", ajustarIcono("/Iconos/medicamentos.png",30,30), medicamentosPanel);
+            }break;
         }
-        configurarIconosPestanas();
+
+        //configurarIconosPestanas();
 
         panelTabs.revalidate();
         panelTabs.repaint();
@@ -180,10 +183,10 @@ public class VentanaPrincipal extends JFrame {
         });
 
         // Evento de cambio de pestaña (opcional para optimizaciones)
-        panelTabs.addChangeListener(e -> {
+        /*panelTabs.addChangeListener(e -> {
             int tabSeleccionado = panelTabs.getSelectedIndex();
             onCambioDeTab(tabSeleccionado);
-        });
+        });*/
     }
 
     private void onCambioDeTab(int indiceTab) {
@@ -223,7 +226,6 @@ public class VentanaPrincipal extends JFrame {
 
         if (opcion == JOptionPane.YES_OPTION) {
             controlador.cerrarSesion();
-            dispose();
         }
     }
 

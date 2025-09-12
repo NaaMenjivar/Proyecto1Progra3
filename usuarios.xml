@@ -7,13 +7,23 @@
   </Usuario>
   <Usuario tipo="Farmaceuta">
     <ID>FARM001</ID>
-    <Nombre>María González</Nombre>
+    <Nombre>María Gonzalez</Nombre>
     <Clave>FARM001</Clave>
   </Usuario>
   <Usuario tipo="Medico">
     <ID>MED001</ID>
-    <Nombre>Dr. Juan Pérez</Nombre>
+    <Nombre>Dr. Juan Perez</Nombre>
     <Clave>MED001</Clave>
     <Especialidad>Medicina General</Especialidad>
+  </Usuario>
+  <Usuario tipo="Administrador">
+    <ID>admin</ID>
+    <Nombre>Carlos Alvarado</Nombre>
+    <Clave>admin</Clave>
+  </Usuario>
+  <Usuario tipo="Farmaceuta">
+    <ID>farmi</ID>
+    <Nombre>juana</Nombre>
+    <Clave>farmi</Clave>
   </Usuario>
 </Usuarios>

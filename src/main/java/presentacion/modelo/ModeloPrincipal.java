@@ -20,21 +20,21 @@ public class ModeloPrincipal extends AbstractModel {
     public ModeloPrincipal() {
         super();
         inicializar();
+        usuarioActual = null;
+        pacienteSeleccionado = null;
+        recetaActual = null;
     }
 
     public ModeloPrincipal(GestorCatalogos gestor) {
         super(gestor);
         inicializar();
+        usuarioActual = null;
+        pacienteSeleccionado = null;
+        recetaActual = null;
     }
-
-    // ================================
-    // IMPLEMENTACIÓN DE MÉTODOS ABSTRACTOS
-    // ================================
 
     @Override
     public void inicializar() {
-        // Crear datos de prueba si es necesario
-        /*crearDatosPrueba();*/
         gestorCatalogos.cargarDatos();
         marcarComoNoModificado();
     }
@@ -64,13 +64,10 @@ public class ModeloPrincipal extends AbstractModel {
                 gestorCatalogos.contarRecetas();
     }
 
-    // ================================
-    // GESTIÓN DE USUARIOS Y AUTENTICACIÓN
-    // ================================
-
     public boolean autenticarUsuario(String id, String clave) {
-        if(gestorCatalogos.autenticarUsuario(id,clave)){
-            usuarioActual = gestorCatalogos.buscarUsuarioId(id);
+        Usuario user = gestorCatalogos.autenticarUsuario(id,clave);
+        if(user != null){
+            usuarioActual = user;
             return true;
         }
         return false;

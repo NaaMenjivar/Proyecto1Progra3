@@ -194,10 +194,6 @@ public class TableModelPrincipal extends AbstractTableModelPrincipal {
         }
     }
 
-    // ================================
-    // MÉTODOS FACTORY ESTÁTICOS
-    // ================================
-
     public static TableModelPrincipal crearModeloMedicos() {
         return new TableModelPrincipal(TIPO_MEDICOS);
     }

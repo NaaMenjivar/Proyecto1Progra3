@@ -55,9 +55,6 @@ public class XmlPersisterFarmaceutas {
         }
     }
 
-    /**
-     * Carga farmaceutas desde un archivo XML y los retorna en una ListaFarmaceutas
-     */
     public static ListaFarmaceutas cargar(String archivo) {
         ListaFarmaceutas lista = new ListaFarmaceutas();
 

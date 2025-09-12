@@ -12,11 +12,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Panel de Gestión de Médicos - Vista MVC
- */
 public class PanelGestionMedicos {
-    // Componentes del formulario (declarados en el .form)
     private JPanel panelPrincipal;
     private JTextField idFld;
     private JTextField especialidadFld;
@@ -29,10 +25,8 @@ public class PanelGestionMedicos {
     private JButton reporte;
     private JTable list;
 
-    // MVC Components
-    private ControladorPrincipal controlador;
+    private final ControladorPrincipal controlador;
     private TableModelPrincipal tableModel;
-    private boolean modoEdicion = false;
     private String idSeleccionado = null;
 
     public PanelGestionMedicos(ControladorPrincipal controlador) {
@@ -59,7 +53,6 @@ public class PanelGestionMedicos {
     }
 
     private void configurarEventos() {
-        // Botón Guardar
         guardar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -67,7 +60,6 @@ public class PanelGestionMedicos {
             }
         });
 
-        // Botón Limpiar
         limpiar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -75,7 +67,6 @@ public class PanelGestionMedicos {
             }
         });
 
-        // Botón Borrar
         borrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -83,7 +74,6 @@ public class PanelGestionMedicos {
             }
         });
 
-        // Botón Buscar
         buscar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -91,7 +81,6 @@ public class PanelGestionMedicos {
             }
         });
 
-        // Enter en campo de búsqueda
         nombreBusquedaFld.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -99,7 +88,6 @@ public class PanelGestionMedicos {
             }
         });
 
-        // Botón Reporte
         reporte.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -107,7 +95,6 @@ public class PanelGestionMedicos {
             }
         });
 
-        // Selección en tabla
         list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -131,18 +118,9 @@ public class PanelGestionMedicos {
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
-
-            if (modoEdicion) {
-                // TODO: Implementar actualización cuando esté disponible en el controlador
-                JOptionPane.showMessageDialog(panelPrincipal,
-                        "Funcionalidad de edición en desarrollo",
-                        "En desarrollo",
-                        JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                if (controlador.agregarMedico(id, nombre, especialidad)) {
-                    limpiarCampos();
-                    cargarTodosMedicos();
-                }
+            if (controlador.agregarMedico(id, nombre, especialidad)) {
+                limpiarCampos();
+                cargarTodosMedicos();
             }
 
         } catch (Exception e) {
@@ -217,9 +195,7 @@ public class PanelGestionMedicos {
                     especialidadFld.setText(medico.getEspecialidad());
 
                     idSeleccionado = medico.getId();
-                    modoEdicion = true;
 
-                    // Deshabilitar campo ID en modo edición
                     idFld.setEnabled(false);
                 }
             } catch (Exception e) {
@@ -253,7 +229,7 @@ public class PanelGestionMedicos {
         nombreBusquedaFld.setText("");
 
         idSeleccionado = null;
-        modoEdicion = false;
+        //modoEdicion = false;
         idFld.setEnabled(true);
 
         list.clearSelection();
@@ -287,20 +263,13 @@ public class PanelGestionMedicos {
         cargarTodosMedicos();
     }
 
-    /**
-     * Obtiene el panel principal para ser añadido a contenedores
-     * @return JPanel principal del formulario
-     */
     public JPanel getPanel() {
         return panelPrincipal;
     }
 
-    /**
-     * Método para refrescar datos desde el exterior
-     */
     public void refrescarDatos() {
-        cargarTodosMedicos();
         limpiarCampos();
+        cargarTodosMedicos();
     }
 
     public JPanel getPanelPrincipal() {

@@ -11,42 +11,23 @@ import presentacion.vista.principal.VentanaMedico;
 import javax.swing.*;
 import java.time.LocalDate;
 
-/**
- * Controlador principal del sistema que maneja toda la lógica de aplicación
- * Implementa el patrón MVC coordinando Modelos y Vistas
- */
 public class ControladorPrincipal {
 
-    // Modelo principal del sistema
     private ModeloPrincipal modelo;
-
-    // Vistas principales
     private ControladorLogin controladorLogin;
     private VentanaPrincipal ventanaPrincipal;
     private VentanaMedico ventanaMedico;
-
-    // Estado del controlador
-    private boolean sistemaIniciado;
 
     public ControladorPrincipal() {
         inicializarSistema();
     }
 
-    // ================================
-    // INICIALIZACIÓN DEL SISTEMA
-    // ================================
-
     private void inicializarSistema() {
         try {
-            // Crear modelo principal
             modelo = new ModeloPrincipal();
-
-
+            //System.out.println(modelo.generarReporteCompleto()); aqui se cae con un null en actual xd
             controladorLogin = new ControladorLogin(new VentanaLogin(),this);
             controladorLogin.iniciarLogin();
-
-
-            sistemaIniciado = true;
 
         } catch (Exception e) {
             mostrarError("Error al inicializar el sistema: " + e.getMessage());
@@ -54,15 +35,10 @@ public class ControladorPrincipal {
         }
     }
 
-    // ================================
-    // GESTIÓN DE AUTENTICACIÓN
-    // ================================
-
     public boolean autenticarUsuario(String id, String clave) {
         try {
             if (modelo.autenticarUsuario(id, clave)) {
                 Usuario usuario = modelo.getUsuarioActual();
-                // Abrir ventana apropiada según tipo de usuario
                 abrirVentanaSegunTipoUsuario(usuario);
                 return true;
             } else {
@@ -78,7 +54,7 @@ public class ControladorPrincipal {
     private void abrirVentanaSegunTipoUsuario(Usuario usuario) {
         switch (usuario.getTipo()) {
             case MEDICO:
-                abrirVentanaMedico();
+                abrirVentanaPrincipal(TipoUsuario.MEDICO);
                 break;
             case FARMACEUTA:
                 abrirVentanaPrincipal(TipoUsuario.FARMACEUTA);
@@ -93,27 +69,14 @@ public class ControladorPrincipal {
         ventanaPrincipal.setVisible(true);
     }
 
-    private void abrirVentanaMedico() {
-        ventanaMedico = new VentanaMedico(this);
-        ventanaMedico.setVisible(true);
-    }
-
     public void cerrarSesion() {
-        // Cerrar ventanas abiertas
         if (ventanaPrincipal != null) {
             ventanaPrincipal.dispose();
             ventanaPrincipal = null;
         }
 
-        if (ventanaMedico != null) {
-            ventanaMedico.dispose();
-            ventanaMedico = null;
-        }
-
-        // Cerrar sesión en modelo
         modelo.cerrarSesion();
 
-        // Mostrar login nuevamente
         controladorLogin.iniciarLogin();
     }
 
@@ -150,16 +113,10 @@ public class ControladorPrincipal {
 
     public boolean agregarMedico(String id, String nombre, String especialidad) {
         try {
-            if (!modelo.puedeGestionarCatalogos()) {
+            /*if (!modelo.puedeGestionarCatalogos()) {
                 mostrarError("No tiene permisos para gestionar médicos");
                 return false;
-            }
-
-            if (id == null || id.trim().isEmpty() || nombre == null || nombre.trim().isEmpty() ||
-                    especialidad == null || especialidad.trim().isEmpty()) {
-                mostrarError("Todos los campos del médico son obligatorios");
-                return false;
-            }
+            }*/
 
             if (modelo.agregarMedico(id, nombre, especialidad)) {
                 mostrarMensaje("Médico agregado exitosamente");
@@ -176,10 +133,10 @@ public class ControladorPrincipal {
 
     public boolean eliminarMedico(String id) {
         try {
-            if (!modelo.puedeGestionarCatalogos()) {
+            /*if (!modelo.puedeGestionarCatalogos()) {
                 mostrarError("No tiene permisos para gestionar médicos");
                 return false;
-            }
+            }*/
 
             int confirmacion = JOptionPane.showConfirmDialog(
                     null,
@@ -193,7 +150,6 @@ public class ControladorPrincipal {
                     mostrarMensaje("Médico eliminado exitosamente");
                     return true;
                 } else {
-                    mostrarError("No se pudo eliminar el médico");
                     return false;
                 }
             }

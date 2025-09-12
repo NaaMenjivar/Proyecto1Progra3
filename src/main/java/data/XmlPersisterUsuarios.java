@@ -1,5 +1,6 @@
 package data;
 
+import logica.entidades.Administrador;
 import logica.entidades.Farmaceuta;
 import logica.entidades.Medico;
 import logica.entidades.Usuario;
@@ -102,14 +103,26 @@ public class XmlPersisterUsuarios {
                         Medico medico = new Medico(id, nombre, especialidad);
                         medico.setClave(clave);
                         lista.agregarUsuario(medico);
+
                     } else if ("FARMACEUTA".equalsIgnoreCase(tipo)) {
                         Farmaceuta farmaceuta = new Farmaceuta(id, nombre);
                         farmaceuta.setClave(clave);
                         lista.agregarUsuario(farmaceuta);
+
+                    } else if ("ADMINISTRADOR".equalsIgnoreCase(tipo)) {
+                        // Aquí asumo que tienes una clase Administrador que hereda de Usuario
+                        Administrador admin = new Administrador(id, nombre);
+                        admin.setClave(clave);
+                        lista.agregarUsuario(admin);
                     }
                 }
             }
-
+            Usuario user = lista.getUsuarioId("admin");
+            if(user!=null){
+                System.out.println("Se cargo correctamente al usuario admin");
+            }else{
+                System.out.println("No se cargo correctamente al usuario admin");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

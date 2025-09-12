@@ -3,10 +3,6 @@ package presentacion.modelo;
 import logica.gestores.GestorCatalogos;
 import logica.entidades.lista.Lista;
 
-/**
- * Clase abstracta base para todos los modelos del sistema
- * Define la estructura común que deben seguir todos los modelos
- */
 public abstract class AbstractModel {
     protected GestorCatalogos gestorCatalogos;
     protected boolean datosModificados;
@@ -17,7 +13,11 @@ public abstract class AbstractModel {
     }
 
     public AbstractModel(GestorCatalogos gestor) {
-        this.gestorCatalogos = gestor != null ? gestor : new GestorCatalogos();
+        if(gestor != null){
+            this.gestorCatalogos = gestor;
+        }else{
+            this.gestorCatalogos = new GestorCatalogos();
+        }
         this.datosModificados = false;
     }
 
@@ -63,49 +63,27 @@ public abstract class AbstractModel {
         this.datosModificados = true;
     }
 
-    /**
-     * Marca los datos como no modificados
-     */
     public void marcarComoNoModificado() {
         this.datosModificados = false;
     }
 
-    /**
-     * Obtiene el gestor de catálogos
-     */
     public GestorCatalogos getGestorCatalogos() {
         return gestorCatalogos;
     }
 
-    /**
-     * Establece un nuevo gestor de catálogos
-     */
     public void setGestorCatalogos(GestorCatalogos gestor) {
         this.gestorCatalogos = gestor != null ? gestor : new GestorCatalogos();
         marcarComoModificado();
     }
 
-    // ================================
-    // MÉTODOS DE UTILIDAD COMUNES
-    // ================================
-
-    /**
-     * Verifica si una lista es válida (no null y no vacía)
-     */
     protected boolean esListaValida(Lista<?> lista) {
         return lista != null && lista.getTam() > 0;
     }
 
-    /**
-     * Verifica si una cadena es válida (no null y no vacía)
-     */
     protected boolean esCadenaValida(String texto) {
         return texto != null && !texto.trim().isEmpty();
     }
 
-    /**
-     * Obtiene estadísticas básicas del modelo
-     */
     public String getEstadisticas() {
         StringBuilder sb = new StringBuilder();
         sb.append("=== ESTADÍSTICAS DEL MODELO ===\n");

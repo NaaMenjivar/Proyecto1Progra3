@@ -100,6 +100,7 @@ public class XmlPersisterPacientes {
                     lista.agregarPaciente(paciente);
                 }
             }
+            System.out.println("Lista Pacientes creada correctamente desde: " + rutaArchivo);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -25,15 +25,15 @@ public class VentanaLogin {
         SALIRButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+                controlador.cerrarLogin();
             }
         });
         ENTRARButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(!controlador.inicioSesion(IdField.getText(),claveField.getText())){
-                    vaciarCasillas();
-                }
+                controlador.inicioSesion(IdField.getText(),claveField.getText());
+                vaciarCasillas();
+
             }
         });
         CAMBIARCLAVEButton.addActionListener(new ActionListener() {
@@ -52,7 +52,7 @@ public class VentanaLogin {
         SALIRButton.setIcon(ajustarIcono("/Iconos/salir.png", 28, 28));
         ENTRARButton.setIcon(ajustarIcono("/Iconos/check.png", 28, 28));
         CAMBIARCLAVEButton.setIcon(ajustarIcono("/Iconos/iconoCambiarClave.png", 28, 28));
-        loginIcon.setIcon(ajustarIcono("/Iconos/login.jpg",32,32));
+        loginIcon.setIcon(ajustarIcono("/Iconos/login.jpg",42,42));
         loginIcon.setText("");
 
         // Eliminar texto para mostrar solo la imagen

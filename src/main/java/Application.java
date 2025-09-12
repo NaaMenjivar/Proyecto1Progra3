@@ -31,9 +31,8 @@ public class Application {
             try {
                 inicializarSistema();
 
-                agregarDatosListas();
-
-                mostrarInformacionSistema();
+                //agregarDatosListas();
+                //mostrarInformacionSistema();
                 //abrirVentanaPrincipal();
             } catch (Exception e) {
                 mostrarErrorFatal("Error al inicializar el sistema", e);

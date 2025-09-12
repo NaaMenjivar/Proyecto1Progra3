@@ -76,19 +76,21 @@ public class ListaUsuarios implements Iterable<Usuario> {
         return null;
     }
 
-    public boolean autenticarUsuario(String id,String clave){
-        if(cabeza == null || id == null || clave == null){
-            return false;
+    public Usuario autenticarUsuario(String id,String clave){
+        if(cabeza == null){
+            return null;
         }
-
+        if(cabeza.getDato().getClave().equals(clave) && cabeza.getDato().getId().equals(id)){
+            return cabeza.getDato();
+        }
         Nodo<Usuario> aux = cabeza;
         while(aux.getSiguiente() != null){
             if(aux.getDato().getId().equals(id) && aux.getDato().getClave().equals(clave)){
-                return true;
+                return aux.getDato();
             }
             aux = aux.getSiguiente();
         }
-        return false;
+        return null ;
     }
 
     public boolean cambiarClave(Usuario user) throws CatalogoException {

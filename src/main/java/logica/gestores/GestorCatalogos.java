@@ -10,7 +10,6 @@ import logica.excepciones.CatalogoException;
  * Basado en tu implementación existente pero completado
  */
 public class GestorCatalogos {
-    // Datos en memoria - NO persistencia por ahora
     private ListaMedicos listaMedicos;
     private ListaFarmaceutas listaFarmaceutas;
     private ListaPacientes listaPacientes;
@@ -98,7 +97,7 @@ public class GestorCatalogos {
         return listaUsuarios.cambiarClave(user);
     }
 
-    public boolean autenticarUsuario(String id, String clave) {
+    public Usuario autenticarUsuario(String id, String clave) {
         return listaUsuarios.autenticarUsuario(id,clave);
     }
 
@@ -287,9 +286,6 @@ public class GestorCatalogos {
         return true;
     }
 
-    // ================================
-    // MÉTODOS DE CONTEO
-    // ================================
 
     public int contarPacientes() {
         return listaPacientes.getTam();
@@ -307,9 +303,10 @@ public class GestorCatalogos {
         return listaFarmaceutas.getTam();
     }
 
-    // ================================
-    // REPORTES Y ESTADÍSTICAS
-    // ================================
+    public int contarRecetas() {
+        return recetas.getTam();
+    }
+
 
     public String generarReporteGeneral() {
         StringBuilder sb = new StringBuilder();
@@ -407,16 +404,7 @@ public class GestorCatalogos {
         return recetasPorEstado;
     }
 
-    /**
-     * Obtiene el total de recetas en el sistema
-     */
-    public int contarRecetas() {
-        return recetas.getTam();
-    }
 
-    /**
-     * Agrega una receta al sistema (para prescripciones)
-     */
     public boolean agregarReceta(Receta receta) throws CatalogoException {
         if (receta == null) {
             throw new CatalogoException("La receta no puede ser null");
