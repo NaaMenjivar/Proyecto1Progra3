@@ -17,16 +17,11 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
 public class XmlPersisterMedicos {
-    private String archivo;
-
-    public XmlPersisterMedicos(String archivo) {
-        this.archivo = archivo;
-    }
 
     /**
      * Guarda un catálogo de médicos en un archivo XML
      */
-    public void guardar(ListaMedicos catalogo) {
+    public static void guardar(ListaMedicos catalogo, String archivo) {
         try {
             // Crear documento XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -65,7 +60,7 @@ public class XmlPersisterMedicos {
     /**
      * Carga médicos desde el XML y retorna un CatalogoMedicos
      */
-    public ListaMedicos cargar() {
+    public static ListaMedicos cargar(String archivo) {
         ListaMedicos catalogo = new ListaMedicos();
 
         try {
@@ -115,7 +110,7 @@ public class XmlPersisterMedicos {
     /**
      * Método auxiliar para crear nodos XML
      */
-    private void crearElemento(Document doc, Element parent, String tagName, String valor) {
+    private static void crearElemento(Document doc, Element parent, String tagName, String valor) {
         Element elem = doc.createElement(tagName);
         elem.appendChild(doc.createTextNode(valor != null ? valor : ""));
         parent.appendChild(elem);

@@ -1,10 +1,9 @@
 package logica.gestores;
 
+import data.*;
 import logica.entidades.*;
 import logica.entidades.lista.*;
 import logica.excepciones.CatalogoException;
-
-import java.time.LocalDate;
 
 /**
  * Gestor único para todos los catálogos del sistema
@@ -28,6 +27,24 @@ public class GestorCatalogos {
         this.listaUsuarios = new ListaUsuarios();
         this.medicamentos = new CatalogoMedicamentos();
         this.recetas = new Lista<>();
+    }
+
+    public void guardarDatos(){
+        XmlPersisterMedicos.guardar(listaMedicos,"medicos.xml");
+        XmlPersisterFarmaceutas.guardar(listaFarmaceutas, "farmaceutas.xml");
+        XmlPersisterPacientes.guardar(listaPacientes,"pacientes.xml");
+        XmlPersisterUsuarios.guardar(listaUsuarios,"usuarios.xml");
+        XmlPersisterMedicamentos.guardar(medicamentos,"medicamentos.xml");
+        XmlPersisterRecetas.guardar(recetas,"recetas.xml");
+    }
+
+    public void cargarDatos(){
+        listaMedicos = XmlPersisterMedicos.cargar("medicos.xml");
+        listaFarmaceutas = XmlPersisterFarmaceutas.cargar("farmaceutas.xml");
+        listaPacientes = XmlPersisterPacientes.cargar("pacientes.xml");
+        listaUsuarios = XmlPersisterUsuarios.cargar("usuarios.xml");
+        medicamentos = XmlPersisterMedicamentos.cargar("medicamentos.xml");
+        recetas = XmlPersisterRecetas.cargar("recetas.xml");
     }
 
     // ================================

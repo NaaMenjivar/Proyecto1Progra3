@@ -15,7 +15,7 @@ import java.io.File;
 
 public class XmlPersisterUsuarios {
 
-    public void guardar(ListaUsuarios lista, String rutaArchivo) {
+    public static void guardar(ListaUsuarios lista, String rutaArchivo) {
     try {
         // Crear documento XML
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -68,7 +68,7 @@ public class XmlPersisterUsuarios {
 /**
  * Carga una ListaUsuarios desde un archivo XML.
  */
-    public ListaUsuarios cargar(String rutaArchivo) {
+    public static ListaUsuarios cargar(String rutaArchivo) {
         ListaUsuarios lista = new ListaUsuarios();
         File archivo = new File(rutaArchivo);
 
@@ -117,7 +117,7 @@ public class XmlPersisterUsuarios {
     }
 
 
-    private void crearElemento(Document doc, Element padre, String nombre, String valor) {
+    private static void crearElemento(Document doc, Element padre, String nombre, String valor) {
         Element elemento = doc.createElement(nombre);
         elemento.appendChild(doc.createTextNode(valor));
         padre.appendChild(elemento);

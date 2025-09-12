@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Usuarios>
+  <Usuario tipo="Administrador">
+    <ID>ADMIN</ID>
+    <Nombre>Administrador</Nombre>
+    <Clave>ADMIN</Clave>
+  </Usuario>
+  <Usuario tipo="Farmaceuta">
+    <ID>FARM001</ID>
+    <Nombre>María González</Nombre>
+    <Clave>FARM001</Clave>
+  </Usuario>
+  <Usuario tipo="Medico">
+    <ID>MED001</ID>
+    <Nombre>Dr. Juan Pérez</Nombre>
+    <Clave>MED001</Clave>
+    <Especialidad>Medicina General</Especialidad>
+  </Usuario>
+</Usuarios>

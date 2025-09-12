@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Medicos>
+    <Medico>
+        <Id>MED001</Id>
+        <Nombre>Dr. Juan Pérez</Nombre>
+        <Clave>MED001</Clave>
+        <Especialidad>Medicina General</Especialidad>
+    </Medico>
+</Medicos>

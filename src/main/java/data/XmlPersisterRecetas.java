@@ -17,10 +17,7 @@ public class XmlPersisterRecetas {
 
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    /**
-     * Guarda la lista de recetas en un archivo XML.
-     */
-    public void guardar(Lista<Receta> lista, String rutaArchivo) {
+    public static void guardar(Lista<Receta> lista, String rutaArchivo) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -73,10 +70,7 @@ public class XmlPersisterRecetas {
         }
     }
 
-    /**
-     * Carga la lista de recetas desde un archivo XML.
-     */
-    public Lista<Receta> cargar(String rutaArchivo) {
+    public static Lista<Receta> cargar(String rutaArchivo) {
         Lista<Receta> lista = new Lista<>();
         File archivo = new File(rutaArchivo);
 
@@ -142,8 +136,7 @@ public class XmlPersisterRecetas {
         return lista;
     }
 
-    // Método auxiliar para crear elementos XML con texto
-    private void crearElemento(Document doc, Element padre, String nombre, String valor) {
+    private static void crearElemento(Document doc, Element padre, String nombre, String valor) {
         Element elemento = doc.createElement(nombre);
         elemento.appendChild(doc.createTextNode(valor != null ? valor : ""));
         padre.appendChild(elemento);

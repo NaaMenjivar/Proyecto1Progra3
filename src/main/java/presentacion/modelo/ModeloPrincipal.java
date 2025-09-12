@@ -34,7 +34,8 @@ public class ModeloPrincipal extends AbstractModel {
     @Override
     public void inicializar() {
         // Crear datos de prueba si es necesario
-        crearDatosPrueba();
+        /*crearDatosPrueba();*/
+        gestorCatalogos.cargarDatos();
         marcarComoNoModificado();
     }
 

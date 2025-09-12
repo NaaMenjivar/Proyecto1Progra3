@@ -20,7 +20,7 @@ public class XmlPersisterPacientes {
     /**
      * Guarda la lista de pacientes en un archivo XML.
      */
-    public void guardar(ListaPacientes lista, String rutaArchivo) {
+    public static void guardar(ListaPacientes lista, String rutaArchivo) {
         try {
             // Crear el documento XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -64,7 +64,7 @@ public class XmlPersisterPacientes {
     /**
      * Carga la lista de pacientes desde un archivo XML.
      */
-    public ListaPacientes cargar(String rutaArchivo) {
+    public static ListaPacientes cargar(String rutaArchivo) {
         ListaPacientes lista = new ListaPacientes();
         File archivo = new File(rutaArchivo);
 
@@ -111,7 +111,7 @@ public class XmlPersisterPacientes {
     /**
      * Método de ayuda para crear elementos XML con texto.
      */
-    private void crearElemento(Document doc, Element padre, String nombre, String valor) {
+    private static void crearElemento(Document doc, Element padre, String nombre, String valor) {
         Element elemento = doc.createElement(nombre);
         elemento.appendChild(doc.createTextNode(valor));
         padre.appendChild(elemento);

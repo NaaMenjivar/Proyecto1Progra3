@@ -17,16 +17,8 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
 public class XmlPersisterFarmaceutas {
-    private String archivo;
 
-    public XmlPersisterFarmaceutas(String archivo) {
-        this.archivo = archivo;
-    }
-
-    /**
-     * Guarda una lista de farmaceutas en un archivo XML
-     */
-    public void guardar(ListaFarmaceutas listaFarmaceutas) {
+    public static void guardar(ListaFarmaceutas listaFarmaceutas, String archivo) {
         try {
             // Crear documento XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -66,7 +58,7 @@ public class XmlPersisterFarmaceutas {
     /**
      * Carga farmaceutas desde un archivo XML y los retorna en una ListaFarmaceutas
      */
-    public ListaFarmaceutas cargar() {
+    public static ListaFarmaceutas cargar(String archivo) {
         ListaFarmaceutas lista = new ListaFarmaceutas();
 
         try {
@@ -111,10 +103,7 @@ public class XmlPersisterFarmaceutas {
         return lista;
     }
 
-    /**
-     * Método auxiliar para crear nodos XML
-     */
-    private void crearElemento(Document doc, Element parent, String tagName, String valor) {
+    private static void crearElemento(Document doc, Element parent, String tagName, String valor) {
         Element elem = doc.createElement(tagName);
         elem.appendChild(doc.createTextNode(valor != null ? valor : ""));
         parent.appendChild(elem);

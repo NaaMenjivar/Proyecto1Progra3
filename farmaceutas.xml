@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Farmaceutas>
+  <Farmaceuta>
+    <Id>FARM001</Id>
+    <Nombre>María González</Nombre>
+    <Clave>FARM001</Clave>
+  </Farmaceuta>
+</Farmaceutas>

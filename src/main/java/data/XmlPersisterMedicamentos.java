@@ -20,7 +20,7 @@ import java.io.File;
 
 public class XmlPersisterMedicamentos {
 
-    public void guardar(CatalogoMedicamentos catalogo, String archivo) {
+    public static void guardar(CatalogoMedicamentos catalogo, String archivo) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -71,7 +71,7 @@ public class XmlPersisterMedicamentos {
         }
     }
 
-    public CatalogoMedicamentos cargar(String archivo) {
+    public static CatalogoMedicamentos cargar(String archivo) {
         CatalogoMedicamentos catalogo = new CatalogoMedicamentos();
 
         try {
