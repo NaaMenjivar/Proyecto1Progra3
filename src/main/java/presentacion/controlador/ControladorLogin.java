@@ -53,7 +53,7 @@ public class ControladorLogin {
 
         JFrame frame = new JFrame("Cambiar Clave");
         frame.setContentPane(ventanaClave.getPanelClave());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(400,400);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
@@ -62,8 +62,7 @@ public class ControladorLogin {
     public void cerrarVentanaClave(){
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(ventanaClave.getPanelClave());
         if(frame != null){
-            frame.dispose(); //cierra
-            //frame.remove(ventanaClave.getPanelClave());
+            frame.dispose();
         }
         JFrame frameLogin = (JFrame) SwingUtilities.getWindowAncestor(ventanaLogin.getVentanaLogin());
         frameLogin.setVisible(true);

@@ -6,8 +6,8 @@ public class Administrador extends Usuario {
         this.tipo = TipoUsuario.ADMINISTRADOR;
     }
 
-    public Administrador(String id, String nombre, String clave) {
-        super(id, nombre, clave, TipoUsuario.ADMINISTRADOR);
+    public Administrador(String id, String nombre) {
+        super(id, nombre, id, TipoUsuario.ADMINISTRADOR);
     }
 
     // Métodos específicos

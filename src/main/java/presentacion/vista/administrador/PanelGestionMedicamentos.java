@@ -1,5 +1,7 @@
 package presentacion.vista.administrador;
 
+import logica.entidades.lista.CatalogoMedicamentos;
+import logica.entidades.lista.ListaMedicos;
 import presentacion.controlador.ControladorPrincipal;
 import presentacion.modelo.TableModelPrincipal;
 import logica.entidades.*;
@@ -203,16 +205,14 @@ public class PanelGestionMedicamentos {
             if (criterio.isEmpty()) {
                 cargarTodosMedicamentos();
             } else {
-                Lista<Medicamento> medicamentosEncontrados = controlador.getModelo().buscarMedicamentosPorDescripcion(criterio);
+                Medicamento medicamentosEncontrados = controlador.getModelo().buscarMedicamentosPorDescripcion(criterio);
                 Lista<Object> datos = new Lista<>();
 
-                for (int i = 0; i < medicamentosEncontrados.getTam(); i++) {
-                    datos.agregarFinal(medicamentosEncontrados.obtenerPorPos(i));
-                }
+                datos.agregarInicio(medicamentosEncontrados);
 
                 tableModel.setDatos(datos);
 
-                if (medicamentosEncontrados.getTam() == 0) {
+                if (medicamentosEncontrados == null) {
                     JOptionPane.showMessageDialog(panelPrincipal,
                             "No se encontraron medicamentos con el criterio: " + criterio,
                             "Sin resultados",
@@ -254,11 +254,11 @@ public class PanelGestionMedicamentos {
 
     private void cargarTodosMedicamentos() {
         try {
-            Lista<Medicamento> medicamentos = controlador.getModelo().obtenerMedicamentos();
+            CatalogoMedicamentos medicamentos = controlador.getModelo().obtenerMedicamentos();
             Lista<Object> datos = new Lista<>();
 
-            for (int i = 0; i < medicamentos.getTam(); i++) {
-                datos.agregarFinal(medicamentos.obtenerPorPos(i));
+            for (Medicamento medicamento : medicamentos) {
+                datos.agregarFinal(medicamentos);
             }
 
             tableModel.setDatos(datos);

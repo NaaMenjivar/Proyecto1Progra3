@@ -1,5 +1,6 @@
 package presentacion.vista.medico;
 
+import logica.entidades.lista.CatalogoMedicamentos;
 import presentacion.controlador.ControladorPrincipal;
 import presentacion.modelo.TableModelPrincipal;
 import logica.entidades.*;
@@ -154,13 +155,11 @@ public class VenatanaAgregarMedicamento extends JDialog {
             if (criterio.isEmpty()) {
                 cargarTodosMedicamentos();
             } else {
-                Lista<Medicamento> medicamentos = controlador.getModelo().obtenerMedicamentos();
+                CatalogoMedicamentos medicamentos = controlador.getModelo().obtenerMedicamentos();
                 Lista<Object> medicamentosFiltrados = new Lista<>();
 
-                for (int i = 0; i < medicamentos.getTam(); i++) {
-                    Medicamento medicamento = medicamentos.obtenerPorPos(i);
+                for (Medicamento medicamento : medicamentos) {;
                     boolean coincide = false;
-
                     switch (atributoSeleccionado) {
                         case "Nombre":
                             coincide = medicamento.getNombre().toLowerCase().contains(criterio.toLowerCase());
@@ -303,11 +302,11 @@ public class VenatanaAgregarMedicamento extends JDialog {
 
     private void cargarTodosMedicamentos() {
         try {
-            Lista<Medicamento> todosMedicamentos = controlador.getModelo().obtenerMedicamentos();
+            CatalogoMedicamentos todosMedicamentos = controlador.getModelo().obtenerMedicamentos();
             Lista<Object> datos = new Lista<>();
 
-            for (int i = 0; i < todosMedicamentos.getTam(); i++) {
-                datos.agregarFinal(todosMedicamentos.obtenerPorPos(i));
+            for (Medicamento medicamento : todosMedicamentos) {
+                datos.agregarFinal(medicamento);
             }
 
             tableModel.setDatos(datos);
@@ -326,11 +325,10 @@ public class VenatanaAgregarMedicamento extends JDialog {
         }
     }
 
-    private void verificarMedicamentosBajoStock(Lista<Medicamento> medicamentos) {
+    private void verificarMedicamentosBajoStock(CatalogoMedicamentos medicamentos) {
         Lista<Medicamento> medicamentosBajoStock = new Lista<>();
 
-        for (int i = 0; i < medicamentos.getTam(); i++) {
-            Medicamento med = medicamentos.obtenerPorPos(i);
+        for (Medicamento med : medicamentos) {
             if (med.getStock() <= 10) {
                 medicamentosBajoStock.agregarFinal(med);
             }

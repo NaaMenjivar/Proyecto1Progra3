@@ -1,8 +1,9 @@
 package logica.gestores;
 
 import logica.entidades.*;
+import logica.entidades.lista.*;
 import logica.excepciones.CatalogoException;
-import logica.entidades.lista.Lista;
+
 import java.time.LocalDate;
 
 /**
@@ -11,16 +12,21 @@ import java.time.LocalDate;
  */
 public class GestorCatalogos {
     // Datos en memoria - NO persistencia por ahora
-    private Lista<Usuario> usuarios;
-    private Lista<Paciente> pacientes;
-    private Lista<Medicamento> medicamentos;
+    private ListaMedicos listaMedicos;
+    private ListaFarmaceutas listaFarmaceutas;
+    private ListaPacientes listaPacientes;
+    private ListaUsuarios listaUsuarios;
+
+    private CatalogoMedicamentos medicamentos;
     private Lista<Receta> recetas; // Para prescripciones y despacho
 
     public GestorCatalogos() {
         // Inicializar listas vacías
-        this.usuarios = new Lista<>();
-        this.pacientes = new Lista<>();
-        this.medicamentos = new Lista<>();
+        this.listaMedicos = new ListaMedicos();
+        this.listaFarmaceutas = new ListaFarmaceutas();
+        this.listaPacientes = new ListaPacientes();
+        this.listaUsuarios = new ListaUsuarios();
+        this.medicamentos = new CatalogoMedicamentos();
         this.recetas = new Lista<>();
     }
 
@@ -43,8 +49,13 @@ public class GestorCatalogos {
 
         // Establecer clave igual al ID por defecto
         medico.setClave(medico.getId());
-        usuarios.agregarFinal(medico);
+        listaMedicos.agregarMedico(medico);
+        listaUsuarios.agregarUsuario(medico);
         return true;
+    }
+
+    public void agregarUsuario(Usuario usuario) {
+        listaUsuarios.agregarUsuario(usuario);
     }
 
     public boolean agregarFarmaceuta(Farmaceuta farmaceuta) throws CatalogoException {
@@ -61,76 +72,49 @@ public class GestorCatalogos {
         }
 
         farmaceuta.setClave(farmaceuta.getId());
-        usuarios.agregarFinal(farmaceuta);
+        listaFarmaceutas.agregarFarmaceuta(farmaceuta);
+        listaUsuarios.agregarUsuario(farmaceuta);
         return true;
     }
 
-    public boolean actualizarUsuario(Usuario usuario) throws CatalogoException {
-        if (usuario == null) {
-            throw new CatalogoException("Usuario no puede ser null");
-        }
+    public boolean cambiarClave(Usuario user) throws CatalogoException {
+        return listaUsuarios.cambiarClave(user);
+    }
 
-        if (!existeUsuario(usuario.getId())) {
-            throw new CatalogoException("Usuario no existe: " + usuario.getId());
-        }
+    public boolean autenticarUsuario(String id, String clave) {
+        return listaUsuarios.autenticarUsuario(id,clave);
+    }
 
-        return usuarios.actualizarPorId(usuario.getId(), usuario);
+    public Usuario buscarUsuarioId(String id) {
+        return listaUsuarios.getUsuarioId(id);
+    }
+
+    public ListaMedicos buscarMedicos() {
+        return listaMedicos;
+    }
+
+    public Medico buscarMedicoId(String id){
+        return listaMedicos.buscarMedicoId(id);
+    }
+
+    public ListaFarmaceutas buscarFarmaceutas() {
+        return listaFarmaceutas;
+    }
+
+    public Medico buscarMedicosPorNombre(String nombre) {
+        return listaMedicos.buscarMedicoNombre(nombre);
+    }
+
+    public Farmaceuta buscarFarmaceutaId(String id) {
+        return listaFarmaceutas.buscarFarmaceutaId(id);
+    }
+
+    public Farmaceuta buscarFarmaceutasPorNombre(String nombre) {
+        return listaFarmaceutas.buscarFarmaceutaNombre(nombre);
     }
 
     public boolean eliminarUsuario(String id) throws CatalogoException {
-        if (!existeUsuario(id)) {
-            throw new CatalogoException("Usuario no existe: " + id);
-        }
-
-        return usuarios.eliminarPorId(id);
-    }
-
-    public Lista<Usuario> buscarMedicos() {
-        Lista<Usuario> medicos = new Lista<>();
-        for (int i = 0; i < usuarios.getTam(); i++) {
-            Usuario usuario = usuarios.obtenerPorPos(i);
-            if (usuario instanceof Medico) {
-                medicos.agregarFinal(usuario);
-            }
-        }
-        return medicos;
-    }
-
-    public Lista<Usuario> buscarFarmaceutas() {
-        Lista<Usuario> farmaceutas = new Lista<>();
-        for (int i = 0; i < usuarios.getTam(); i++) {
-            Usuario usuario = usuarios.obtenerPorPos(i);
-            if (usuario instanceof Farmaceuta) {
-                farmaceutas.agregarFinal(usuario);
-            }
-        }
-        return farmaceutas;
-    }
-
-    public Lista<Usuario> buscarMedicosPorNombre(String nombre) {
-        Lista<Usuario> resultado = new Lista<>();
-        Lista<Usuario> medicos = buscarMedicos();
-
-        for (int i = 0; i < medicos.getTam(); i++) {
-            Usuario medico = medicos.obtenerPorPos(i);
-            if (medico.getNombre().toLowerCase().contains(nombre.toLowerCase())) {
-                resultado.agregarFinal(medico);
-            }
-        }
-        return resultado;
-    }
-
-    public Lista<Usuario> buscarFarmaceutasPorNombre(String nombre) {
-        Lista<Usuario> resultado = new Lista<>();
-        Lista<Usuario> farmaceutas = buscarFarmaceutas();
-
-        for (int i = 0; i < farmaceutas.getTam(); i++) {
-            Usuario farmaceuta = farmaceutas.obtenerPorPos(i);
-            if (farmaceuta.getNombre().toLowerCase().contains(nombre.toLowerCase())) {
-                resultado.agregarFinal(farmaceuta);
-            }
-        }
-        return resultado;
+        return listaUsuarios.eliminarUsuario(id);
     }
 
     // ================================
@@ -146,20 +130,16 @@ public class GestorCatalogos {
             throw new CatalogoException("Ya existe un paciente con el ID: " + paciente.getId());
         }
 
-        pacientes.agregarFinal(paciente);
+        listaPacientes.agregarPaciente(paciente);
         return true;
     }
 
+    public Paciente buscarPacientePorId(String id) {
+        return listaPacientes.buscarPacienteId(id);
+    }
+
     public boolean actualizarPaciente(Paciente paciente) throws CatalogoException {
-        if (paciente == null) {
-            throw new CatalogoException("Paciente no puede ser null");
-        }
-
-        if (!existePaciente(paciente.getId())) {
-            throw new CatalogoException("Paciente no existe: " + paciente.getId());
-        }
-
-        return pacientes.actualizarPorId(paciente.getId(), paciente);
+        return listaPacientes.actualizarPaciente(paciente);
     }
 
     public boolean eliminarPaciente(String id) throws CatalogoException {
@@ -167,22 +147,15 @@ public class GestorCatalogos {
             throw new CatalogoException("Paciente no existe: " + id);
         }
 
-        return pacientes.eliminarPorId(id);
+        return listaPacientes.eliminarPaciente(id);
     }
 
-    public Lista<Paciente> obtenerTodosPacientes() {
-        return pacientes;
+    public ListaPacientes obtenerTodosPacientes() {
+        return listaPacientes;
     }
 
-    public Lista<Paciente> buscarPacientesPorNombre(String nombre) {
-        Lista<Paciente> resultado = new Lista<>();
-        for (int i = 0; i < pacientes.getTam(); i++) {
-            Paciente p = pacientes.obtenerPorPos(i);
-            if (p.getNombre().toLowerCase().contains(nombre.toLowerCase())) {
-                resultado.agregarFinal(p);
-            }
-        }
-        return resultado;
+    public Paciente buscarPacientesPorNombre(String nombre) {
+        return listaPacientes.buscarPacienteNombre(nombre);
     }
 
     // ================================
@@ -198,20 +171,16 @@ public class GestorCatalogos {
             throw new CatalogoException("Ya existe un medicamento con el código: " + medicamento.getCodigo());
         }
 
-        medicamentos.agregarFinal(medicamento);
+        medicamentos.agregarMedicamento(medicamento);
         return true;
     }
 
-    public Lista<Medicamento> buscarMedicamentosPorDescripcion(String descripcion) {
-        Lista<Medicamento> resultado = new Lista<>();
-        for (int i = 0; i < medicamentos.getTam(); i++) {
-            Medicamento m = medicamentos.obtenerPorPos(i);
-            if (m.getNombre().toLowerCase().contains(descripcion.toLowerCase()) ||
-                    m.getPresentacion().toLowerCase().contains(descripcion.toLowerCase())) {
-                resultado.agregarFinal(m);
-            }
-        }
-        return resultado;
+    public Medicamento buscarMedicamentoPorCodigo(String codigo) {
+        return medicamentos.buscarMedicamentoCodigo(codigo);
+    }
+
+    public Medicamento buscarMedicamentosPorDescripcion(String descripcion) {
+        return medicamentos.buscarMedicamentoDescripcion(descripcion);
     }
 
     public boolean actualizarMedicamento(Medicamento medicamento) throws CatalogoException {
@@ -223,7 +192,7 @@ public class GestorCatalogos {
             throw new CatalogoException("Medicamento no existe: " + medicamento.getCodigo());
         }
 
-        return medicamentos.actualizarPorId(medicamento.getCodigo(), medicamento);
+        return medicamentos.modificarMedicamento(medicamento.getCodigo(), medicamento);
     }
 
     public boolean eliminarMedicamento(String codigo) throws CatalogoException {
@@ -231,22 +200,15 @@ public class GestorCatalogos {
             throw new CatalogoException("Medicamento no existe: " + codigo);
         }
 
-        return medicamentos.eliminarPorId(codigo);
+        return medicamentos.eliminarMedicamento(codigo);
     }
 
-    public Lista<Medicamento> obtenerTodosMedicamentos() {
+    public CatalogoMedicamentos obtenerTodosMedicamentos() {
         return medicamentos;
     }
 
-    public Lista<Medicamento> obtenerMedicamentosBajoStock(int umbral) {
-        Lista<Medicamento> resultado = new Lista<>();
-        for (int i = 0; i < medicamentos.getTam(); i++) {
-            Medicamento m = medicamentos.obtenerPorPos(i);
-            if (m.getStock() <= umbral) {
-                resultado.agregarFinal(m);
-            }
-        }
-        return resultado;
+    public CatalogoMedicamentos obtenerMedicamentosBajoStock(int umbral) {
+        return medicamentos.medicamentosBajoStock(umbral);
     }
 
     // ================================
@@ -313,7 +275,7 @@ public class GestorCatalogos {
     // ================================
 
     public int contarPacientes() {
-        return pacientes.getTam();
+        return listaPacientes.getTam();
     }
 
     public int contarMedicamentos() {
@@ -321,11 +283,11 @@ public class GestorCatalogos {
     }
 
     public int contarMedicos() {
-        return buscarMedicos().getTam();
+        return listaMedicos.getTam();
     }
 
     public int contarFarmaceutas() {
-        return buscarFarmaceutas().getTam();
+        return listaFarmaceutas.getTam();
     }
 
     // ================================
@@ -342,16 +304,9 @@ public class GestorCatalogos {
         sb.append("Recetas en el sistema: ").append(contarRecetas()).append("\n\n");
 
         // Medicamentos con stock bajo
-        Lista<Medicamento> bajoStock = obtenerMedicamentosBajoStock(10);
+        CatalogoMedicamentos bajoStock = obtenerMedicamentosBajoStock(10);
         sb.append("Medicamentos con stock bajo (≤10): ").append(bajoStock.getTam()).append("\n");
-        if (bajoStock.getTam() > 0) {
-            sb.append("\nMedicamentos con stock crítico:\n");
-            for (int i = 0; i < bajoStock.getTam(); i++) {
-                Medicamento med = bajoStock.obtenerPorPos(i);
-                sb.append("- ").append(med.getCodigoYNombre())
-                        .append(" (Stock: ").append(med.getStock()).append(")\n");
-            }
-        }
+        sb.append(bajoStock.toString());
 
         return sb.toString();
     }
@@ -372,15 +327,15 @@ public class GestorCatalogos {
     }
 
     private boolean existeUsuario(String id) {
-        return usuarios.buscarPorId(id) != null;
+        return listaUsuarios.existeUsuarioId(id);
     }
 
     private boolean existePaciente(String id) {
-        return pacientes.buscarPorId(id) != null;
+        return listaPacientes.buscarPacienteId(id) != null;
     }
 
     private boolean existeMedicamento(String codigo) {
-        return medicamentos.buscarPorId(codigo) != null;
+        return medicamentos.buscarMedicamentoCodigo(codigo) != null;
     }
 
     /**

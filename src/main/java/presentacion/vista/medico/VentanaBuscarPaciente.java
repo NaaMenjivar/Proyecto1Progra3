@@ -1,5 +1,6 @@
 package presentacion.vista.medico;
 
+import logica.entidades.lista.ListaPacientes;
 import presentacion.controlador.ControladorPrincipal;
 import presentacion.modelo.TableModelPrincipal;
 import logica.entidades.*;
@@ -127,11 +128,10 @@ public class VentanaBuscarPaciente extends JDialog {
             if (criterio.isEmpty()) {
                 cargarTodosPacientes();
             } else {
-                Lista<Paciente> pacientes = controlador.getModelo().obtenerPacientes();
+                ListaPacientes pacientes = controlador.getModelo().obtenerPacientes();
                 Lista<Object> pacientesFiltrados = new Lista<>();
 
-                for (int i = 0; i < pacientes.getTam(); i++) {
-                    Paciente paciente = pacientes.obtenerPorPos(i);
+                for (Paciente paciente : pacientes) {
                     boolean coincide = false;
 
                     switch (atributoSeleccionado) {
@@ -170,11 +170,11 @@ public class VentanaBuscarPaciente extends JDialog {
 
     private void cargarTodosPacientes() {
         try {
-            Lista<Paciente> pacientes = controlador.getModelo().obtenerPacientes();
+            ListaPacientes pacientes = controlador.getModelo().obtenerPacientes();
             Lista<Object> datos = new Lista<>();
 
-            for (int i = 0; i < pacientes.getTam(); i++) {
-                datos.agregarFinal(pacientes.obtenerPorPos(i));
+            for (Paciente paciente : pacientes) {
+                datos.agregarFinal(paciente);
             }
 
             tableModel.setDatos(datos);

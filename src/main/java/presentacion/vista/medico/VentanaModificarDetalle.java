@@ -106,7 +106,7 @@ public class VentanaModificarDetalle extends JDialog {
 
         try {
             medicamentoInfo = controlador.getModelo().getGestorCatalogos()
-                    .obtenerTodosMedicamentos().buscarPorId(detalleOriginal.getCodigoMedicamento());
+                    .obtenerTodosMedicamentos().buscarMedicamentoCodigo(detalleOriginal.getCodigoMedicamento());
         } catch (Exception e) {
             // Manejar error silenciosamente
         }

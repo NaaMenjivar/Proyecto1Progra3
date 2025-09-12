@@ -1,5 +1,6 @@
 package presentacion.vista.administrador;
 
+import logica.entidades.lista.ListaFarmaceutas;
 import presentacion.controlador.ControladorPrincipal;
 import presentacion.modelo.TableModelPrincipal;
 import logica.entidades.*;
@@ -179,17 +180,10 @@ public class PanelGestionFarmaceutas {
             if (criterio.isEmpty()) {
                 cargarTodosFarmaceutas();
             } else {
-                Lista<Farmaceuta> farmaceutas = controlador.getModelo().obtenerFarmaceutas();
+                Farmaceuta farmaceuta = controlador.getModelo().buscarFarmaceutaId(criterio);
                 Lista<Object> datos = new Lista<>();
 
-                // Buscar por nombre
-                for (int i = 0; i < farmaceutas.getTam(); i++) {
-                    Farmaceuta farmaceuta = farmaceutas.obtenerPorPos(i);
-                    if (farmaceuta.getNombre().toLowerCase().contains(criterio.toLowerCase()) ||
-                            farmaceuta.getId().toLowerCase().contains(criterio.toLowerCase())) {
-                        datos.agregarFinal(farmaceuta);
-                    }
-                }
+                datos.agregarFinal(farmaceuta);
 
                 tableModel.setDatos(datos);
 
@@ -233,11 +227,11 @@ public class PanelGestionFarmaceutas {
 
     private void cargarTodosFarmaceutas() {
         try {
-            Lista<Farmaceuta> farmaceutas = controlador.getModelo().obtenerFarmaceutas();
+            ListaFarmaceutas farmaceutas = controlador.getModelo().obtenerFarmaceutas();
             Lista<Object> datos = new Lista<>();
 
-            for (int i = 0; i < farmaceutas.getTam(); i++) {
-                datos.agregarFinal(farmaceutas.obtenerPorPos(i));
+            for (Farmaceuta farmaceuta :  farmaceutas) {
+                datos.agregarFinal(farmaceuta);
             }
 
             tableModel.setDatos(datos);

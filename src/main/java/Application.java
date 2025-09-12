@@ -1,3 +1,4 @@
+import logica.entidades.TipoUsuario;
 import presentacion.controlador.ControladorLogin;
 import presentacion.controlador.ControladorPrincipal;
 import presentacion.modelo.ModeloLogin;
@@ -29,6 +30,9 @@ public class Application {
         SwingUtilities.invokeLater(() -> {
             try {
                 inicializarSistema();
+
+                agregarDatosListas();
+
                 mostrarInformacionSistema();
                 //abrirVentanaPrincipal();
             } catch (Exception e) {
@@ -71,7 +75,8 @@ public class Application {
             System.out.println("Abriendo ventana principal...");
 
             // Crear la ventana principal pasando el controlador
-            ventanaPrincipal = new VentanaPrincipal(controlador);
+            TipoUsuario tipo = TipoUsuario.MEDICO;
+            ventanaPrincipal = new VentanaPrincipal(controlador,tipo);
 
             // Configurar la ventana
             configurarVentanaPrincipal();
@@ -263,5 +268,12 @@ public class Application {
         }
 
         System.out.println("=".repeat(40));
+    }
+
+    public static void agregarDatosListas(){
+        controlador.agregarMedico("1234","juan","oculista");
+        controlador.agregarMedico("5678","miguel","general");
+        controlador.agregarMedico("91011","ricardo","fisioterapeuta");
+        controlador.agregarMedico("1213","fiona","familiar");
     }
 }

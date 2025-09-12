@@ -10,6 +10,7 @@ public abstract class Usuario {
     private boolean sesionActiva = false;
 
     public Usuario(){
+
     }
 
     public Usuario(String id, String nombre, String clave, TipoUsuario tipo) {

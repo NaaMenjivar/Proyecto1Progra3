@@ -1,7 +1,7 @@
 package logica.entidades;
 
 public enum TipoUsuario{
-    MEDICO("Médico"),
+    MEDICO("Medico"),
     FARMACEUTA("Farmaceuta"),
     ADMINISTRADOR("Administrador");
 

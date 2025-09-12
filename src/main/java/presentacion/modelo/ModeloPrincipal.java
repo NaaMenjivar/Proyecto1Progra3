@@ -1,8 +1,8 @@
 package presentacion.modelo;
 
+import logica.entidades.lista.*;
 import logica.gestores.GestorCatalogos;
 import logica.entidades.*;
-import logica.entidades.lista.Lista;
 import logica.excepciones.CatalogoException;
 import java.time.LocalDate;
 
@@ -68,31 +68,10 @@ public class ModeloPrincipal extends AbstractModel {
     // ================================
 
     public boolean autenticarUsuario(String id, String clave) {
-        if (!esCadenaValida(id) || !esCadenaValida(clave)) {
-            return false;
+        if(gestorCatalogos.autenticarUsuario(id,clave)){
+            usuarioActual = gestorCatalogos.buscarUsuarioId(id);
+            return true;
         }
-
-        Lista<Usuario> medicos = gestorCatalogos.buscarMedicos();
-        for (int i = 0; i < medicos.getTam(); i++) {
-            Usuario usuario = medicos.obtenerPorPos(i);
-            if (usuario.getId().equals(id) && usuario.getClave().equals(clave)) {
-                usuarioActual = usuario;
-                marcarComoModificado();
-                return true;
-            }
-        }
-
-        Lista<Usuario> farmaceutas = gestorCatalogos.buscarFarmaceutas();
-        for (int i = 0; i < farmaceutas.getTam(); i++) {
-            Usuario usuario = farmaceutas.obtenerPorPos(i);
-            if (usuario.getId().equals(id) && usuario.getClave().equals(clave)) {
-                usuarioActual = usuario;
-                marcarComoModificado();
-                return true;
-            }
-        }
-
-        // TODO: Agregar autenticación para administradores cuando se implemente
         return false;
     }
 
@@ -105,7 +84,7 @@ public class ModeloPrincipal extends AbstractModel {
 
         try {
             usuarioActual.setClave(claveNueva);
-            boolean resultado = gestorCatalogos.actualizarUsuario(usuarioActual);
+            boolean resultado = gestorCatalogos.cambiarClave(usuarioActual);
             if (resultado) {
                 marcarComoModificado();
             }
@@ -134,7 +113,7 @@ public class ModeloPrincipal extends AbstractModel {
         if (!antesDeModificar()) return false;
 
         try {
-            Medico medico = new Medico(id, nombre, id, especialidad); // clave = id inicialmente
+            Medico medico = new Medico(id, nombre, especialidad); // clave = id inicialmente
             boolean resultado = gestorCatalogos.agregarMedico(medico);
             if (resultado) {
                 despuesDeModificar();
@@ -159,30 +138,12 @@ public class ModeloPrincipal extends AbstractModel {
         }
     }
 
-    public Lista<Medico> obtenerMedicos() {
-        Lista<Usuario> usuarios = gestorCatalogos.buscarMedicos();
-        Lista<Medico> medicos = new Lista<>();
-
-        for (int i = 0; i < usuarios.getTam(); i++) {
-            Usuario usuario = usuarios.obtenerPorPos(i);
-            if (usuario instanceof Medico) {
-                medicos.agregarFinal((Medico) usuario);
-            }
-        }
-        return medicos;
+    public ListaMedicos obtenerMedicos() {
+        return gestorCatalogos.buscarMedicos();
     }
 
-    public Lista<Medico> buscarMedicosPorNombre(String nombre) {
-        Lista<Usuario> usuarios = gestorCatalogos.buscarMedicosPorNombre(nombre);
-        Lista<Medico> medicos = new Lista<>();
-
-        for (int i = 0; i < usuarios.getTam(); i++) {
-            Usuario usuario = usuarios.obtenerPorPos(i);
-            if (usuario instanceof Medico) {
-                medicos.agregarFinal((Medico) usuario);
-            }
-        }
-        return medicos;
+    public Medico buscarMedicosPorNombre(String nombre) {
+        return gestorCatalogos.buscarMedicosPorNombre(nombre);
     }
 
     // ================================
@@ -193,7 +154,7 @@ public class ModeloPrincipal extends AbstractModel {
         if (!antesDeModificar()) return false;
 
         try {
-            Farmaceuta farmaceuta = new Farmaceuta(id, nombre, id); // clave = id inicialmente
+            Farmaceuta farmaceuta = new Farmaceuta(id, nombre); // clave = id inicialmente
             boolean resultado = gestorCatalogos.agregarFarmaceuta(farmaceuta);
             if (resultado) {
                 despuesDeModificar();
@@ -204,17 +165,12 @@ public class ModeloPrincipal extends AbstractModel {
         }
     }
 
-    public Lista<Farmaceuta> obtenerFarmaceutas() {
-        Lista<Usuario> usuarios = gestorCatalogos.buscarFarmaceutas();
-        Lista<Farmaceuta> farmaceutas = new Lista<>();
+    public Farmaceuta buscarFarmaceutaId(String id) {
+        return gestorCatalogos.buscarFarmaceutaId(id);
+    }
 
-        for (int i = 0; i < usuarios.getTam(); i++) {
-            Usuario usuario = usuarios.obtenerPorPos(i);
-            if (usuario instanceof Farmaceuta) {
-                farmaceutas.agregarFinal((Farmaceuta) usuario);
-            }
-        }
-        return farmaceutas;
+    public ListaFarmaceutas obtenerFarmaceutas() {
+        return gestorCatalogos.buscarFarmaceutas();
     }
 
     // ================================
@@ -236,11 +192,11 @@ public class ModeloPrincipal extends AbstractModel {
         }
     }
 
-    public Lista<Paciente> obtenerPacientes() {
+    public ListaPacientes obtenerPacientes() {
         return gestorCatalogos.obtenerTodosPacientes();
     }
 
-    public Lista<Paciente> buscarPacientesPorNombre(String nombre) {
+    public Paciente buscarPacientesPorNombre(String nombre) {
         return gestorCatalogos.buscarPacientesPorNombre(nombre);
     }
 
@@ -273,11 +229,11 @@ public class ModeloPrincipal extends AbstractModel {
         }
     }
 
-    public Lista<Medicamento> obtenerMedicamentos() {
+    public CatalogoMedicamentos obtenerMedicamentos() {
         return gestorCatalogos.obtenerTodosMedicamentos();
     }
 
-    public Lista<Medicamento> buscarMedicamentosPorDescripcion(String descripcion) {
+    public Medicamento buscarMedicamentosPorDescripcion(String descripcion) {
         return gestorCatalogos.buscarMedicamentosPorDescripcion(descripcion);
     }
 
@@ -471,36 +427,15 @@ public class ModeloPrincipal extends AbstractModel {
     // ================================
 
     private Paciente buscarPacientePorId(String id) {
-        Lista<Paciente> pacientes = gestorCatalogos.obtenerTodosPacientes();
-        for (int i = 0; i < pacientes.getTam(); i++) {
-            Paciente p = pacientes.obtenerPorPos(i);
-            if (p.getId().equals(id)) {
-                return p;
-            }
-        }
-        return null;
+        return gestorCatalogos.buscarPacientePorId(id);
     }
 
     private Medico buscarMedicoPorId(String id) {
-        Lista<Usuario> medicos = gestorCatalogos.buscarMedicos();
-        for (int i = 0; i < medicos.getTam(); i++) {
-            Usuario u = medicos.obtenerPorPos(i);
-            if (u instanceof Medico && u.getId().equals(id)) {
-                return (Medico) u;
-            }
-        }
-        return null;
+        return gestorCatalogos.buscarMedicoId(id);
     }
 
     private Medicamento buscarMedicamentoPorCodigo(String codigo) {
-        Lista<Medicamento> medicamentos = gestorCatalogos.obtenerTodosMedicamentos();
-        for (int i = 0; i < medicamentos.getTam(); i++) {
-            Medicamento m = medicamentos.obtenerPorPos(i);
-            if (m.getCodigo().equals(codigo)) {
-                return m;
-            }
-        }
-        return null;
+        return gestorCatalogos.buscarMedicamentoPorCodigo(codigo);
     }
 
     // ================================
@@ -530,18 +465,18 @@ public class ModeloPrincipal extends AbstractModel {
         try {
             // Crear médico de prueba
             if (gestorCatalogos.contarMedicos() == 0) {
-                Medico medico = new Medico("MED001", "Dr. Juan Pérez", "MED001", "Medicina General");
+                Medico medico = new Medico("MED001", "Dr. Juan Pérez", "Medicina General");
                 gestorCatalogos.agregarMedico(medico);
             }
 
             // Crear farmaceuta de prueba
             if (gestorCatalogos.contarFarmaceutas() == 0) {
-                Farmaceuta farmaceuta = new Farmaceuta("FARM001", "María González", "FARM001");
+                Farmaceuta farmaceuta = new Farmaceuta("FARM001", "María González");
                 gestorCatalogos.agregarFarmaceuta(farmaceuta);
             }
+            Usuario adminAux = new Administrador("ADMIN", "Administrador");
 
-            // Crear administrador de prueba
-            // TODO: Implementar cuando se tenga la clase Administrador
+            gestorCatalogos.agregarUsuario(adminAux);
 
         } catch (CatalogoException e) {
             // Silenciar errores de datos de prueba

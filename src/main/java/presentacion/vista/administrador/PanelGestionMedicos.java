@@ -1,5 +1,6 @@
 package presentacion.vista.administrador;
 
+import logica.entidades.lista.ListaMedicos;
 import presentacion.controlador.ControladorPrincipal;
 import presentacion.modelo.TableModelPrincipal;
 import logica.entidades.*;
@@ -181,16 +182,14 @@ public class PanelGestionMedicos {
             if (criterio.isEmpty()) {
                 cargarTodosMedicos();
             } else {
-                Lista<Medico> medicosEncontrados = controlador.getModelo().buscarMedicosPorNombre(criterio);
+                Medico medicosEncontrados = controlador.getModelo().buscarMedicosPorNombre(criterio);
                 Lista<Object> datos = new Lista<>();
 
-                for (int i = 0; i < medicosEncontrados.getTam(); i++) {
-                    datos.agregarFinal(medicosEncontrados.obtenerPorPos(i));
-                }
+                datos.agregarFinal(medicosEncontrados);
 
                 tableModel.setDatos(datos);
 
-                if (medicosEncontrados.getTam() == 0) {
+                if (medicosEncontrados == null) {
                     JOptionPane.showMessageDialog(panelPrincipal,
                             "No se encontraron médicos con el criterio: " + criterio,
                             "Sin resultados",
@@ -231,11 +230,11 @@ public class PanelGestionMedicos {
 
     private void cargarTodosMedicos() {
         try {
-            Lista<Medico> medicos = controlador.getModelo().obtenerMedicos();
+            ListaMedicos medicos = controlador.getModelo().obtenerMedicos();
             Lista<Object> datos = new Lista<>();
 
-            for (int i = 0; i < medicos.getTam(); i++) {
-                datos.agregarFinal(medicos.obtenerPorPos(i));
+            for (Medico medico : medicos) {
+                datos.agregarFinal(medico);
             }
 
             tableModel.setDatos(datos);

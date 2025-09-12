@@ -7,8 +7,8 @@ public class Medico extends Usuario {
         super();
         this.tipo = TipoUsuario.MEDICO;
     }
-    public Medico(String id, String nombre, String clave, String especialidad) {
-        super(id, nombre, clave, TipoUsuario.MEDICO);
+    public Medico(String id, String nombre, String especialidad) {
+        super(id, nombre, id, TipoUsuario.MEDICO);
         this.especialidad = especialidad;
     }
 

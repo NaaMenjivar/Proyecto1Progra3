@@ -2,6 +2,7 @@ package presentacion.controlador;
 
 import logica.entidades.*;
 import logica.entidades.lista.Lista;
+import logica.entidades.lista.ListaPacientes;
 import presentacion.modelo.*;
 import presentacion.vista.sistema.VentanaLogin;
 import presentacion.vista.principal.VentanaPrincipal;
@@ -40,7 +41,7 @@ public class ControladorPrincipal {
             // Crear modelo principal
             modelo = new ModeloPrincipal();
 
-            //Crear ventana de login
+
             controladorLogin = new ControladorLogin(new VentanaLogin(),this);
             controladorLogin.iniciarLogin();
 
@@ -77,24 +78,25 @@ public class ControladorPrincipal {
     private void abrirVentanaSegunTipoUsuario(Usuario usuario) {
         switch (usuario.getTipo()) {
             case MEDICO:
-                //abrirVentanaMedico();
+                abrirVentanaMedico();
                 break;
             case FARMACEUTA:
+                abrirVentanaPrincipal(TipoUsuario.FARMACEUTA);
             case ADMINISTRADOR:
-                abrirVentanaPrincipal();
+                abrirVentanaPrincipal(TipoUsuario.ADMINISTRADOR);
                 break;
         }
     }
 
-    private void abrirVentanaPrincipal() {
-        ventanaPrincipal = new VentanaPrincipal(this);
+    private void abrirVentanaPrincipal(TipoUsuario tipoUsuario) {
+        ventanaPrincipal = new VentanaPrincipal(this, tipoUsuario);
         ventanaPrincipal.setVisible(true);
     }
 
-    /*private void abrirVentanaMedico() {
+    private void abrirVentanaMedico() {
         ventanaMedico = new VentanaMedico(this);
         ventanaMedico.setVisible(true);
-    }*/
+    }
 
     public void cerrarSesion() {
         // Cerrar ventanas abiertas
@@ -103,17 +105,16 @@ public class ControladorPrincipal {
             ventanaPrincipal = null;
         }
 
-        /*if (ventanaMedico != null) {
+        if (ventanaMedico != null) {
             ventanaMedico.dispose();
             ventanaMedico = null;
-        }*/
+        }
 
         // Cerrar sesión en modelo
         modelo.cerrarSesion();
 
         // Mostrar login nuevamente
-        //ventanaLogin.limpiarCampos();
-        //ventanaLogin.setVisible(true);
+        controladorLogin.iniciarLogin();
     }
 
     public boolean cambiarClave(String claveActual, String claveNueva, String confirmarClave) {
@@ -131,7 +132,7 @@ public class ControladorPrincipal {
             }
 
             if (modelo.cambiarClave(claveActual, claveNueva)) {
-                mostrarMensaje("Contraseña cambiada exitosamente");
+                mostrarMensaje("La contraseña se cambio exitosamente");
                 return true;
             } else {
                 mostrarError("No se pudo cambiar la contraseña. Verifique la clave actual");
@@ -307,13 +308,12 @@ public class ControladorPrincipal {
             }
 
             // Buscar paciente por ID
-            Lista<Paciente> pacientes = modelo.obtenerPacientes();
+            ListaPacientes pacientes = modelo.obtenerPacientes();
             Paciente pacienteEncontrado = null;
 
-            for (int i = 0; i < pacientes.getTam(); i++) {
-                Paciente p = pacientes.obtenerPorPos(i);
-                if (p.getId().equals(idPaciente)) {
-                    pacienteEncontrado = p;
+            for (Paciente paciente : pacientes) {
+                if (paciente.getId().equals(idPaciente)) {
+                    pacienteEncontrado = paciente;
                     break;
                 }
             }
