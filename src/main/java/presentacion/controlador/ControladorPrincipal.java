@@ -6,7 +6,6 @@ import logica.entidades.lista.ListaPacientes;
 import presentacion.modelo.*;
 import presentacion.vista.sistema.VentanaLogin;
 import presentacion.vista.principal.VentanaPrincipal;
-import presentacion.vista.principal.VentanaMedico;
 
 import javax.swing.*;
 import java.time.LocalDate;
@@ -16,7 +15,6 @@ public class ControladorPrincipal {
     private ModeloPrincipal modelo;
     private ControladorLogin controladorLogin;
     private VentanaPrincipal ventanaPrincipal;
-    private VentanaMedico ventanaMedico;
 
     public ControladorPrincipal() {
         inicializarSistema();
