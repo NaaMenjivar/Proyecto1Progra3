@@ -8,7 +8,6 @@ import java.time.LocalDate;
 
 public class ModeloPrincipal extends AbstractModel {
 
-    // Estado actual del sistema
     private Usuario usuarioActual;
     private Paciente pacienteSeleccionado;
     private Receta recetaActual;
@@ -100,9 +99,6 @@ public class ModeloPrincipal extends AbstractModel {
         return usuarioActual;
     }
 
-    // ================================
-    // GESTIÓN DE MÉDICOS
-    // ================================
 
     public boolean agregarMedico(String id, String nombre, String especialidad) {
         if (!antesDeModificar()) return false;
@@ -270,6 +266,10 @@ public class ModeloPrincipal extends AbstractModel {
     // GESTIÓN DE RECETAS
     // ================================
 
+    public void agregarReceta(Receta receta) throws CatalogoException {
+        gestorCatalogos.agregarReceta(receta);
+    }
+
     public void iniciarNuevaReceta(LocalDate fechaRetiro) {
         if (pacienteSeleccionado != null && usuarioActual != null) {
             String numeroReceta = generarNumeroReceta();
@@ -311,6 +311,10 @@ public class ModeloPrincipal extends AbstractModel {
 
     public Receta getRecetaActual() {
         return recetaActual;
+    }
+
+    public Lista<Receta> obtenerRecetas(){
+        return gestorCatalogos.obtenerTodasRecetas();
     }
 
     public Lista<Receta> obtenerRecetasPorPaciente(String idPaciente) {

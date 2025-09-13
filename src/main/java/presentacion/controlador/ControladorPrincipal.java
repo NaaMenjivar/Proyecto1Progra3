@@ -1,8 +1,10 @@
 package presentacion.controlador;
 
 import logica.entidades.*;
+import logica.entidades.lista.CatalogoMedicamentos;
 import logica.entidades.lista.Lista;
 import logica.entidades.lista.ListaPacientes;
+import logica.excepciones.CatalogoException;
 import presentacion.modelo.*;
 import presentacion.vista.sistema.VentanaLogin;
 import presentacion.vista.principal.VentanaPrincipal;
@@ -257,9 +259,6 @@ public class ControladorPrincipal {
         }
     }
 
-    // ================================
-    // GESTIÓN DE PACIENTES
-    // ================================
 
     public boolean agregarPaciente(String id, String nombre, LocalDate fechaNacimiento, String telefono) {
         try {
@@ -286,9 +285,10 @@ public class ControladorPrincipal {
         }
     }
 
-    // ================================
-    // GESTIÓN DE MEDICAMENTOS
-    // ================================
+    public ListaPacientes getListaPacientes() {
+        return modelo.obtenerPacientes();
+    }
+
 
     public boolean agregarMedicamento(String codigo, String nombre, String presentacion, int stock) {
         try {
@@ -320,9 +320,13 @@ public class ControladorPrincipal {
         }
     }
 
-    // ================================
-    // GESTIÓN DE PRESCRIPCIÓN
-    // ================================
+    public CatalogoMedicamentos getMedicamentos(){
+        return modelo.obtenerMedicamentos();
+    }
+
+    public void agregarReceta(Receta receta) throws CatalogoException {
+        modelo.agregarReceta(receta);
+    }
 
     public boolean iniciarNuevaReceta(String idPaciente, LocalDate fechaRetiro) {
         try {
@@ -331,7 +335,6 @@ public class ControladorPrincipal {
                 return false;
             }
 
-            // Buscar paciente por ID
             ListaPacientes pacientes = modelo.obtenerPacientes();
             Paciente pacienteEncontrado = null;
 
@@ -409,10 +412,6 @@ public class ControladorPrincipal {
         }
     }
 
-    // ================================
-    // GESTIÓN DE DESPACHO
-    // ================================
-
     public boolean cambiarEstadoReceta(String numeroReceta, EstadoReceta nuevoEstado) {
         try {
             if (!modelo.puedeDespachar()) {
@@ -432,10 +431,6 @@ public class ControladorPrincipal {
             return false;
         }
     }
-
-    // ================================
-    // MÉTODOS PARA HISTÓRICO - ARQUITECTURA MVC CORRECTA
-    // ================================
 
     public Lista<Receta> obtenerRecetasDelMedicoActual() {
         try {
@@ -478,10 +473,6 @@ public class ControladorPrincipal {
         }
     }
 
-    // ================================
-    // MÉTODOS PARA TODAS LAS RECETAS (ADMINISTRADOR)
-    // ================================
-
     public Lista<Receta> obtenerTodasLasRecetas() {
         try {
             if (!modelo.puedeGestionarCatalogos()) {
@@ -510,10 +501,6 @@ public class ControladorPrincipal {
         }
     }
 
-    // ================================
-    // GETTERS PARA LAS VISTAS
-    // ================================
-
     public ModeloPrincipal getModelo() {
         return modelo;
     }
@@ -526,9 +513,6 @@ public class ControladorPrincipal {
         return modelo.generarReporteCompleto();
     }
 
-    // ================================
-    // MÉTODOS DE UTILIDAD
-    // ================================
 
     private void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
@@ -537,18 +521,6 @@ public class ControladorPrincipal {
     private void mostrarMensaje(String mensaje) {
         JOptionPane.showMessageDialog(null, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
     }
-
-    /*
-    Arreglar
-    public void mostrarVentanaCambiarClave() {
-        VentanaCambiarClave ventana = new VentanaCambiarClave(null);
-        ventana.setControlador(this);
-        ventana.setVisible(true);
-    }*/
-
-    // ================================
-    // MÉTODOS PARA CERRAR APLICACIÓN
-    // ================================
 
     public void cerrarAplicacion() {
         int confirmacion = JOptionPane.showConfirmDialog(

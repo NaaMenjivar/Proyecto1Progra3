@@ -29,7 +29,7 @@ public class Receta {
         this.fechaRetiro = fechaRetiro;
     }
 
-    // Getters y Setters
+
     public String getNumeroReceta() {
         return numeroReceta;
     }

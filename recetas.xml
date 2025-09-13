@@ -1,2 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Recetas/>
+<Recetas>
+  <Receta>
+    <NumeroReceta>REC-1757804374308</NumeroReceta>
+    <IdPaciente>0983</IdPaciente>
+    <IdMedico>admin</IdMedico>
+    <FechaConfeccion>13/09/2025</FechaConfeccion>
+    <FechaRetiro>13/09/2025</FechaRetiro>
+    <Estado>PROCESO</Estado>
+    <Detalles>
+      <Detalle>
+        <CodigoMedicamento>01</CodigoMedicamento>
+        <Cantidad>12</Cantidad>
+        <Indicaciones>12</Indicaciones>
+        <DuracionDias>12</DuracionDias>
+      </Detalle>
+    </Detalles>
+  </Receta>
+  <Receta>
+    <NumeroReceta>REC-1757806893329</NumeroReceta>
+    <IdPaciente>0983</IdPaciente>
+    <IdMedico>admin</IdMedico>
+    <FechaConfeccion>13/09/2025</FechaConfeccion>
+    <FechaRetiro>13/09/2025</FechaRetiro>
+    <Estado>PROCESO</Estado>
+    <Detalles>
+      <Detalle>
+        <CodigoMedicamento>02</CodigoMedicamento>
+        <Cantidad>12</Cantidad>
+        <Indicaciones>12</Indicaciones>
+        <DuracionDias>12</DuracionDias>
+      </Detalle>
+    </Detalles>
+  </Receta>
+</Recetas>

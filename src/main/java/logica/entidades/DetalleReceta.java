@@ -58,7 +58,6 @@ public class DetalleReceta {
         return cantidad + (cantidad == 1 ? " unidad" : " unidades");
     }
 
-    // Métodos propios de Object
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -67,10 +66,6 @@ public class DetalleReceta {
         return Objects.equals(codigoMedicamento, that.codigoMedicamento);
     }
 
-    /*@Override
-    public int hashCode() {
-        return Objects.hash(codigoMedicamento);
-    }*/
 
     @Override
     public String toString() {

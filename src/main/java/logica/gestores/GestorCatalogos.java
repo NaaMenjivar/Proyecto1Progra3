@@ -19,7 +19,6 @@ public class GestorCatalogos {
     private Lista<Receta> recetas; // Para prescripciones y despacho
 
     public GestorCatalogos() {
-        // Inicializar listas vacías
         this.listaMedicos = new ListaMedicos();
         this.listaFarmaceutas = new ListaFarmaceutas();
         this.listaPacientes = new ListaPacientes();

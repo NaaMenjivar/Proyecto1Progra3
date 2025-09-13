@@ -6,10 +6,19 @@ public class Medicamento {
     private String codigo;
     private String nombre;
     private String presentacion;
+    private String indicaciones;
+    private int cantidad;
+    private int duracion;
     private int stock;
 
     public Medicamento(){
+        this.codigo = "";
+        this.nombre = "";
+        this.presentacion = "";
         stock = 0;
+        this.cantidad = 0;
+        this.duracion = 0;
+        this.indicaciones = "";
     }
 
     public Medicamento(String codigo, String nombre, String presentacion) {
@@ -17,6 +26,9 @@ public class Medicamento {
         this.nombre = nombre;
         this.presentacion = presentacion;
         stock = 0;
+        this.cantidad = 0;
+        this.duracion = 0;
+        this.indicaciones = "";
     }
 
     public String getCodigo() {
@@ -40,12 +52,26 @@ public class Medicamento {
     public int getStock() {
         return stock;
     }
-
+    public String getIndicaciones() {return indicaciones; }
+    public void setIndicaciones(String indicaciones) {
+        this.indicaciones = indicaciones;
+    }
+    public int getDuracion() {
+        return duracion;
+    }
+    public void setDuracion(int duracion) {
+        this.duracion = duracion;
+    }
+    public int getCantidad() {
+        return cantidad;
+    }
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
     public void setStock(int stock) {
         this.stock = stock;
     }
 
-    // Métodos específicos
     public String getDescripcionCompleta(){
         return nombre + " - " + presentacion;
     }
@@ -60,7 +86,6 @@ public class Medicamento {
                 presentacion != null && !presentacion.trim().isEmpty();
     }
 
-    // Métodos propios de Object
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -68,11 +93,6 @@ public class Medicamento {
         Medicamento medicamento = (Medicamento) o;
         return Objects.equals(codigo, medicamento.codigo);
     }
-
-    /*@Override
-    public int hashCode() {
-        return Objects.hash(codigo);
-    }*/
 
     @Override
     public String toString() {

@@ -22,6 +22,7 @@ public class VentanaPrincipal extends JFrame {
     private JPanel dashboardPanel;
     private JPanel historicoPanel;
     private JPanel acercaDePanel;
+    private JPanel prescribir;
 
     private final ControladorPrincipal controlador;
 
@@ -33,6 +34,7 @@ public class VentanaPrincipal extends JFrame {
     private PanelDashboard panelDashboard;
     private PanelHistorico panelHistorico;
     private PanelAcercaDe panelAcercaDe;
+    private PanelPrescribir prescribirPanel;
 
     private final TipoUsuario tipoUsuario;
 
@@ -73,9 +75,12 @@ public class VentanaPrincipal extends JFrame {
                 panelDespacho = new PanelDespacho(controlador);
                 panelDashboard = new PanelDashboard(controlador);
                 panelHistorico = new PanelHistorico(controlador);
+                prescribirPanel = new PanelPrescribir(controlador);
                 panelAcercaDe = new PanelAcercaDe();
+
             }break;
             case MEDICO:{
+                prescribirPanel = new PanelPrescribir(controlador);
                 panelDashboard = new PanelDashboard(controlador);
                 panelHistorico = new PanelHistorico(controlador);
                 panelAcercaDe = new PanelAcercaDe();
@@ -99,6 +104,7 @@ public class VentanaPrincipal extends JFrame {
                 dashboardPanel.setLayout(new BorderLayout());
                 historicoPanel.setLayout(new BorderLayout());
                 acercaDePanel.setLayout(new BorderLayout());
+                prescribir.setLayout(new BorderLayout());
 
 
                 medicosPanel.add(panelGestionMedicos.getPanelPrincipal(), BorderLayout.CENTER);
@@ -109,11 +115,13 @@ public class VentanaPrincipal extends JFrame {
                 dashboardPanel.add(panelDashboard.getPanelPrincipal(), BorderLayout.CENTER);
                 historicoPanel.add(panelHistorico.getPanelPrincipal(), BorderLayout.CENTER);
                 acercaDePanel.add(panelAcercaDe.getPanelPrincipal(), BorderLayout.CENTER);
+                prescribir.add(prescribirPanel.getPanelPrincipal(),BorderLayout.CENTER);
 
                 panelTabs.addTab("Médicos", ajustarIcono("/Iconos/medico.png",30,30), medicosPanel);
                 panelTabs.addTab("Farmacéutas", ajustarIcono("/Iconos/farmaceuta.png",30,30), farmaceutasPanel);
                 panelTabs.addTab("Pacientes", ajustarIcono("/Iconos/pasciente.png",30,30), pacientesPanel);
                 panelTabs.addTab("Medicamentos", ajustarIcono("/Iconos/medicamentos.png",30,30), medicamentosPanel);
+                panelTabs.addTab("Prescribir",ajustarIcono("/Iconos/prescribir.png",30,30), prescribir);
                 panelTabs.addTab("Despacho", ajustarIcono("/Iconos/despacho.png",30,30), despachoPanel);
                 panelTabs.addTab("Dashboard", ajustarIcono("/Iconos/dashboard.png",30,30), dashboardPanel);
                 panelTabs.addTab("Histórico", ajustarIcono("/Iconos/historico.png",30,30), historicoPanel);
@@ -125,12 +133,15 @@ public class VentanaPrincipal extends JFrame {
                 dashboardPanel.setLayout(new BorderLayout());
                 historicoPanel.setLayout(new BorderLayout());
                 acercaDePanel.setLayout(new BorderLayout());
+                prescribir.setLayout(new BorderLayout());
 
                 despachoPanel.add(panelDespacho.getPanelPrincipal(), BorderLayout.CENTER);
                 dashboardPanel.add(panelDashboard.getPanelPrincipal(), BorderLayout.CENTER);
                 historicoPanel.add(panelHistorico.getPanelPrincipal(), BorderLayout.CENTER);
                 acercaDePanel.add(panelAcercaDe.getPanelPrincipal(), BorderLayout.CENTER);
+                prescribir.add(prescribirPanel.getPanelPrincipal(),BorderLayout.CENTER);
 
+                panelTabs.addTab("Prescribir",ajustarIcono("/Iconos/prescribir.png",30,30), prescribir);
                 panelTabs.addTab("Despacho", ajustarIcono("/Iconos/despacho.png",30,30), despachoPanel);
                 panelTabs.addTab("Dashboard", ajustarIcono("/Iconos/dashboard.png",30,30), dashboardPanel);
                 panelTabs.addTab("Histórico", ajustarIcono("/Iconos/historico.png",30,30), historicoPanel);
