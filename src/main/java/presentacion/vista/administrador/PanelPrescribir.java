@@ -51,9 +51,6 @@ public class PanelPrescribir {
         inicializarComponentes();
         configurarEventos();
         cargarDatos();
-
-        buscarPacienteButton.addActionListener(e -> mostrarPopupBusquedaPacientes());
-        agregarMedicamentoButton.addActionListener(e -> mostrarPopupBusquedaMedicamentos());
     }
 
     public void inicializarComponentes(){
@@ -92,7 +89,10 @@ public class PanelPrescribir {
     }
 
     private void configurarEventos() {
-
+        buscarPacienteButton.addActionListener(e -> mostrarPopupBusquedaPacientes());
+        agregarMedicamentoButton.addActionListener(e -> mostrarPopupBusquedaMedicamentos());
+        limpiarButton.addActionListener(e -> limpiarFormulario());
+        descartarMedicamentosButton.addActionListener(e -> descartarMedicamentoSeleccionado());
     }
 
     public void cargarDatos(){
@@ -385,7 +385,118 @@ public class PanelPrescribir {
         return "REC-" + System.currentTimeMillis();
     }
 
-    // Métodos auxiliares
+    private void limpiarFormulario() {
+        modeloRecetas.setRowCount(0);
+
+        actual = null;
+        medicamentoSeleccionado = null;
+
+        if (pacienteActualText != null) {
+            pacienteActualText.setText("Paciente actual: Ninguno");
+        }
+
+        JOptionPane.showMessageDialog(panelPrincipal,
+                "Se ha limpiado el formulario correctamente.",
+                "Información",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void descartarMedicamentoSeleccionado() {
+        if (actual == null) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Debe seleccionar un paciente antes de descartar medicamentos.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int filaSeleccionada = tablaRecetas.getSelectedRow();
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Seleccione un medicamento de la tabla para descartarlo.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String nombreMedicamento = tablaRecetas.getValueAt(filaSeleccionada, 0).toString();
+
+        Medicamento medSeleccionado = controlador.getMedicamentos().buscarMedicamentoNombre(nombreMedicamento);
+        if (medSeleccionado == null) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "No se encontró el medicamento en el catálogo.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Lista<Receta> recetas = controlador.getModelo().obtenerTodasLasRecetas();
+        Receta recetaPaciente = null;
+        for (Receta r : recetas) {
+            if (r.getIdPaciente().equals(actual.getId())) {
+                recetaPaciente = r;
+                break;
+            }
+        }
+
+        if (recetaPaciente == null) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "No se encontró una receta para el paciente actual.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Lista<DetalleReceta> detalles = recetaPaciente.getDetalles();
+        DetalleReceta detalleAEliminar = null;
+
+        for (DetalleReceta d : detalles) {
+            if (d.getCodigoMedicamento().equals(medSeleccionado.getCodigo())) {
+                detalleAEliminar = d;
+                break;
+            }
+        }
+
+        if (detalleAEliminar != null) {
+            detalles.eliminar(detalleAEliminar);
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "El medicamento ha sido eliminado correctamente.",
+                    "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            cargarRecetasPorPaciente(actual.getId()); // actualizar tabla
+        } else {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "No se encontró el medicamento en la receta.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void cargarRecetasPorPaciente(String idPaciente) {
+        modeloRecetas.setRowCount(0);
+
+        Lista<Receta> recetas = controlador.getModelo().obtenerTodasLasRecetas();
+
+        for (Receta receta : recetas) {
+            if (receta.getIdPaciente().equals(idPaciente)) {
+                for (DetalleReceta detalle : receta.getDetalles()) {
+                    Medicamento med = controlador.getMedicamentos().buscarMedicamentoCodigo(detalle.getCodigoMedicamento());
+                    if (med != null) {
+                        modeloRecetas.addRow(new Object[]{
+                                med.getCodigo(),
+                                med.getNombre(),
+                                med.getPresentacion(),
+                                detalle.getCantidad(),
+                                detalle.getIndicaciones(),
+                                detalle.getDuracionDias()
+                        });
+                    }
+                }
+            }
+        }
+    }
+
     public JPanel getPanelPrincipal(){ return panelPrincipal; }
     public Paciente getPacienteActual(){ return actual; }
 }

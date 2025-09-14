@@ -59,6 +59,17 @@ public class CatalogoMedicamentos implements Iterable<Medicamento> {
         return null;
     }
 
+    public Medicamento buscarMedicamentoNombre(String nombre){
+        Nodo<Medicamento> actual = cabeza;
+        while (actual != null) {
+            if (actual.getDato().getNombre().equalsIgnoreCase(nombre)) {
+                return actual.getDato();
+            }
+            actual = actual.getSiguiente();
+        }
+        return null;
+    }
+
     public Medicamento buscarMedicamentoDescripcion(String descripcion){
         Nodo<Medicamento> actual = cabeza;
         while (actual != null) {

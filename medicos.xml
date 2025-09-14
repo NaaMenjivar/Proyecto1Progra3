@@ -8,12 +8,6 @@
     </Medico>
     <Medico>
         <Id>MED002</Id>
-        <Nombre>Joaquin</Nombre>
-        <Clave>MED002</Clave>
-        <Especialidad>Medicina General</Especialidad>
-    </Medico>
-    <Medico>
-        <Id>MED002</Id>
         <Nombre>Miguel</Nombre>
         <Clave>MED002</Clave>
         <Especialidad>Medicina General</Especialidad>

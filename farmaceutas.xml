@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Farmaceutas>
   <Farmaceuta>
-    <Id>37637</Id>
-    <Nombre>ABI</Nombre>
-    <Clave>37637</Clave>
-  </Farmaceuta>
-  <Farmaceuta>
     <Id>FARM001</Id>
     <Nombre>María González</Nombre>
     <Clave>FARM001</Clave>

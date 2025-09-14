@@ -32,4 +32,20 @@
       </Detalle>
     </Detalles>
   </Receta>
+  <Receta>
+    <NumeroReceta>REC-1757807745203</NumeroReceta>
+    <IdPaciente>0983</IdPaciente>
+    <IdMedico>admin</IdMedico>
+    <FechaConfeccion>13/09/2025</FechaConfeccion>
+    <FechaRetiro>13/09/2025</FechaRetiro>
+    <Estado>PROCESO</Estado>
+    <Detalles>
+      <Detalle>
+        <CodigoMedicamento>02</CodigoMedicamento>
+        <Cantidad>15</Cantidad>
+        <Indicaciones>tarde</Indicaciones>
+        <DuracionDias>18</DuracionDias>
+      </Detalle>
+    </Detalles>
+  </Receta>
 </Recetas>
