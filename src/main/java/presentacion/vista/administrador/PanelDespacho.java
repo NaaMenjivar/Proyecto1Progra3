@@ -2,7 +2,9 @@ package presentacion.vista.administrador;
 
 import presentacion.controlador.ControladorPrincipal;
 import presentacion.modelo.TableModelPrincipal;
-import logica.entidades.*;
+import logica.entidades.Receta;
+import logica.entidades.EstadoReceta;
+import logica.entidades.Paciente;
 import logica.entidades.lista.Lista;
 
 import javax.swing.*;
@@ -10,192 +12,257 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDate;
 
-/**
- * Panel de Despacho - Vista MVC
- * Implementa el proceso de despacho de recetas según especificaciones del PDF
- */
 public class PanelDespacho {
-    // Componentes del formulario (declarados en el .form)
+    private ControladorPrincipal controlador;
     private JPanel panelPrincipal;
-    private JTextField idPacienteFld;
+    private JTextField txtIdPaciente;
     private JButton buscar;
     private JTable table1;
-    private JButton cambiarEstado;
+    private JButton cambiarEstadoBoton;
+    private JLabel idPacienteLbl;
+    private JPanel panelBusqueda;
+    private JPanel panelRecetas;
+    private JPanel panelCambiarEstado;
 
-    // MVC Components
-    private ControladorPrincipal controlador;
     private TableModelPrincipal tableModel;
-    private Receta recetaSeleccionada = null;
+    private Lista<Receta> recetasPaciente;
+    private Receta recetaSeleccionada;
 
     public PanelDespacho(ControladorPrincipal controlador) {
         this.controlador = controlador;
-        inicializarComponentes();
-        configurarEventos();
-        cargarRecetasDisponibles();
+        this.recetasPaciente = new Lista<>();
+        this.recetaSeleccionada = null;
+        inicializar();
     }
 
-    private void inicializarComponentes() {
-        // Configurar tabla de recetas
+    private void inicializar() {
+        configurarComponentes();
+        configurarEventos();
+        cargarTablaVacia();
+    }
+
+    private void configurarComponentes() {
         tableModel = TableModelPrincipal.crearModeloRecetas();
-        table1.setModel(tableModel);
-        table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Configurar columnas
-        table1.getColumnModel().getColumn(0).setPreferredWidth(120); // Número
-        table1.getColumnModel().getColumn(1).setPreferredWidth(80);  // ID Paciente
-        table1.getColumnModel().getColumn(2).setPreferredWidth(80);  // ID Médico
-        table1.getColumnModel().getColumn(3).setPreferredWidth(100); // Fecha
-        table1.getColumnModel().getColumn(4).setPreferredWidth(100); // Estado
+        if (table1 != null) {
+            table1.setModel(tableModel);
+            table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Configurar tabla para mejor visualización
-        table1.setRowHeight(25);
-        table1.getTableHeader().setReorderingAllowed(false);
+            table1.getColumnModel().getColumn(0).setPreferredWidth(120);
+            table1.getColumnModel().getColumn(1).setPreferredWidth(80);
+            table1.getColumnModel().getColumn(2).setPreferredWidth(80);
+            table1.getColumnModel().getColumn(3).setPreferredWidth(100);
+            table1.getColumnModel().getColumn(4).setPreferredWidth(120);
+        }
 
-        // Deshabilitar botón cambiar estado inicialmente
-        cambiarEstado.setEnabled(false);
+        if (idPacienteLbl != null) {
+            idPacienteLbl.setText("ID Paciente:");
+        }
+
+        if (cambiarEstadoBoton != null) {
+            cambiarEstadoBoton.setText("Cambiar Estado");
+            cambiarEstadoBoton.setEnabled(false);
+        }
     }
 
     private void configurarEventos() {
-        // Botón Buscar
-        buscar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarRecetasPorPaciente();
-            }
-        });
-
-        // Enter en campo de búsqueda
-        idPacienteFld.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                buscarRecetasPorPaciente();
-            }
-        });
-
-        // Botón Cambiar Estado
-        cambiarEstado.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cambiarEstadoReceta();
-            }
-        });
-
-        // Selección en tabla
-        table1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    seleccionarReceta();
+        if (buscar != null) {
+            buscar.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    buscarRecetasPaciente();
                 }
-            }
-        });
-    }
-
-    private void buscarRecetasPorPaciente() {
-        String idPaciente = idPacienteFld.getText().trim();
-
-        if (idPaciente.isEmpty()) {
-            // Si no hay criterio, mostrar recetas disponibles para despacho
-            cargarRecetasDisponibles();
-            return;
+            });
         }
 
-        try {
-            // Buscar recetas del paciente que pueden ser despachadas
-            Lista<Receta> recetasPaciente = controlador.getModelo().obtenerRecetasPorPaciente(idPaciente);
-            Lista<Object> recetasParaDespacho = new Lista<>();
-
-            LocalDate fechaActual = LocalDate.now();
-
-            for (int i = 0; i < recetasPaciente.getTam(); i++) {
-                Receta receta = recetasPaciente.obtenerPorPos(i);
-
-                // Según el PDF: recetas "confeccionadas" con fecha de retiro
-                // para ese día o a lo sumo tres días anteriores o posteriores
-                if (puedeSerDespachada(receta, fechaActual)) {
-                    recetasParaDespacho.agregarFinal(receta);
+        if (cambiarEstadoBoton != null) {
+            cambiarEstadoBoton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cambiarEstadoReceta();
                 }
+            });
+        }
+
+        if (table1 != null) {
+            table1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    if (!e.getValueIsAdjusting()) {
+                        seleccionarReceta();
+                    }
+                }
+            });
+        }
+    }
+
+    private void buscarRecetasPaciente() {
+        try {
+            String idPaciente = txtIdPaciente.getText().trim();
+
+            if (idPaciente.isEmpty()) {
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Ingrese un ID de paciente",
+                        "Advertencia",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
             }
 
-            tableModel.setDatos(recetasParaDespacho);
-
-            if (recetasParaDespacho.getTam() == 0) {
+            if (!controlador.existePaciente(idPaciente)) {
                 JOptionPane.showMessageDialog(panelPrincipal,
-                        "No hay recetas disponibles para despacho para el paciente: " + idPaciente +
-                                "\n(Se muestran solo recetas confeccionadas con fecha de retiro válida)",
-                        "Sin recetas para despachar",
+                        "Paciente no encontrado: " + idPaciente,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                cargarTablaVacia();
+                return;
+            }
+
+            recetasPaciente = controlador.obtenerRecetasPorPaciente(idPaciente);
+
+            if (recetasPaciente.getTam() == 0) {
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "No se encontraron recetas para el paciente: " + idPaciente,
+                        "Información",
                         JOptionPane.INFORMATION_MESSAGE);
+                cargarTablaVacia();
             } else {
+                cargarTablaRecetas();
                 JOptionPane.showMessageDialog(panelPrincipal,
-                        "Se encontraron " + recetasParaDespacho.getTam() +
-                                " receta(s) para despacho del paciente: " + idPaciente,
-                        "Recetas encontradas",
+                        "Se encontraron " + recetasPaciente.getTam() + " receta(s)",
+                        "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
             }
+
+            recetaSeleccionada = null;
+            cambiarEstadoBoton.setEnabled(false);
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(panelPrincipal,
                     "Error al buscar recetas: " + e.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE);
+            cargarTablaVacia();
         }
-    }
-
-    private boolean puedeSerDespachada(Receta receta, LocalDate fechaActual) {
-        // Solo recetas confeccionadas, en proceso, listas pueden ser gestionadas
-        EstadoReceta estado = receta.getEstado();
-        if (estado == EstadoReceta.ENTREGADA) {
-            return false; // Ya entregada, no se puede gestionar
-        }
-
-        // Verificar fecha de retiro (±3 días según PDF)
-        if (receta.getFechaRetiro() != null) {
-            long diferenciaDias = java.time.temporal.ChronoUnit.DAYS.between(
-                    receta.getFechaRetiro(), fechaActual);
-            return Math.abs(diferenciaDias) <= 3;
-        }
-
-        return true; // Si no tiene fecha de retiro, permitir gestión
     }
 
     private void seleccionarReceta() {
-        int filaSeleccionada = table1.getSelectedRow();
-        if (filaSeleccionada >= 0) {
-            try {
-                Object elemento = tableModel.getObjetoEnFila(filaSeleccionada);
-                if (elemento instanceof Receta) {
-                    recetaSeleccionada = (Receta) elemento;
+        try {
+            int filaSeleccionada = table1.getSelectedRow();
 
-                    // Habilitar botón de cambiar estado
-                    cambiarEstado.setEnabled(true);
-                    cambiarEstado.setText("Cambiar a " + obtenerSiguienteEstado(recetaSeleccionada.getEstado()));
+            if (filaSeleccionada >= 0 && filaSeleccionada < recetasPaciente.getTam()) {
+                recetaSeleccionada = recetasPaciente.obtenerPorPos(filaSeleccionada);
+
+                if (cambiarEstadoBoton != null) {
+                    cambiarEstadoBoton.setEnabled(true);
+                    String estadoActual = recetaSeleccionada.getEstado().getDescripcion();
+                    String siguienteEstado = obtenerSiguienteEstado(recetaSeleccionada.getEstado());
+                    cambiarEstadoBoton.setText("Cambiar a: " + siguienteEstado);
                 }
-            } catch (Exception e) {
+
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Receta seleccionada: " + recetaSeleccionada.getNumeroReceta() +
+                                "\nEstado actual: " + recetaSeleccionada.getEstado().getDescripcion(),
+                        "Receta Seleccionada",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
                 recetaSeleccionada = null;
-                cambiarEstado.setEnabled(false);
+                if (cambiarEstadoBoton != null) {
+                    cambiarEstadoBoton.setEnabled(false);
+                    cambiarEstadoBoton.setText("Cambiar Estado");
+                }
             }
-        } else {
-            recetaSeleccionada = null;
-            cambiarEstado.setEnabled(false);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al seleccionar receta: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private String obtenerSiguienteEstado(EstadoReceta estadoActual) {
-        switch (estadoActual) {
-            case CONFECCIONADA:
-                return "En Proceso";
-            case PROCESO:
-                return "Lista";
-            case LISTA:
-                return "Entregada";
-            default:
-                return "Estado";
+    private void cambiarEstadoReceta() {
+        try {
+            if (recetaSeleccionada == null) {
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Seleccione una receta primero",
+                        "Advertencia",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            EstadoReceta estadoActual = recetaSeleccionada.getEstado();
+            EstadoReceta nuevoEstado = obtenerProximoEstado(estadoActual);
+
+            if (nuevoEstado == estadoActual) {
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "La receta ya está en el estado final: " + estadoActual.getDescripcion(),
+                        "Información",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            boolean exito = controlador.cambiarEstadoReceta(recetaSeleccionada.getNumeroReceta(), nuevoEstado);
+
+            if (exito) {
+                recetaSeleccionada.setEstado(nuevoEstado);
+                cargarTablaRecetas();
+
+                String siguienteEstado = obtenerSiguienteEstado(nuevoEstado);
+                cambiarEstadoBoton.setText("Cambiar a: " + siguienteEstado);
+
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "Estado cambiado exitosamente a: " + nuevoEstado.getDescripcion(),
+                        "Éxito",
+                        JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(panelPrincipal,
+                        "No se pudo cambiar el estado de la receta",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al cambiar estado: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private EstadoReceta obtenerSiguienteEstadoEnum(EstadoReceta estadoActual) {
+    private void cargarTablaVacia() {
+        Lista<Object> datosVacios = new Lista<>();
+        tableModel.setDatos(datosVacios);
+
+        recetasPaciente = new Lista<>();
+        recetaSeleccionada = null;
+
+        if (cambiarEstadoBoton != null) {
+            cambiarEstadoBoton.setEnabled(false);
+            cambiarEstadoBoton.setText("Cambiar Estado");
+        }
+    }
+
+    private void cargarTablaRecetas() {
+        try {
+            Lista<Object> datosRecetas = new Lista<>();
+
+            for (int i = 0; i < recetasPaciente.getTam(); i++) {
+                Receta receta = recetasPaciente.obtenerPorPos(i);
+                datosRecetas.agregarFinal(receta);
+            }
+
+            tableModel.setDatos(datosRecetas);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelPrincipal,
+                    "Error al cargar tabla: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            cargarTablaVacia();
+        }
+    }
+
+    private EstadoReceta obtenerProximoEstado(EstadoReceta estadoActual) {
         switch (estadoActual) {
             case CONFECCIONADA:
                 return EstadoReceta.PROCESO;
@@ -203,101 +270,26 @@ public class PanelDespacho {
                 return EstadoReceta.LISTA;
             case LISTA:
                 return EstadoReceta.ENTREGADA;
+            case ENTREGADA:
+                return EstadoReceta.ENTREGADA;
             default:
                 return estadoActual;
         }
     }
 
-    private void cambiarEstadoReceta() {
-        if (recetaSeleccionada == null) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Seleccione una receta de la lista",
-                    "Receta no seleccionada",
-                    JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        try {
-            EstadoReceta estadoActual = recetaSeleccionada.getEstado();
-            EstadoReceta nuevoEstado = obtenerSiguienteEstadoEnum(estadoActual);
-
-            if (estadoActual == nuevoEstado) {
-                JOptionPane.showMessageDialog(panelPrincipal,
-                        "Esta receta ya está en el estado final",
-                        "Sin cambios",
-                        JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-
-            int confirmacion = JOptionPane.showConfirmDialog(
-                    panelPrincipal,
-                    "¿Está seguro de cambiar el estado de la receta " + recetaSeleccionada.getNumeroReceta() +
-                            "\nde '" + estadoActual.getDescripcion() + "' a '" + nuevoEstado.getDescripcion() + "'?",
-                    "Confirmar cambio de estado",
-                    JOptionPane.YES_NO_OPTION
-            );
-
-            if (confirmacion == JOptionPane.YES_OPTION) {
-                if (controlador.cambiarEstadoReceta(recetaSeleccionada.getNumeroReceta(), nuevoEstado)) {
-                    // Actualizar la vista
-                    buscarRecetasPorPaciente();
-                    recetaSeleccionada = null;
-                    cambiarEstado.setEnabled(false);
-                }
-            }
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Error al cambiar estado de receta: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void cargarRecetasDisponibles() {
-        try {
-            // Cargar todas las recetas que pueden ser despachadas (no entregadas)
-            Lista<Receta> todasLasRecetas = controlador.obtenerTodasLasRecetas();
-            Lista<Object> recetasParaDespacho = new Lista<>();
-
-            LocalDate fechaActual = LocalDate.now();
-
-            for (int i = 0; i < todasLasRecetas.getTam(); i++) {
-                Receta receta = todasLasRecetas.obtenerPorPos(i);
-                if (puedeSerDespachada(receta, fechaActual)) {
-                    recetasParaDespacho.agregarFinal(receta);
-                }
-            }
-
-            tableModel.setDatos(recetasParaDespacho);
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(panelPrincipal,
-                    "Error al cargar recetas: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    /**
-     * Obtiene el panel principal para ser añadido a contenedores
-     * @return JPanel principal del formulario
-     */
-    public JPanel getPanel() {
-        return panelPrincipal;
-    }
-
-    /**
-     * Método para refrescar datos desde el exterior
-     */
-    public void refrescarDatos() {
-        cargarRecetasDisponibles();
-        idPacienteFld.setText("");
-        recetaSeleccionada = null;
-        cambiarEstado.setEnabled(false);
+    private String obtenerSiguienteEstado(EstadoReceta estadoActual) {
+        EstadoReceta siguiente = obtenerProximoEstado(estadoActual);
+        return siguiente == estadoActual ? "Final" : siguiente.getDescripcion();
     }
 
     public JPanel getPanelPrincipal() {
         return panelPrincipal;
+    }
+
+    public void refrescarDatos() {
+        cargarTablaVacia();
+        if (txtIdPaciente != null) {
+            txtIdPaciente.setText("");
+        }
     }
 }

@@ -542,4 +542,12 @@ public class ControladorPrincipal {
     public CatalogoMedicamentos obtenerMedicamentos() {
         return modelo.obtenerMedicamentos();
     }
+
+    public boolean existePaciente(String idPaciente) {
+        return modelo.existePaciente(idPaciente);
+    }
+
+    public Lista<Receta> obtenerRecetasPorPaciente(String idPaciente) {
+        return modelo.obtenerRecetasPorPaciente(idPaciente);
+    }
 }
