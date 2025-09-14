@@ -599,4 +599,8 @@ public class ModeloPrincipal extends AbstractModel {
                 tipo == TipoUsuario.FARMACEUTA ||
                 tipo == TipoUsuario.ADMINISTRADOR;
     }
+
+    public boolean existePaciente(String idPaciente) {
+        return gestorCatalogos.buscarPacientePorId(idPaciente) != null;
+    }
 }
