@@ -67,23 +67,14 @@ public class ModeloPrincipal extends AbstractModel {
         return false;
     }
 
-    public boolean cambiarClave(String claveActual, String claveNueva) {
-        if (usuarioActual == null) return false;
-
-        if (!usuarioActual.getClave().equals(claveActual)) {
-            return false;
-        }
-
+    public boolean cambiarClave(String claveActual, String claveNueva, String id) {
         try {
-            usuarioActual.setClave(claveNueva);
-            boolean resultado = gestorCatalogos.cambiarClave(usuarioActual);
-            if (resultado) {
-                marcarComoModificado();
-            }
+            boolean resultado = gestorCatalogos.cambiarClave(claveNueva,id);
             return resultado;
         } catch (CatalogoException e) {
             return false;
         }
+
     }
 
     public void cerrarSesion() {

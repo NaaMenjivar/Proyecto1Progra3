@@ -79,7 +79,7 @@ public class ControladorPrincipal {
         controladorLogin.iniciarLogin();
     }
 
-    public boolean cambiarClave(String claveActual, String claveNueva, String confirmarClave) {
+    public boolean cambiarClave(String claveActual, String claveNueva, String confirmarClave,String id) {
         try {
             if (!claveNueva.equals(confirmarClave)) {
                 mostrarError("Las nuevas claves no coinciden");
@@ -91,7 +91,7 @@ public class ControladorPrincipal {
                 return false;
             }
 
-            if (modelo.cambiarClave(claveActual, claveNueva)) {
+            if (modelo.cambiarClave(claveActual, claveNueva, id)) {
                 mostrarMensaje("La contraseña se cambio exitosamente");
                 return true;
             } else {

@@ -10,6 +10,7 @@ public class ControladorLogin {
     private VentanaLogin ventanaLogin;
     private VentanaClave ventanaClave;
     private ControladorPrincipal controladorPrincipal;
+    private String id;
 
     public ControladorLogin(VentanaLogin ventanaLogin, ControladorPrincipal controladorPrincipal) {
         this.ventanaLogin = ventanaLogin;
@@ -44,6 +45,7 @@ public class ControladorLogin {
     }
 
     public void iniciarVentanaClave(){
+        id = ventanaLogin.getId();
         JFrame frameLogin = (JFrame) SwingUtilities.getWindowAncestor(ventanaLogin.getVentanaLogin());
         frameLogin.setVisible(false);
 
@@ -65,7 +67,7 @@ public class ControladorLogin {
     }
 
     public Boolean cambiarClave(String claveActual,String claveNueva,String confirmarClave){
-        return controladorPrincipal.cambiarClave(claveActual,claveNueva,confirmarClave);
+        return controladorPrincipal.cambiarClave(claveActual,claveNueva,confirmarClave,id);
     }
 
 }

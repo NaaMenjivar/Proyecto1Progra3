@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <CatalogoMedicamentos>
   <Medicamento>
-    <Codigo>02</Codigo>
-    <Nombre>BioTos</Nombre>
-    <Presentacion>Bebible</Presentacion>
-    <Stock>15</Stock>
+    <Codigo>Ty</Codigo>
+    <Nombre>Tylex</Nombre>
+    <Presentacion>Tableta</Presentacion>
+    <Stock>3</Stock>
   </Medicamento>
   <Medicamento>
     <Codigo>01</Codigo>
@@ -13,9 +13,9 @@
     <Stock>2</Stock>
   </Medicamento>
   <Medicamento>
-    <Codigo>Ty</Codigo>
-    <Nombre>Tylex</Nombre>
-    <Presentacion>Tableta</Presentacion>
-    <Stock>3</Stock>
+    <Codigo>02</Codigo>
+    <Nombre>BioTos</Nombre>
+    <Presentacion>Bebible</Presentacion>
+    <Stock>15</Stock>
   </Medicamento>
 </CatalogoMedicamentos>

@@ -24,7 +24,7 @@ public class VentanaClave {
         checkBoton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String claveActual = claveNuevaField.getText();
+                String claveActual = claveActualField.getText();
                 String claveNueva = claveNuevaField.getText();
                 String claveNueva2 = claveNuevaField2.getText();
                 controlador.cambiarClave(claveActual,claveNueva,claveNueva2);

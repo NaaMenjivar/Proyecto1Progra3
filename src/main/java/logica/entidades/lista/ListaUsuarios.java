@@ -93,15 +93,15 @@ public class ListaUsuarios implements Iterable<Usuario> {
         return null ;
     }
 
-    public boolean cambiarClave(Usuario user) throws CatalogoException {
-        if(cabeza == null || user == null){
+    public boolean cambiarClave(String claveNueva, String id) throws CatalogoException {
+        if(cabeza == null || id == null){
             throw new CatalogoException("Usuario Null o Lista de Usuarios Vacia");
         }
 
         Nodo<Usuario> actual = cabeza;
         while(actual.getSiguiente() != null){
-            if(actual.getDato().getId().equals(user.getId())){
-                actual.setDato(user);
+            if(actual.getDato().getId().equals(id)){
+                actual.getDato().setClave(claveNueva);
                 return true;
             }
             actual = actual.getSiguiente();

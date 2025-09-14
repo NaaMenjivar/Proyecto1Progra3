@@ -83,8 +83,8 @@ public class GestorCatalogos {
         return true;
     }
 
-    public boolean cambiarClave(Usuario user) throws CatalogoException {
-        return listaUsuarios.cambiarClave(user);
+    public boolean cambiarClave(String claveNueva, String id) throws CatalogoException {
+        return listaUsuarios.cambiarClave(claveNueva, id);
     }
 
     public Usuario autenticarUsuario(String id, String clave) {

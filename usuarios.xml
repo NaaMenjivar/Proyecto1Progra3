@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Usuarios>
   <Usuario tipo="Farmaceuta">
-    <ID>37637</ID>
-    <Nombre>ABI</Nombre>
-    <Clave>37637</Clave>
+    <ID>farmi</ID>
+    <Nombre>juana</Nombre>
+    <Clave>farmi</Clave>
   </Usuario>
   <Usuario tipo="Administrador">
-    <ID>ADMIN</ID>
-    <Nombre>Administrador</Nombre>
-    <Clave>ADMIN</Clave>
-  </Usuario>
-  <Usuario tipo="Farmaceuta">
-    <ID>FARM001</ID>
-    <Nombre>María Gonzalez</Nombre>
-    <Clave>FARM001</Clave>
+    <ID>admin</ID>
+    <Nombre>Carlos Alvarado</Nombre>
+    <Clave>admin</Clave>
   </Usuario>
   <Usuario tipo="Medico">
     <ID>MED001</ID>
@@ -21,14 +16,19 @@
     <Clave>MED001</Clave>
     <Especialidad>Medicina General</Especialidad>
   </Usuario>
+  <Usuario tipo="Farmaceuta">
+    <ID>FARM001</ID>
+    <Nombre>María Gonzalez</Nombre>
+    <Clave>FARM001</Clave>
+  </Usuario>
   <Usuario tipo="Administrador">
-    <ID>admin</ID>
-    <Nombre>Carlos Alvarado</Nombre>
-    <Clave>admin</Clave>
+    <ID>ADMIN</ID>
+    <Nombre>Administrador</Nombre>
+    <Clave>ADMIN1</Clave>
   </Usuario>
   <Usuario tipo="Farmaceuta">
-    <ID>farmi</ID>
-    <Nombre>juana</Nombre>
-    <Clave>farmi</Clave>
+    <ID>37637</ID>
+    <Nombre>ABI</Nombre>
+    <Clave>37637</Clave>
   </Usuario>
 </Usuarios>
