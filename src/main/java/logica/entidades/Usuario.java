@@ -53,7 +53,6 @@ public abstract class Usuario {
         this.sesionActiva = sesionActiva;
     }
 
-    // Métodos para validar
     public boolean validarCredenciales(String id, String clave){
         return this.id != null && this.clave != null &&
                 this.clave.equals(clave) && this.id.equals(id);
@@ -63,7 +62,6 @@ public abstract class Usuario {
         return this.tipo == tipo;
     }
 
-    // Métodos propios de Object
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -75,11 +73,6 @@ public abstract class Usuario {
         Usuario usuario = (Usuario) o;
         return Objects.equals(id, usuario.id);
     }
-
-    /*@Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }*/
 
     @Override
     public String toString() {

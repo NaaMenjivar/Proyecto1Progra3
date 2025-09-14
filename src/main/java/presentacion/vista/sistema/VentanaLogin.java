@@ -55,7 +55,6 @@ public class VentanaLogin {
         loginIcon.setIcon(ajustarIcono("/Iconos/login.jpg",42,42));
         loginIcon.setText("");
 
-        // Eliminar texto para mostrar solo la imagen
         SALIRButton.setText("");
         ENTRARButton.setText("");
         CAMBIARCLAVEButton.setText("");

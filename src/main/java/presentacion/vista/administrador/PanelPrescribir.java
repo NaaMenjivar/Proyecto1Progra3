@@ -1,18 +1,14 @@
 package presentacion.vista.administrador;
 
-
 import logica.entidades.*;
 import logica.entidades.lista.CatalogoMedicamentos;
 import logica.entidades.lista.Lista;
 import logica.entidades.lista.ListaPacientes;
 import logica.excepciones.CatalogoException;
 import presentacion.controlador.ControladorPrincipal;
-import presentacion.modelo.TableModelPrincipal;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
@@ -306,16 +302,13 @@ public class PanelPrescribir {
                     return;
                 }
 
-                // Validar paciente seleccionado
                 if (actual == null) {
                     JOptionPane.showMessageDialog(dialogDetalles, "Seleccione un paciente antes de agregar medicamentos.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                // Crear DetalleReceta
                 DetalleReceta detalle = new DetalleReceta(medicamento.getCodigo(), cantidad, indicaciones, duracion);
 
-                // Crear Receta
                 String numeroReceta = generarNumeroReceta();
                 String idPaciente = actual.getId();
                 String idMedico = controlador.getModelo().getUsuarioActual().getId();
@@ -464,7 +457,7 @@ public class PanelPrescribir {
                     "Éxito",
                     JOptionPane.INFORMATION_MESSAGE);
 
-            cargarRecetasPorPaciente(actual.getId()); // actualizar tabla
+            cargarRecetasPorPaciente(actual.getId());
         } else {
             JOptionPane.showMessageDialog(panelPrincipal,
                     "No se encontró el medicamento en la receta.",

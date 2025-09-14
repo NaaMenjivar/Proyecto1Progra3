@@ -52,7 +52,6 @@ public class XmlPersisterMedicamentos {
                 root.appendChild(medicamentoElem);
             }
 
-            // Guardar a archivo
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
 
@@ -78,7 +77,7 @@ public class XmlPersisterMedicamentos {
             File file = new File(archivo);
             if (!file.exists()) {
                 System.out.println("El archivo no existe: " + archivo);
-                return catalogo; // retorna catálogo vacío
+                return catalogo;
             }
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

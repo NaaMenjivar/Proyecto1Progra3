@@ -9,7 +9,6 @@ import logica.entidades.lista.Lista;
  */
 public class TableModelPrincipal extends AbstractTableModelPrincipal {
 
-    // Usar constantes en lugar de enum para evitar problemas
     public static final int TIPO_MEDICOS = 1;
     public static final int TIPO_FARMACEUTAS = 2;
     public static final int TIPO_PACIENTES = 3;
@@ -117,10 +116,6 @@ public class TableModelPrincipal extends AbstractTableModelPrincipal {
                 return true;
         }
     }
-
-    // ================================
-    // MÉTODOS ESPECÍFICOS POR TIPO DE OBJETO
-    // ================================
 
     private Object obtenerValorMedico(Object objeto, int columna) {
         if (!(objeto instanceof Medico)) return "";
@@ -241,10 +236,6 @@ public class TableModelPrincipal extends AbstractTableModelPrincipal {
     public static TableModelPrincipal crearModeloDetallesReceta(Lista<Object> datos) {
         return new TableModelPrincipal(TIPO_DETALLES_RECETA, datos);
     }
-
-    // ================================
-    // GETTERS Y SETTERS
-    // ================================
 
     public int getTipoTabla() {
         return tipoTabla;

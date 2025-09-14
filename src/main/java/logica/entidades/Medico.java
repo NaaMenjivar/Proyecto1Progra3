@@ -18,8 +18,6 @@ public class Medico extends Usuario {
     public void setEspecialidad(String especialidad) {
         this.especialidad = especialidad;
     }
-
-    // Métodos específicos
     public boolean puedePrescribir(){
         return true;
     }

@@ -13,11 +13,8 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Panel de Gestión de Medicamentos - Vista MVC
- */
+
 public class PanelGestionMedicamentos {
-    // Componentes del formulario (declarados en el .form)
     private JPanel panelPrincipal;
     private JTextField codigoFld;
     private JTextField nombreFld;
@@ -31,7 +28,6 @@ public class PanelGestionMedicamentos {
     private JButton reporte;
     private JTable list;
 
-    // MVC Components
     private ControladorPrincipal controlador;
     private TableModelPrincipal tableModel;
     private String codigoSeleccionado = null;
@@ -44,24 +40,20 @@ public class PanelGestionMedicamentos {
     }
 
     private void inicializarComponentes() {
-        // Configurar tabla
         tableModel = TableModelPrincipal.crearModeloMedicamentos();
         list.setModel(tableModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Configurar columnas
         list.getColumnModel().getColumn(0).setPreferredWidth(80);  // Código
         list.getColumnModel().getColumn(1).setPreferredWidth(200); // Nombre
         list.getColumnModel().getColumn(2).setPreferredWidth(150); // Presentación
         list.getColumnModel().getColumn(3).setPreferredWidth(80);  // Stock
 
-        // Configurar tabla para mejor visualización
         list.setRowHeight(25);
         list.getTableHeader().setReorderingAllowed(false);
     }
 
     private void configurarEventos() {
-        // Botón Guardar
         guardar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -69,7 +61,6 @@ public class PanelGestionMedicamentos {
             }
         });
 
-        // Botón Limpiar
         limpiar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -77,7 +68,6 @@ public class PanelGestionMedicamentos {
             }
         });
 
-        // Botón Borrar
         borrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -85,7 +75,6 @@ public class PanelGestionMedicamentos {
             }
         });
 
-        // Botón Buscar
         buscar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -93,7 +82,6 @@ public class PanelGestionMedicamentos {
             }
         });
 
-        // Enter en campo de búsqueda
         nombreBusquedaFld.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -101,7 +89,6 @@ public class PanelGestionMedicamentos {
             }
         });
 
-        // Botón Reporte
         reporte.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,7 +96,6 @@ public class PanelGestionMedicamentos {
             }
         });
 
-        // Selección en tabla
         list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {

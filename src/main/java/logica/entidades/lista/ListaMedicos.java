@@ -1,10 +1,6 @@
 package logica.entidades.lista;
 
-import logica.entidades.Farmaceuta;
 import logica.entidades.Medico;
-import logica.entidades.Medicamento;
-import logica.entidades.Medico;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 

@@ -48,4 +48,20 @@
       </Detalle>
     </Detalles>
   </Receta>
+  <Receta>
+    <NumeroReceta>REC-1757880537724</NumeroReceta>
+    <IdPaciente>0001</IdPaciente>
+    <IdMedico>admin</IdMedico>
+    <FechaConfeccion>14/09/2025</FechaConfeccion>
+    <FechaRetiro>14/09/2025</FechaRetiro>
+    <Estado>PROCESO</Estado>
+    <Detalles>
+      <Detalle>
+        <CodigoMedicamento>Ty</CodigoMedicamento>
+        <Cantidad>4</Cantidad>
+        <Indicaciones>dia y noche</Indicaciones>
+        <DuracionDias>6</DuracionDias>
+      </Detalle>
+    </Detalles>
+  </Receta>
 </Recetas>

@@ -1,7 +1,6 @@
 package logica.entidades.lista;
 
 import logica.entidades.Paciente;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 

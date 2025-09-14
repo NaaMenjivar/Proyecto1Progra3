@@ -37,17 +37,14 @@ public class PanelGestionMedicos {
     }
 
     private void inicializarComponentes() {
-        // Configurar tabla
         tableModel = TableModelPrincipal.crearModeloMedicos();
         list.setModel(tableModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Configurar columnas
         list.getColumnModel().getColumn(0).setPreferredWidth(80);  // ID
         list.getColumnModel().getColumn(1).setPreferredWidth(200); // Nombre
         list.getColumnModel().getColumn(2).setPreferredWidth(150); // Especialidad
 
-        // Configurar tabla para mejor visualización
         list.setRowHeight(25);
         list.getTableHeader().setReorderingAllowed(false);
     }

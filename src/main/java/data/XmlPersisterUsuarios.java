@@ -18,28 +18,22 @@ public class XmlPersisterUsuarios {
 
     public static void guardar(ListaUsuarios lista, String rutaArchivo) {
     try {
-        // Crear documento XML
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.newDocument();
 
-        // Nodo raíz
         Element root = doc.createElement("Usuarios");
         doc.appendChild(root);
 
-        // Iterar sobre la ListaUsuarios
         for (Usuario usuario : lista) {
             Element eUsuario = doc.createElement("Usuario");
 
-            // Tipo de usuario
             eUsuario.setAttribute("tipo", usuario.getTipo().toString());
 
-            // Datos comunes
             crearElemento(doc, eUsuario, "ID", usuario.getId());
             crearElemento(doc, eUsuario, "Nombre", usuario.getNombre());
             crearElemento(doc, eUsuario, "Clave", usuario.getClave());
 
-            // Si es médico, guardar especialidad
             if (usuario instanceof Medico) {
                 Medico medico = (Medico) usuario;
                 crearElemento(doc, eUsuario, "Especialidad", medico.getEspecialidad());
@@ -48,7 +42,6 @@ public class XmlPersisterUsuarios {
             root.appendChild(eUsuario);
         }
 
-        // Configuración para salida formateada
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -66,20 +59,16 @@ public class XmlPersisterUsuarios {
     }
 }
 
-/**
- * Carga una ListaUsuarios desde un archivo XML.
- */
     public static ListaUsuarios cargar(String rutaArchivo) {
         ListaUsuarios lista = new ListaUsuarios();
         File archivo = new File(rutaArchivo);
 
         if (!archivo.exists()) {
             System.out.println("Archivo no encontrado: " + rutaArchivo);
-            return lista; // Retorna lista vacía
+            return lista;
         }
 
         try {
-            // Preparar lector XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(archivo);
@@ -92,7 +81,6 @@ public class XmlPersisterUsuarios {
                 if (nodo.getNodeType() == Node.ELEMENT_NODE) {
                     Element eUsuario = (Element) nodo;
 
-                    // Leer atributos y datos
                     String tipo = eUsuario.getAttribute("tipo");
                     String id = eUsuario.getElementsByTagName("ID").item(0).getTextContent();
                     String nombre = eUsuario.getElementsByTagName("Nombre").item(0).getTextContent();
@@ -110,7 +98,6 @@ public class XmlPersisterUsuarios {
                         lista.agregarUsuario(farmaceuta);
 
                     } else if ("ADMINISTRADOR".equalsIgnoreCase(tipo)) {
-                        // Aquí asumo que tienes una clase Administrador que hereda de Usuario
                         Administrador admin = new Administrador(id, nombre);
                         admin.setClave(clave);
                         lista.agregarUsuario(admin);

@@ -3,9 +3,6 @@ package presentacion.vista.administrador;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Panel Acerca De - Vista Administrador
- */
 public class PanelAcercaDe {
     private JPanel panelPrincipal;
 
@@ -17,7 +14,6 @@ public class PanelAcercaDe {
         panelPrincipal = new JPanel(new BorderLayout());
         panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Panel superior con título
         JPanel panelTitulo = new JPanel(new BorderLayout());
 
         JLabel lblTitulo = new JLabel("Prescripción y despacho de recetas", SwingConstants.CENTER);
@@ -30,29 +26,24 @@ public class PanelAcercaDe {
         panelTitulo.add(lblTitulo, BorderLayout.NORTH);
         panelTitulo.add(lblContacto, BorderLayout.SOUTH);
 
-        // Panel central con imagen
         JPanel panelImagen = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         try {
-            // Intentar cargar imagen del hospital
             ImageIcon iconoHospital = new ImageIcon(getClass().getResource("/Iconos/hospital.jpg"));
             if (iconoHospital.getIconWidth() > 0) {
                 JLabel lblImagen = new JLabel(iconoHospital);
                 panelImagen.add(lblImagen);
             } else {
-                // Imagen alternativa si no se encuentra
                 JLabel lblImagenAlt = new JLabel("🏥", SwingConstants.CENTER);
                 lblImagenAlt.setFont(new Font("Arial Unicode MS", Font.PLAIN, 120));
                 panelImagen.add(lblImagenAlt);
             }
         } catch (Exception e) {
-            // Imagen alternativa si hay error
             JLabel lblImagenAlt = new JLabel("🏥", SwingConstants.CENTER);
             lblImagenAlt.setFont(new Font("Arial Unicode MS", Font.PLAIN, 120));
             panelImagen.add(lblImagenAlt);
         }
 
-        // Panel inferior con información del sistema
         JPanel panelInfo = new JPanel(new GridLayout(4, 1, 5, 5));
         panelInfo.setBorder(BorderFactory.createTitledBorder("Información del Sistema"));
 
@@ -62,7 +53,6 @@ public class PanelAcercaDe {
         panelInfo.add(lblVersion);
         panelInfo.add(lblFecha);
 
-        // Agregar todo al panel principal
         panelPrincipal.add(panelTitulo, BorderLayout.NORTH);
         panelPrincipal.add(panelImagen, BorderLayout.CENTER);
         panelPrincipal.add(panelInfo, BorderLayout.SOUTH);
@@ -71,11 +61,6 @@ public class PanelAcercaDe {
     public JPanel getPanel() {
         return panelPrincipal;
     }
-
-    public void refrescarDatos() {
-        // No hay datos dinámicos que refrescar en este panel
-    }
-
     public JPanel getPanelPrincipal() {
         return panelPrincipal;
     }

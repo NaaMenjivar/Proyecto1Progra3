@@ -43,7 +43,6 @@ public class DetalleReceta {
         this.duracionDias = duracionDias;
     }
 
-    // Métodos específicos
     public boolean esValidoPrescripcion(){
         return codigoMedicamento != null && !codigoMedicamento.trim().isEmpty() &&
                 cantidad > 0 && duracionDias > 0 &&
@@ -66,11 +65,8 @@ public class DetalleReceta {
         return Objects.equals(codigoMedicamento, that.codigoMedicamento);
     }
 
-
     @Override
     public String toString() {
         return codigoMedicamento + " - " + getCantidadTexto() + " por " + getDuracionTexto();
     }
-
-
 }

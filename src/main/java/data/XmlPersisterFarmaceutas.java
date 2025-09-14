@@ -20,16 +20,13 @@ public class XmlPersisterFarmaceutas {
 
     public static void guardar(ListaFarmaceutas listaFarmaceutas, String archivo) {
         try {
-            // Crear documento XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.newDocument();
 
-            // Nodo raíz
             Element rootElement = doc.createElement("Farmaceutas");
             doc.appendChild(rootElement);
 
-            // Recorrer la lista y crear nodos
             for (Farmaceuta farmaceuta : listaFarmaceutas) {
                 Element farmaceutaElement = doc.createElement("Farmaceuta");
 
@@ -40,7 +37,6 @@ public class XmlPersisterFarmaceutas {
                 rootElement.appendChild(farmaceutaElement);
             }
 
-            // Guardar en archivo físico
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); // Formato bonito
@@ -65,7 +61,6 @@ public class XmlPersisterFarmaceutas {
                 return lista;
             }
 
-            // Leer archivo XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(file);
@@ -73,7 +68,6 @@ public class XmlPersisterFarmaceutas {
 
             NodeList listaNodos = doc.getElementsByTagName("Farmaceuta");
 
-            // Recorrer los elementos <Farmaceuta>
             for (int i = 0; i < listaNodos.getLength(); i++) {
                 Node nodo = listaNodos.item(i);
 

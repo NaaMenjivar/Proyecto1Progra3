@@ -70,7 +70,6 @@ public class Receta {
         return detalles;
     }
 
-    // Gestión de detalles
     public void agregarDetalle(DetalleReceta detalle){
         detalles.agregarFinal(detalle);
     }
@@ -99,7 +98,6 @@ public class Receta {
         return detalles.getTam();
     }
 
-    // Métodos de librerías
     public boolean puedeSerDespachada(LocalDate fecha){
         if (estado != EstadoReceta.CONFECCIONADA){
             return false;
@@ -117,7 +115,7 @@ public class Receta {
             case LISTA:
                 return nuevoEstado == EstadoReceta.ENTREGADA;
             case ENTREGADA:
-                return false; // No puede cambiar una vez entregada
+                return false;
             default:
                 return false;
         }

@@ -18,21 +18,15 @@ import java.io.File;
 
 public class XmlPersisterMedicos {
 
-    /**
-     * Guarda un catálogo de médicos en un archivo XML
-     */
     public static void guardar(ListaMedicos catalogo, String archivo) {
         try {
-            // Crear documento XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.newDocument();
 
-            // Nodo raíz
             Element rootElement = doc.createElement("Medicos");
             doc.appendChild(rootElement);
 
-            // Recorrer catálogo y crear nodos
             for (Medico medico : catalogo) {
                 Element medicoElement = doc.createElement("Medico");
 
@@ -44,7 +38,6 @@ public class XmlPersisterMedicos {
                 rootElement.appendChild(medicoElement);
             }
 
-            // Guardar en archivo
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes"); // formato bonito
@@ -57,9 +50,6 @@ public class XmlPersisterMedicos {
         }
     }
 
-    /**
-     * Carga médicos desde el XML y retorna un CatalogoMedicos
-     */
     public static ListaMedicos cargar(String archivo) {
         ListaMedicos catalogo = new ListaMedicos();
 
@@ -70,7 +60,6 @@ public class XmlPersisterMedicos {
                 return catalogo;
             }
 
-            // Leer XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(file);
@@ -79,7 +68,6 @@ public class XmlPersisterMedicos {
 
             NodeList listaMedicos = doc.getElementsByTagName("Medico");
 
-            // Recorrer nodos <Medico>
             for (int i = 0; i < listaMedicos.getLength(); i++) {
                 Node nodo = listaMedicos.item(i);
 
@@ -92,7 +80,7 @@ public class XmlPersisterMedicos {
                     String especialidad = elemento.getElementsByTagName("Especialidad").item(0).getTextContent();
 
                     Medico medico = new Medico(id, nombre, especialidad);
-                    medico.setClave(clave); // asignar clave
+                    medico.setClave(clave);
 
                     catalogo.agregarMedico(medico);
                 }
@@ -107,9 +95,6 @@ public class XmlPersisterMedicos {
         return catalogo;
     }
 
-    /**
-     * Método auxiliar para crear nodos XML
-     */
     private static void crearElemento(Document doc, Element parent, String tagName, String valor) {
         Element elem = doc.createElement(tagName);
         elem.appendChild(doc.createTextNode(valor != null ? valor : ""));

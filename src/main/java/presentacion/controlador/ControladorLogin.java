@@ -1,7 +1,5 @@
 package presentacion.controlador;
 
-import logica.entidades.Usuario;
-import presentacion.modelo.ModeloLogin;
 import presentacion.vista.sistema.VentanaClave;
 import presentacion.vista.sistema.VentanaLogin;
 
@@ -41,11 +39,9 @@ public class ControladorLogin {
     public void cerrarLogin(){
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(ventanaLogin.getVentanaLogin());
         if(frame != null){
-            frame.dispose(); //cierra
+            frame.dispose();
         }
     }
-
-    //Ventana Clave
 
     public void iniciarVentanaClave(){
         JFrame frameLogin = (JFrame) SwingUtilities.getWindowAncestor(ventanaLogin.getVentanaLogin());

@@ -11,19 +11,13 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Panel Histórico para todos los usuarios - Vista MVC
- * Permite visualizar recetas a MÉDICOS, FARMACEUTAS y ADMINISTRADORES
- */
 public class PanelHistorico {
-    // Componentes del formulario (declarados en el .form)
     private JPanel panelPrincipal;
     private JTextField numFld;
     private JButton buscar;
     private JTable list;
     private JTextArea detalles;
 
-    // MVC Components
     private ControladorPrincipal controlador;
     private TableModelPrincipal tableModel;
     private Receta recetaSeleccionada = null;
@@ -36,26 +30,22 @@ public class PanelHistorico {
     }
 
     private void inicializarComponentes() {
-        // Configurar tabla de recetas
         tableModel = TableModelPrincipal.crearModeloRecetas();
         list.setModel(tableModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Configurar columnas
         list.getColumnModel().getColumn(0).setPreferredWidth(100); // Número
         list.getColumnModel().getColumn(1).setPreferredWidth(80);  // ID Paciente
         list.getColumnModel().getColumn(2).setPreferredWidth(80);  // ID Médico
         list.getColumnModel().getColumn(3).setPreferredWidth(120); // Fecha Confección
         list.getColumnModel().getColumn(4).setPreferredWidth(80);  // Estado
 
-        // Configurar área de detalles
         detalles.setEditable(false);
         detalles.setWrapStyleWord(true);
         detalles.setLineWrap(true);
     }
 
     private void configurarEventos() {
-        // Evento de selección en tabla
         list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -65,7 +55,6 @@ public class PanelHistorico {
             }
         });
 
-        // Evento del botón buscar
         buscar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -73,7 +62,6 @@ public class PanelHistorico {
             }
         });
 
-        // Buscar al presionar Enter en el campo
         numFld.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -84,7 +72,6 @@ public class PanelHistorico {
 
     private void cargarTodasLasRecetas() {
         try {
-            // Verificar que el usuario tiene permisos
             Usuario usuarioActual = controlador.getModelo().getUsuarioActual();
 
             if (usuarioActual == null) {
@@ -92,7 +79,6 @@ public class PanelHistorico {
                 return;
             }
 
-            // Verificar permisos - MÉDICOS, FARMACEUTAS y ADMINISTRADORES pueden ver histórico
             TipoUsuario tipoUsuario = usuarioActual.getTipo();
             if (tipoUsuario != TipoUsuario.MEDICO &&
                     tipoUsuario != TipoUsuario.FARMACEUTA &&
@@ -101,18 +87,15 @@ public class PanelHistorico {
                 return;
             }
 
-            // Obtener todas las recetas según el tipo de usuario
             Lista<Receta> recetas = obtenerRecetasSegunPermisos(usuarioActual);
 
             if (recetas == null || recetas.getTam() == 0) {
-                // No mostrar error si no hay recetas, solo limpiar la tabla
                 Lista<Object> datosVacios = new Lista<>();
                 tableModel.setDatos(datosVacios);
                 detalles.setText("No hay recetas para mostrar.");
                 return;
             }
 
-            // Convertir a lista de Object para el modelo de tabla
             Lista<Object> datosRecetas = new Lista<>();
             for (int i = 0; i < recetas.getTam(); i++) {
                 datosRecetas.agregarFinal(recetas.obtenerPorPos(i));
@@ -132,11 +115,9 @@ public class PanelHistorico {
             switch (usuario.getTipo()) {
                 case ADMINISTRADOR:
                 case FARMACEUTA:
-                    // Administradores y farmaceutas pueden ver TODAS las recetas
                     return controlador.getModelo().obtenerTodasLasRecetas();
 
                 case MEDICO:
-                    // Médicos solo pueden ver sus propias recetas
                     return controlador.getModelo().obtenerRecetasPorMedico(usuario.getId());
 
                 default:
@@ -144,7 +125,7 @@ public class PanelHistorico {
             }
         } catch (Exception e) {
             System.err.println("Error al obtener recetas según permisos: " + e.getMessage());
-            return new Lista<>(); // Retornar lista vacía en caso de error
+            return new Lista<>();
         }
     }
 
@@ -152,7 +133,6 @@ public class PanelHistorico {
         int filaSeleccionada = list.getSelectedRow();
         if (filaSeleccionada >= 0) {
             try {
-                // Obtener la receta seleccionada del modelo
                 recetaSeleccionada = (Receta) tableModel.getDatos().obtenerPorPos(filaSeleccionada);
                 mostrarDetallesReceta(recetaSeleccionada);
             } catch (Exception e) {
@@ -179,7 +159,6 @@ public class PanelHistorico {
         detallesTexto.append("Fecha de Retiro: ").append(receta.getFechaRetiro()).append("\n");
         detallesTexto.append("Estado: ").append(receta.getEstado()).append("\n\n");
 
-        // Mostrar medicamentos de la receta
         if (receta.getDetalles() != null && receta.getDetalles().getTam() > 0) {
             detallesTexto.append("=== MEDICAMENTOS PRESCRITOS ===\n\n");
 
@@ -195,14 +174,13 @@ public class PanelHistorico {
         }
 
         detalles.setText(detallesTexto.toString());
-        detalles.setCaretPosition(0); // Scroll al inicio
+        detalles.setCaretPosition(0);
     }
 
     private void buscarRecetas() {
         String numeroReceta = numFld.getText().trim();
 
         if (numeroReceta.isEmpty()) {
-            // Si el campo está vacío, mostrar todas las recetas
             cargarTodasLasRecetas();
             return;
         }
@@ -214,7 +192,6 @@ public class PanelHistorico {
                 return;
             }
 
-            // Buscar receta específica
             Lista<Receta> todasLasRecetas = obtenerRecetasSegunPermisos(usuarioActual);
             Lista<Object> recetasFiltradas = new Lista<>();
 
@@ -242,40 +219,23 @@ public class PanelHistorico {
         JOptionPane.showMessageDialog(panelPrincipal, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    // ================================
-    // MÉTODOS REQUERIDOS PARA LA INTEGRACIÓN
-    // ================================
-
-    /**
-     * Retorna el panel principal para ser integrado en VentanaPrincipal
-     */
     public JPanel getPanelPrincipal() {
         return panelPrincipal;
     }
-
-    /**
-     * Refresca los datos del panel cuando se selecciona la pestaña
-     */
     public void refrescarDatos() {
-        // Limpiar selección actual
         list.clearSelection();
         recetaSeleccionada = null;
         numFld.setText("");
         detalles.setText("");
 
-        // Recargar todas las recetas
         cargarTodasLasRecetas();
     }
-
-    // Método para limpiar campos (útil para el controlador)
     public void limpiarCampos() {
         numFld.setText("");
         detalles.setText("");
         list.clearSelection();
         recetaSeleccionada = null;
     }
-
-    // Método para obtener la receta seleccionada (útil para el controlador)
     public Receta getRecetaSeleccionada() {
         return recetaSeleccionada;
     }

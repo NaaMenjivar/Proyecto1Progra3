@@ -7,14 +7,12 @@ import logica.entidades.DetalleReceta;
 import logica.entidades.EstadoReceta;
 import logica.entidades.lista.Lista;
 import logica.entidades.lista.CatalogoMedicamentos;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -467,10 +465,6 @@ public class PanelDashboard {
         actualizarGraficos();
     }
 
-    // ================================
-    // MÉTODOS AUXILIARES
-    // ================================
-
     private Medicamento buscarMedicamentoPorNombre(String nombre) {
         try {
             CatalogoMedicamentos catalogo = controlador.obtenerMedicamentos();
@@ -487,7 +481,6 @@ public class PanelDashboard {
     }
 
     private String[] obtenerRangoMeses() {
-        // Valores por defecto
         String anioDesde = "2025";
         String anioHasta = "2025";
         String mesDesde = "01";
@@ -541,7 +534,6 @@ public class PanelDashboard {
             }
 
         } catch (Exception e) {
-            // En caso de error, retornar rango básico
             mesesRango.agregarFinal("2025-01");
             mesesRango.agregarFinal("2025-02");
             mesesRango.agregarFinal("2025-03");

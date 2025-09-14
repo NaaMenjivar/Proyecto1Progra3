@@ -17,21 +17,15 @@ import java.time.format.DateTimeFormatter;
 public class XmlPersisterPacientes {
     private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    /**
-     * Guarda la lista de pacientes en un archivo XML.
-     */
     public static void guardar(ListaPacientes lista, String rutaArchivo) {
         try {
-            // Crear el documento XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.newDocument();
 
-            // Nodo raíz
             Element root = doc.createElement("Pacientes");
             doc.appendChild(root);
 
-            // Iterar sobre la lista y agregar cada paciente
             for (Paciente paciente : lista) {
                 Element ePaciente = doc.createElement("Paciente");
 
@@ -43,7 +37,6 @@ public class XmlPersisterPacientes {
                 root.appendChild(ePaciente);
             }
 
-            // Escribir el XML al archivo
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -61,9 +54,6 @@ public class XmlPersisterPacientes {
         }
     }
 
-    /**
-     * Carga la lista de pacientes desde un archivo XML.
-     */
     public static ListaPacientes cargar(String rutaArchivo) {
         ListaPacientes lista = new ListaPacientes();
         File archivo = new File(rutaArchivo);
@@ -74,7 +64,6 @@ public class XmlPersisterPacientes {
         }
 
         try {
-            // Preparar lector XML
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(archivo);
@@ -82,7 +71,6 @@ public class XmlPersisterPacientes {
 
             NodeList pacientesNodes = doc.getElementsByTagName("Paciente");
 
-            // Iterar nodos <Paciente>
             for (int i = 0; i < pacientesNodes.getLength(); i++) {
                 Node nodo = pacientesNodes.item(i);
                 if (nodo.getNodeType() == Node.ELEMENT_NODE) {
@@ -109,9 +97,6 @@ public class XmlPersisterPacientes {
         return lista;
     }
 
-    /**
-     * Método de ayuda para crear elementos XML con texto.
-     */
     private static void crearElemento(Document doc, Element padre, String nombre, String valor) {
         Element elemento = doc.createElement(nombre);
         elemento.appendChild(doc.createTextNode(valor));

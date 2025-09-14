@@ -15,11 +15,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
-/**
- * Panel de Gestión de Pacientes - Vista MVC
- */
 public class PanelGestionPacientes {
-    // Componentes del formulario (declarados en el .form)
     private JPanel panelPrincipal;
     private JTextField idFld;
     private JTextField nombreFld;
@@ -33,7 +29,6 @@ public class PanelGestionPacientes {
     private JButton reporte;
     private JTable list;
 
-    // MVC Components
     private ControladorPrincipal controlador;
     private TableModelPrincipal tableModel;
     private boolean modoEdicion = false;
@@ -47,29 +42,24 @@ public class PanelGestionPacientes {
     }
 
     private void inicializarComponentes() {
-        // Configurar tabla
         tableModel = TableModelPrincipal.crearModeloPacientes();
         list.setModel(tableModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Configurar columnas
         list.getColumnModel().getColumn(0).setPreferredWidth(80);  // ID
         list.getColumnModel().getColumn(1).setPreferredWidth(200); // Nombre
         list.getColumnModel().getColumn(2).setPreferredWidth(120); // Fecha Nacimiento
         list.getColumnModel().getColumn(3).setPreferredWidth(100); // Teléfono
 
-        // Configurar tabla para mejor visualización
         list.setRowHeight(25);
         list.getTableHeader().setReorderingAllowed(false);
 
-        // Configurar spinner de fecha
         fechaNacimientoFld.setModel(new SpinnerDateModel());
         JSpinner.DateEditor dateEditor = new JSpinner.DateEditor(fechaNacimientoFld, "dd/MM/yyyy");
         fechaNacimientoFld.setEditor(dateEditor);
     }
 
     private void configurarEventos() {
-        // Botón Guardar
         guardar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -77,7 +67,6 @@ public class PanelGestionPacientes {
             }
         });
 
-        // Botón Limpiar
         limpiar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -85,7 +74,6 @@ public class PanelGestionPacientes {
             }
         });
 
-        // Botón Borrar
         borrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -93,7 +81,6 @@ public class PanelGestionPacientes {
             }
         });
 
-        // Botón Buscar
         buscar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -101,7 +88,6 @@ public class PanelGestionPacientes {
             }
         });
 
-        // Enter en campo de búsqueda
         nombreBusquedaFld.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,7 +95,6 @@ public class PanelGestionPacientes {
             }
         });
 
-        // Botón Reporte
         reporte.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -117,7 +102,6 @@ public class PanelGestionPacientes {
             }
         });
 
-        // Selección en tabla
         list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -142,14 +126,13 @@ public class PanelGestionPacientes {
                 return;
             }
 
-            // Obtener fecha de nacimiento del spinner
             Date fechaDate = (Date) fechaNacimientoFld.getValue();
             LocalDate fechaNacimiento = fechaDate.toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate();
 
             if (modoEdicion) {
-                // TODO: Implementar actualización cuando esté disponible en el controlador
+
                 JOptionPane.showMessageDialog(panelPrincipal,
                         "Funcionalidad de edición en desarrollo",
                         "En desarrollo",
@@ -231,7 +214,6 @@ public class PanelGestionPacientes {
                     nombreFld.setText(paciente.getNombre());
                     telefonoFld.setText(paciente.getTelefono());
 
-                    // Convertir LocalDate a Date para el spinner
                     if (paciente.getFechaNacimiento() != null) {
                         Date fecha = Date.from(paciente.getFechaNacimiento()
                                 .atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -241,7 +223,6 @@ public class PanelGestionPacientes {
                     idSeleccionado = paciente.getId();
                     modoEdicion = true;
 
-                    // Deshabilitar campo ID en modo edición
                     idFld.setEnabled(false);
                 }
             } catch (Exception e) {
@@ -309,23 +290,13 @@ public class PanelGestionPacientes {
     private void cargarDatos() {
         cargarTodosPacientes();
     }
-
-    /**
-     * Obtiene el panel principal para ser añadido a contenedores
-     * @return JPanel principal del formulario
-     */
     public JPanel getPanel() {
         return panelPrincipal;
     }
-
-    /**
-     * Método para refrescar datos desde el exterior
-     */
     public void refrescarDatos() {
         cargarTodosPacientes();
         limpiarCampos();
     }
-
     public JPanel getPanelPrincipal() {
         return panelPrincipal;
     }

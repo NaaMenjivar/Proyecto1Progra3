@@ -101,10 +101,9 @@ public class Lista<T> implements Iterable<T>{
 
     public boolean eliminarPorId(String id) {
         if (cabeza == null) {
-            return false; // lista vacía
+            return false;
         }
 
-        // Caso especial: el primero es el que hay que eliminar
         if (cabeza.getDato() instanceof Usuario) {
             Usuario u = (Usuario) cabeza.getDato();
             if (u.getId().equals(id)) {
@@ -120,14 +119,14 @@ public class Lista<T> implements Iterable<T>{
                 Usuario u = (Usuario) actual.getSiguiente().getDato();
                 if (u.getId().equals(id)) {
                     actual.setSiguiente(actual.getSiguiente().getSiguiente());
-                    tam--; // actualizar tamaño
+                    tam--;
                     return true;
                 }
             }
             actual = actual.getSiguiente();
         }
 
-        return false; // no se encontró
+        return false;
     }
 
     public DetalleReceta[] toArrayDetalleReceta() {
@@ -211,23 +210,23 @@ public class Lista<T> implements Iterable<T>{
             if (temp.getDato() instanceof Usuario) {
                 Usuario u = (Usuario) temp.getDato();
                 if (u.getId().equals(id)) {
-                    temp.setDato(nuevoUsuario); // reemplaza el usuario encontrado
-                    return true; // actualización exitosa
+                    temp.setDato(nuevoUsuario);
+                    return true;
                 }
             }
             temp = temp.getSiguiente();
         }
-        return false; // no se encontró el id
+        return false;
     }
 
     public String mostrarBajoStock(int umbral) {
         StringBuilder sb = new StringBuilder();
-        Nodo<T> actual = cabeza; // tipo genérico T
+        Nodo<T> actual = cabeza;
         boolean hayBajoStock = false;
 
         while (actual != null) {
             if (actual.getDato() instanceof Medicamento) {
-                Medicamento med = (Medicamento) actual.getDato(); // cast seguro
+                Medicamento med = (Medicamento) actual.getDato();
                 if (med.getStock() <= umbral) {
                     sb.append(med.getCodigoYNombre())
                             .append(" - Stock: ")
@@ -250,7 +249,7 @@ public class Lista<T> implements Iterable<T>{
     }
 
     public T obtenerPorPos(int i) {
-        if (i < 0 || i >= tam || cabeza == null) { // validamos índice y lista vacía
+        if (i < 0 || i >= tam || cabeza == null) {
             return null;
         }
 
@@ -262,12 +261,10 @@ public class Lista<T> implements Iterable<T>{
     }
 
     public boolean modificarPorPos(int i, T detalle) {
-        // Validaciones básicas
         if (i < 0 || i >= tam || detalle == null) {
             return false;
         }
 
-        // Si quieres validar que sea un DetalleReceta válido
         if (detalle instanceof DetalleReceta) {
             DetalleReceta dr = (DetalleReceta) detalle;
             if (!dr.esValidoPrescripcion()) {

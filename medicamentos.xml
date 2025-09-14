@@ -12,4 +12,10 @@
     <Presentacion>Tableta</Presentacion>
     <Stock>2</Stock>
   </Medicamento>
+  <Medicamento>
+    <Codigo>Ty</Codigo>
+    <Nombre>Tylex</Nombre>
+    <Presentacion>Tableta</Presentacion>
+    <Stock>3</Stock>
+  </Medicamento>
 </CatalogoMedicamentos>

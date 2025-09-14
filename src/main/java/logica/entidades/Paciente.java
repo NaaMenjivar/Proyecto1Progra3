@@ -8,7 +8,7 @@ import java.util.Objects;
 public class Paciente {
     private String id;
     private String nombre;
-    private LocalDate fechaNacimiento;  // Cambiado a LocalDate
+    private LocalDate fechaNacimiento;
     private String telefono;
 
     public Paciente(){
@@ -21,7 +21,6 @@ public class Paciente {
         this.telefono = telefono;
     }
 
-    // Getters y Setters
     public String getId() {
         return id;
     }
@@ -47,7 +46,6 @@ public class Paciente {
         this.telefono = telefono;
     }
 
-    // Métodos de conveniencia
     public String getFechaNacimientoTexto() {
         if(fechaNacimiento == null) {
             return "No especificada";

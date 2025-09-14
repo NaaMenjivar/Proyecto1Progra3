@@ -25,7 +25,6 @@ public class ControladorPrincipal {
     private void inicializarSistema() {
         try {
             modelo = new ModeloPrincipal();
-            //System.out.println(modelo.generarReporteCompleto()); aqui se cae con un null en actual xd
             controladorLogin = new ControladorLogin(new VentanaLogin(),this);
             controladorLogin.iniciarLogin();
 
@@ -82,13 +81,11 @@ public class ControladorPrincipal {
 
     public boolean cambiarClave(String claveActual, String claveNueva, String confirmarClave) {
         try {
-            // Validar que las claves nuevas coincidan
             if (!claveNueva.equals(confirmarClave)) {
                 mostrarError("Las nuevas claves no coinciden");
                 return false;
             }
 
-            // Validar longitud mínima
             if (claveNueva.length() < 3) {
                 mostrarError("La nueva clave debe tener al menos 3 caracteres");
                 return false;
@@ -107,17 +104,8 @@ public class ControladorPrincipal {
         }
     }
 
-    // ================================
-    // GESTIÓN DE MÉDICOS
-    // ================================
-
     public boolean agregarMedico(String id, String nombre, String especialidad) {
         try {
-            /*if (!modelo.puedeGestionarCatalogos()) {
-                mostrarError("No tiene permisos para gestionar médicos");
-                return false;
-            }*/
-
             if (modelo.agregarMedico(id, nombre, especialidad)) {
                 mostrarMensaje("Médico agregado exitosamente");
                 return true;
@@ -229,10 +217,6 @@ public class ControladorPrincipal {
             return false;
         }
     }
-
-    // ================================
-    // GESTIÓN DE FARMACEUTAS
-    // ================================
 
     public boolean agregarFarmaceuta(String id, String nombre) {
         try {

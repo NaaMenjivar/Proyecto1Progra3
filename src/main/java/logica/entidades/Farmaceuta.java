@@ -5,12 +5,10 @@ public class Farmaceuta extends Usuario {
         super();
         this.tipo = TipoUsuario.FARMACEUTA;
     }
-
     public Farmaceuta(String id, String nombre) {
         super(id, nombre, id, TipoUsuario.FARMACEUTA);
     }
 
-    // Métodos específicos
     public boolean puedeDespachar() {
         return true;
     }

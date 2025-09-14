@@ -53,7 +53,6 @@ public class XmlPersisterRecetas {
                 root.appendChild(eReceta);
             }
 
-            // Guardar en archivo
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -111,7 +110,6 @@ public class XmlPersisterRecetas {
                     receta.setFechaConfeccion(fechaConfeccion);
                     receta.setEstado(estado);
 
-                    // Cargar detalles
                     NodeList detallesNodes = ((Element) eReceta.getElementsByTagName("Detalles").item(0)).getElementsByTagName("Detalle");
                     for (int j = 0; j < detallesNodes.getLength(); j++) {
                         Element eDetalle = (Element) detallesNodes.item(j);

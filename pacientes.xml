@@ -6,4 +6,10 @@
     <FechaNacimiento>23/09/2006</FechaNacimiento>
     <Telefono>88383</Telefono>
   </Paciente>
+  <Paciente>
+    <ID>0001</ID>
+    <Nombre>Ignacio</Nombre>
+    <FechaNacimiento>14/09/2025</FechaNacimiento>
+    <Telefono>9838394</Telefono>
+  </Paciente>
 </Pacientes>

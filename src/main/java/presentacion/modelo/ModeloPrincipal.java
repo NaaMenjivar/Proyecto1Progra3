@@ -39,7 +39,6 @@ public class ModeloPrincipal extends AbstractModel {
         usuarioActual = null;
         pacienteSeleccionado = null;
         recetaActual = null;
-        // No limpiamos gestorCatalogos porque perdería todos los datos
         marcarComoModificado();
     }
 
@@ -171,15 +170,11 @@ public class ModeloPrincipal extends AbstractModel {
         return gestorCatalogos.buscarMedicosPorNombre(nombre);
     }
 
-    // ================================
-    // GESTIÓN DE FARMACEUTAS
-    // ================================
-
     public boolean agregarFarmaceuta(String id, String nombre) {
         if (!antesDeModificar()) return false;
 
         try {
-            Farmaceuta farmaceuta = new Farmaceuta(id, nombre); // clave = id inicialmente
+            Farmaceuta farmaceuta = new Farmaceuta(id, nombre);
             boolean resultado = gestorCatalogos.agregarFarmaceuta(farmaceuta);
             if (resultado) {
                 despuesDeModificar();
@@ -197,10 +192,6 @@ public class ModeloPrincipal extends AbstractModel {
     public ListaFarmaceutas obtenerFarmaceutas() {
         return gestorCatalogos.buscarFarmaceutas();
     }
-
-    // ================================
-    // GESTIÓN DE PACIENTES
-    // ================================
 
     public boolean agregarPaciente(String id, String nombre, LocalDate fechaNacimiento, String telefono) {
         if (!antesDeModificar()) return false;
@@ -234,9 +225,6 @@ public class ModeloPrincipal extends AbstractModel {
         return pacienteSeleccionado;
     }
 
-    // ================================
-    // GESTIÓN DE MEDICAMENTOS
-    // ================================
 
     public boolean agregarMedicamento(String codigo, String nombre, String presentacion, int stock) {
         if (!antesDeModificar()) return false;
@@ -262,9 +250,6 @@ public class ModeloPrincipal extends AbstractModel {
         return gestorCatalogos.buscarMedicamentosPorDescripcion(descripcion);
     }
 
-    // ================================
-    // GESTIÓN DE RECETAS
-    // ================================
 
     public void agregarReceta(Receta receta) throws CatalogoException {
         gestorCatalogos.agregarReceta(receta);
@@ -300,7 +285,7 @@ public class ModeloPrincipal extends AbstractModel {
         try {
             boolean resultado = gestorCatalogos.agregarReceta(recetaActual);
             if (resultado) {
-                recetaActual = null; // Limpiar receta actual
+                recetaActual = null;
                 marcarComoModificado();
             }
             return resultado;
@@ -336,10 +321,6 @@ public class ModeloPrincipal extends AbstractModel {
             return false;
         }
     }
-
-    // ================================
-    // NUEVOS MÉTODOS PARA HISTÓRICO MVC
-    // ================================
 
 
     public Lista<Receta> buscarRecetasPorMedicoYNumero(String idMedico, String numeroReceta) {
@@ -393,14 +374,12 @@ public class ModeloPrincipal extends AbstractModel {
         StringBuilder sb = new StringBuilder();
 
         try {
-            // Información de la receta
             sb.append("=== INFORMACIÓN DE LA RECETA ===\n");
             sb.append("Número: ").append(receta.getNumeroReceta()).append("\n");
             sb.append("Fecha de Confección: ").append(receta.getFechaConfeccion()).append("\n");
             sb.append("Fecha de Retiro: ").append(receta.getFechaRetiro()).append("\n");
             sb.append("Estado: ").append(receta.getEstado().getDescripcion()).append("\n");
 
-            // Información del paciente
             sb.append("\n=== INFORMACIÓN DEL PACIENTE ===\n");
             Paciente paciente = buscarPacientePorId(receta.getIdPaciente());
             if (paciente != null) {
@@ -412,7 +391,6 @@ public class ModeloPrincipal extends AbstractModel {
                 sb.append("(Información del paciente no encontrada)\n");
             }
 
-            // Información del médico
             sb.append("\n=== INFORMACIÓN DEL MÉDICO ===\n");
             Medico medico = buscarMedicoPorId(receta.getIdMedico());
             if (medico != null) {
@@ -424,7 +402,6 @@ public class ModeloPrincipal extends AbstractModel {
                 sb.append("(Información del médico no encontrada)\n");
             }
 
-            // Detalles de medicamentos
             sb.append("\n=== MEDICAMENTOS PRESCRITOS ===\n");
             Lista<DetalleReceta> detalles = receta.getDetalles();
             if (detalles != null && detalles.getTam() > 0) {
@@ -455,10 +432,6 @@ public class ModeloPrincipal extends AbstractModel {
         return sb.toString();
     }
 
-    // ================================
-    // MÉTODOS DE BÚSQUEDA AUXILIARES
-    // ================================
-
     private Paciente buscarPacientePorId(String id) {
         return gestorCatalogos.buscarPacientePorId(id);
     }
@@ -471,9 +444,6 @@ public class ModeloPrincipal extends AbstractModel {
         return gestorCatalogos.buscarMedicamentoPorCodigo(codigo);
     }
 
-    // ================================
-    // VALIDACIONES DE PERMISOS
-    // ================================
 
     public boolean puedeGestionarCatalogos() {
         return usuarioActual != null &&
@@ -490,9 +460,6 @@ public class ModeloPrincipal extends AbstractModel {
                 usuarioActual.getTipo() == TipoUsuario.FARMACEUTA;
     }
 
-    // ================================
-    // MÉTODOS DE UTILIDAD
-    // ================================
 
     private void crearDatosPrueba() {
         try {
@@ -517,7 +484,6 @@ public class ModeloPrincipal extends AbstractModel {
     }
 
     private String generarNumeroReceta() {
-        // Generar número único basado en timestamp
         return "REC" + System.currentTimeMillis();
     }
 
@@ -525,12 +491,8 @@ public class ModeloPrincipal extends AbstractModel {
         return gestorCatalogos.generarReporteGeneral();
     }
 
-    /**
-     * Obtiene todas las recetas del sistema (solo para ADMINISTRADORES y FARMACEUTAS)
-     */
     public Lista<Receta> obtenerTodasLasRecetas() {
         try {
-            // Verificar permisos
             if (usuarioActual == null) {
                 throw new SecurityException("Usuario no autenticado");
             }
@@ -547,18 +509,12 @@ public class ModeloPrincipal extends AbstractModel {
             return new Lista<>();
         }
     }
-
-    /**
-     * Obtiene las recetas de un médico específico
-     */
     public Lista<Receta> obtenerRecetasPorMedico(String idMedico) {
         try {
-            // Verificar permisos
             if (usuarioActual == null) {
                 throw new SecurityException("Usuario no autenticado");
             }
 
-            // Los médicos solo pueden ver sus propias recetas
             if (usuarioActual.getTipo() == TipoUsuario.MEDICO &&
                     !usuarioActual.getId().equals(idMedico)) {
                 throw new SecurityException("Los médicos solo pueden ver sus propias recetas");
@@ -572,9 +528,6 @@ public class ModeloPrincipal extends AbstractModel {
         }
     }
 
-    /**
-     * Busca una receta por su número
-     */
     public Receta buscarRecetaPorNumero(String numeroReceta) {
         try {
             if (usuarioActual == null) {

@@ -5,10 +5,6 @@ import logica.entidades.*;
 import logica.entidades.lista.*;
 import logica.excepciones.CatalogoException;
 
-/**
- * Gestor único para todos los catálogos del sistema
- * Basado en tu implementación existente pero completado
- */
 public class GestorCatalogos {
     private ListaMedicos listaMedicos;
     private ListaFarmaceutas listaFarmaceutas;
@@ -16,7 +12,7 @@ public class GestorCatalogos {
     private ListaUsuarios listaUsuarios;
 
     private CatalogoMedicamentos medicamentos;
-    private Lista<Receta> recetas; // Para prescripciones y despacho
+    private Lista<Receta> recetas;
 
     public GestorCatalogos() {
         this.listaMedicos = new ListaMedicos();
@@ -45,10 +41,6 @@ public class GestorCatalogos {
         recetas = XmlPersisterRecetas.cargar("recetas.xml");
     }
 
-    // ================================
-    // GESTIÓN DE USUARIOS (MÉDICOS)
-    // ================================
-
     public boolean agregarMedico(Medico medico) throws CatalogoException {
         if (medico == null) {
             throw new CatalogoException("Médico no puede ser null");
@@ -62,7 +54,6 @@ public class GestorCatalogos {
             throw new CatalogoException("Ya existe un usuario con el ID: " + medico.getId());
         }
 
-        // Establecer clave igual al ID por defecto
         medico.setClave(medico.getId());
         listaMedicos.agregarMedico(medico);
         listaUsuarios.agregarUsuario(medico);
@@ -140,10 +131,6 @@ public class GestorCatalogos {
         return listaMedicos.eliminarMedico(id);
     }
 
-    // ================================
-    // GESTIÓN DE PACIENTES
-    // ================================
-
     public boolean agregarPaciente(Paciente paciente) throws CatalogoException {
         if (paciente == null) {
             throw new CatalogoException("Paciente no puede ser null");
@@ -180,10 +167,6 @@ public class GestorCatalogos {
     public Paciente buscarPacientesPorNombre(String nombre) {
         return listaPacientes.buscarPacienteNombre(nombre);
     }
-
-    // ================================
-    // GESTIÓN DE MEDICAMENTOS
-    // ================================
 
     public boolean agregarMedicamento(Medicamento medicamento) throws CatalogoException {
         if (medicamento == null) {
@@ -233,10 +216,6 @@ public class GestorCatalogos {
     public CatalogoMedicamentos obtenerMedicamentosBajoStock(int umbral) {
         return medicamentos.medicamentosBajoStock(umbral);
     }
-
-    // ================================
-    // GESTIÓN DE RECETAS (Prescripción y Despacho)
-    // ================================
 
     public Lista<Receta> obtenerTodasRecetas() {
         return recetas;
@@ -332,10 +311,6 @@ public class GestorCatalogos {
         return sb.toString();
     }
 
-    // ================================
-    // MÉTODOS DE UTILIDAD Y VALIDACIÓN
-    // ================================
-
     private boolean esValidoMedico(Medico medico) {
         return medico.getId() != null && !medico.getId().trim().isEmpty() &&
                 medico.getNombre() != null && !medico.getNombre().trim().isEmpty() &&
@@ -359,16 +334,10 @@ public class GestorCatalogos {
         return medicamentos.buscarMedicamentoCodigo(codigo) != null;
     }
 
-    /**
-     * Obtiene todas las recetas del sistema
-     */
     public Lista<Receta> obtenerTodasLasRecetas() {
         return recetas; // Retorna la lista completa de recetas
     }
 
-    /**
-     * Obtiene las recetas de un médico específico
-     */
     public Lista<Receta> obtenerRecetasPorMedico(String idMedico) {
         Lista<Receta> recetasMedico = new Lista<>();
 
@@ -382,9 +351,6 @@ public class GestorCatalogos {
         return recetasMedico;
     }
 
-    /**
-     * Busca una receta por su número
-     */
     public Receta buscarRecetaPorNumero(String numeroReceta) {
         for (int i = 0; i < recetas.getTam(); i++) {
             Receta receta = recetas.obtenerPorPos(i);
@@ -395,9 +361,6 @@ public class GestorCatalogos {
         return null;
     }
 
-    /**
-     * Obtiene recetas por estado
-     */
     public Lista<Receta> obtenerRecetasPorEstado(String estado) {
         Lista<Receta> recetasPorEstado = new Lista<>();
 

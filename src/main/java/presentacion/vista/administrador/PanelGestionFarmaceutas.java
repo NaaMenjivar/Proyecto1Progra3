@@ -12,11 +12,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Panel de Gestión de Farmaceutas - Vista MVC
- */
 public class PanelGestionFarmaceutas {
-    // Componentes del formulario (declarados en el .form)
     private JPanel panelPrincipal;
     private JTextField idFld;
     private JTextField nombreFld;
@@ -28,7 +24,6 @@ public class PanelGestionFarmaceutas {
     private JButton reporte;
     private JTable list;
 
-    // MVC Components
     private ControladorPrincipal controlador;
     private TableModelPrincipal tableModel;
     private boolean modoEdicion = false;
@@ -42,22 +37,18 @@ public class PanelGestionFarmaceutas {
     }
 
     private void inicializarComponentes() {
-        // Configurar tabla
         tableModel = TableModelPrincipal.crearModeloFarmaceutas();
         list.setModel(tableModel);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Configurar columnas
         list.getColumnModel().getColumn(0).setPreferredWidth(80);  // ID
         list.getColumnModel().getColumn(1).setPreferredWidth(200); // Nombre
 
-        // Configurar tabla para mejor visualización
         list.setRowHeight(25);
         list.getTableHeader().setReorderingAllowed(false);
     }
 
     private void configurarEventos() {
-        // Botón Guardar
         guardar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -65,7 +56,6 @@ public class PanelGestionFarmaceutas {
             }
         });
 
-        // Botón Limpiar
         limpiar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -73,7 +63,6 @@ public class PanelGestionFarmaceutas {
             }
         });
 
-        // Botón Borrar
         borrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -81,7 +70,6 @@ public class PanelGestionFarmaceutas {
             }
         });
 
-        // Botón Buscar
         buscar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -89,7 +77,6 @@ public class PanelGestionFarmaceutas {
             }
         });
 
-        // Enter en campo de búsqueda
         nombreBusquedaFld.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -97,7 +84,6 @@ public class PanelGestionFarmaceutas {
             }
         });
 
-        // Botón Reporte
         reporte.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -105,7 +91,6 @@ public class PanelGestionFarmaceutas {
             }
         });
 
-        // Selección en tabla
         list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -130,7 +115,6 @@ public class PanelGestionFarmaceutas {
             }
 
             if (modoEdicion) {
-                // TODO: Implementar actualización cuando esté disponible en el controlador
                 JOptionPane.showMessageDialog(panelPrincipal,
                         "Funcionalidad de edición en desarrollo",
                         "En desarrollo",
@@ -212,7 +196,6 @@ public class PanelGestionFarmaceutas {
                     idSeleccionado = farmaceuta.getId();
                     modoEdicion = true;
 
-                    // Deshabilitar campo ID en modo edición
                     idFld.setEnabled(false);
                 }
             } catch (Exception e) {
