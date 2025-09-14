@@ -138,4 +138,15 @@ public class CatalogoMedicamentos implements Iterable<Medicamento> {
     }
 
     public int getTam(){return tam;}
+
+    public Medicamento get(int m) {
+        if (m < 0 || m >= tam) {
+            throw new IndexOutOfBoundsException("Índice fuera de rango");
+        }
+        Nodo<Medicamento> actual = cabeza;
+        for (int i = 0; i < m; i++) {
+            actual = actual.getSiguiente();
+        }
+        return actual.getDato();
+    }
 }

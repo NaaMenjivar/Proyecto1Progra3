@@ -534,4 +534,12 @@ public class ControladorPrincipal {
             System.exit(0);
         }
     }
+
+    public Lista<Receta> obtenerTodasRecetas() {
+        return modelo.obtenerTodasLasRecetas();
+    }
+
+    public CatalogoMedicamentos obtenerMedicamentos() {
+        return modelo.obtenerMedicamentos();
+    }
 }
